@@ -4,7 +4,7 @@ import numpy as np
 
 from epics import caget, caput
 
-def ccdtake(camera = None, dwelltime=0.2, colormap="gray", limits = (None, None), ff = None, df = None):
+def ccdtake(dwelltime=0.2, colormap="gray", limits = (None, None), ff = None, df = None, camera = None):
 #
 #   script: ccdtake(dwelltime, colormap, limits, ff)
 #   By default dwell time = 0.2 s, colormap = jet and limits are min & max, no flat field correction
