@@ -8,7 +8,7 @@ condenser_y = PV('32idcTXM:mxv:c1:m1.VAL')
 pin_hole_x = PV('32idcTXM:xps:c1:m3.VAL')
 zone_plate_y = PV('32idcTXM:xps:c0:m5.VAL')
 
-# IN
+# IN test
 #beam_monitor_x.put(0, wait=True)
 #beam_monitor_y.put(0, wait=True)
 
