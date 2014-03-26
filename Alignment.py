@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 #import Image
 import numpy as np
 from epics import caget, caput
+# import process_variables
 
 
 # Alignement of the BPM:
