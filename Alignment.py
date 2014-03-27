@@ -1,30 +1,22 @@
-# Alignment.py
+# -*- coding: utf-8 -*-
 
-# library importation:
+import process_variables as pv
 import matplotlib.pyplot as plt
-#import Image
 import numpy as np
-from epics import caget, caput
-# import process_variables
+from scipy import interpolate
 
-
-# Alignement of the BPM:
-def Align_BPM(X_Range, Y_Range, steps, dwell_time, camera = None):
-    from scipy import interpolate
-
-    # PV declaration:
-    if camera == None:
-        PV_Prefix = 'TXMNeo1:'
-    PV_beam_monitor_X = '32idcTXM:nf:c0:m1.VAL'
-    PV_beam_monitor_Y = '32idcTXM:nf:c0:m2.VAL'
-    PV_dwelltime = PV_Prefix + 'cam1:AcquireTime'
-    PV_trigger = PV_Prefix + 'cam1:Acquire'
-    PV_acqmode = PV_Prefix + 'cam1:ImageMode'
-    PV_nRow_CCD = PV_Prefix + 'cam1:SizeY'
-    PV_nCol_CCD = PV_Prefix + 'cam1:SizeX'
-    PV_image = PV_Prefix + 'image1:ArrayData'
-
-
+def Align_BPM(X_Range, Y_Range, steps, dwell_time):
+    """
+    Align_BPM
+    
+    Parameters
+    ----------
+    X-range : float
+    Y_range : float
+    step : float
+    dwell_time: float
+    """
+    
     # Work on a ROI
     ROI=0
 
@@ -33,136 +25,171 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time, camera = None):
     ROI_pixV = [620, 1900]
     ROI_pixH = [1300, 1500]
     ROI_pixV = [800, 1000]
-    nVPix = caget(PV_nRow_CCD)
-    nHPix = caget(PV_nCol_CCD)
-#   nHPix = 2560    # CCD parameter
-#   nVPix = 2160    # CCD parameter
+    nVPix = pv.ccd_image_rows.get()
+    nHPix = pv.ccd_image_columns.get()
+    print nVPix, nHPix
+
     image_size = nVPix * nHPix
-#   if ROI:
-#   Mat3D = np.zeros((steps, (ROI_pixV[1]-ROI_pixV[0]), (ROI_pixH[1]-ROI_pixH[0])), np.int16)
-#   else:
-    Mat3D_X = np.zeros((steps, nVPix, nHPix), np.int16) # initialize the 3D matrix
-    Mat3D_Y = Mat3D_X
+    #if ROI:
+        #Mat3D = np.zeros((steps, (ROI_pixV[1]-ROI_pixV[0]), (ROI_pixH[1]-ROI_pixH[0])), np.int16)
+    #else:
+    # Initialize the 3D matrix
+    mat_3d_x = np.zeros((steps, nVPix, nHPix), np.int16) 
+    mat_3d_y = mat_3d_x
 
-    curr_BPMY_pos = caget(PV_beam_monitor_Y)                    # get the current focus position
-    vect_pos_Y = np.linspace(curr_BPMY_pos - Y_Range/2, curr_BPMY_pos + Y_Range/2, steps)   # define the vector containing angles
-#    delta_step_Y = abs(vect_pos_Y[1] - vect_pos_Y[0])                       # get the delta angle
-    Intensity_Y = np.arange(0,np.size(vect_pos_Y),1)
+    # Get the current focus position
+    curr_BPMY_pos = pv.beam_monitor_y.get()
 
-    curr_BPMX_pos = caget(PV_beam_monitor_X)                    # get the current focus position
-    vect_pos_X = np.linspace(curr_BPMX_pos - X_Range/2, curr_BPMX_pos + X_Range/2, steps)   # define the vector containing angles
-#    delta_step_X = abs(vect_pos_X[1] - vect_pos_X[0])                       # get the delta angle
-    Intensity_X = np.arange(0,np.size(vect_pos_X),1)
+    # Define the vector containing angles
+    vect_pos_y = np.linspace(curr_BPMY_pos - Y_Range/2, curr_BPMY_pos + Y_Range/2, steps)
 
+    # get the delta angle
+#    delta_step_Y = abs(vect_pos_y[1] - vect_pos_y[0])                       
+    intensity_y = np.arange(0,np.size(vect_pos_y),1)
 
+    # Det the current focus position
+    curr_BPMX_pos = pv.beam_monitor_x.get() 
 
-    caput(PV_dwelltime, dwell_time)
-    caput(PV_acqmode, 0) # CCD mode switched to fixed
+    # Define the vector containing angles
+    vect_pos_x = np.linspace(curr_BPMX_pos - X_Range/2, curr_BPMX_pos + X_Range/2, steps)
 
+    # Get the delta angle
+    #delta_step_X = abs(vect_pos_x[1] - vect_pos_x[0])                       
+    intensity_x = np.arange(0,np.size(vect_pos_x),1)
+
+    pv.ccd_dwell_time.put(dwell_time)  
+
+    # CCD mode switched to fixed
+    pv.ccd_acquire_mode.put(0) 
 
     ######################################
     # start the Y BPM scan
-    caput(PV_beam_monitor_Y, vect_pos_Y[0]) # move the BPM to the Y starting point
-    print '*** Y BPM scan tarting position: ',(vect_pos_Y[0])
+
+    # move the BPM to the Y starting point
+    pv.beam_monitor_y.put(vect_pos_y[0], wait=True)
+    print '*** Y BPM scan tarting position: ',(vect_pos_y[0])
 
     for iLoop in range(0, steps):
-        print '*** Step #%i / %i' % (iLoop+1, np.size(vect_pos_Y))
-        print '    Motor pos: ',vect_pos_Y[iLoop]
-        caput(PV_beam_monitor_Y, vect_pos_Y[iLoop], wait=True, timeout=500) #
-        caput(PV_trigger, 1, wait=True, timeout=500)                # trigger the CCD
+        print '*** Step %i/%i' % (iLoop+1, np.size(vect_pos_y))
+        print '    Motor pos: ',vect_pos_y[iLoop]
+        pv.beam_monitor_y.put(vect_pos_y[iLoop], wait=True, timeout=500)
 
-        # get the image still in memory
-        Img_vect = caget(PV_image)
-        Img_vect = Img_vect[0:image_size]
-        Img_tmp = np.reshape(Img_vect,[nVPix, nHPix])
+        # Trigger the CCD
+        pv.ccd_trigger.put(1, wait=True, timeout=500)
 
-        Mat3D_Y[iLoop,:,:] = Img_tmp            # store the image in Mat3D
+        # Get the image still in memory
+        img_vect = pv.ccd_image.get()
+        img_vect = img_vect[0:image_size]
+        img_tmp = np.reshape(img_vect,[nVPix, nHPix])
+
+        # Store the image in Mat3D
+        mat_3d_y[iLoop,:,:] = img_tmp            
 
         if ROI:
 #           Im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
-            Im = Mat3D_Y[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
+            Im = mat_3d_y[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
         else:
-            Im = Mat3D_Y[iLoop,:,:]
+            Im = mat_3d_y[iLoop,:,:]
 
-#        Intensity_Y[iLoop] = np.sum(Im) # store the intensity
-        tmp = np.sum(Im) # store the intensity
-        tmp(np.where(tmp<250)) = 0
+        intensity_y[iLoop] = np.sum(Im) # store the intensity
+
+        # Store the intensity
+        tmp = np.sum(Im)
+        print tmp
         
-        print 'intensity: ', Intensity_Y[iLoop]
-
-#       plt.imshow(Img_tmp), plt.set_cmap('gray'), plt.colorbar()
-#       plt.set_title('Image #%i, focus:%f' % (iLoop, vect_pos_Y(iLoop)))
+        # Not sure what this is for:
+        #tmp[np.where(tmp < 250)] = 0
+        
+        print 'Intensity: ', intensity_y[iLoop]
+        #plt.imshow(img_tmp), plt.set_cmap('gray'), plt.colorbar()
+        #plt.set_title('Image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
 
     # Interpolate the minimum value
-    f = interpolate.interp1d(vect_pos_Y, Intensity_Y, kind='cubic')
-    vect_pos_Y_int = np.linspace(vect_pos_Y[0], vect_pos_Y[-1], 50)
-    Intensity_Y_int = f(vect_pos_Y_int)
+    f = interpolate.interp1d(vect_pos_y, intensity_y, kind='cubic')
+    vect_pos_y_int = np.linspace(vect_pos_y[0], vect_pos_y[-1], 50)
+    intensity_y_int = f(vect_pos_y_int)
 
-#    get the motor position with the max intensity:
-    Index_max_Intensity = np.where(Intensity_Y==max(Intensity_Y))
+    # Get the motor position with the max intensity:
+    index_max_intensity = np.where(intensity_y==max(intensity_y))
 
-    print '*** Best Y position at ', vect_pos_Y_int[Index_max_Intensity]
+    print '*** Best Y position at ', vect_pos_y_int[index_max_intensity]
 
-    plt.plot(vect_pos_Y, Intensity_Y, 'go', vect_pos_Y_int, Intensity_Y_int, 'r-'), plt.grid()
-    plt.plot(vect_pos_Y_int[Index_max_Intensity], max(Intensity_Y_int), 'b*')
+    plt.plot(vect_pos_y, intensity_y, 'go', vect_pos_y_int, intensity_y_int, 'r-'), plt.grid()
+    plt.plot(vect_pos_y_int[index_max_intensity], max(intensity_y_int), 'b*')
     plt.title('Standard deviation for different Y BPM positions')
     plt.show()
 
     # Move to the optimum Y position:
-    caput(PV_beam_monitor_Y, vect_pos_Y_int[Index_max_Intensity], wait=True, timeout=500)
-    caput(PV_trigger, 1, wait=True, timeout=500) # make a last snapshot
- 
+    pv.beam_monitor_y.put(vect_pos_y_int[index_max_intensity], wait=True, timeout=500)
+
+    # Make a last snapshot
+    pv.ccd_trigger.put(1, wait=True, timeout=500) 
+
 
     ######################################
-    # start the X BPM scan
-    caput(PV_beam_monitor_X, vect_pos_X[0]) # move the BPM to the X starting point
-    print ' '; print '*** X BPM scan tarting position: ',(vect_pos_X[0])
+    # Start the X BPM scan
+
+    # Move the BPM to the X starting point
+    pv.beam_monitor_x.put(vect_pos_x[0], wait=True)
+    print '*** X BPM scan tarting position: ',(vect_pos_x[0])
 
     for iLoop in range(0, steps):
-        print '*** Step #%i / %i' % (iLoop+1, np.size(vect_pos_X))
-        print '    Motor pos: ',vect_pos_X[iLoop]
-        caput(PV_beam_monitor_X, vect_pos_X[iLoop], wait=True, timeout=500) #
-        caput(PV_trigger, 1, wait=True, timeout=500)                # trigger the CCD
+        print '*** Step %i/%i' % (iLoop+1, np.size(vect_pos_x))
+        print '    Motor pos: ',vect_pos_x[iLoop]
+        pv.beam_monitor_x.put(vect_pos_x[iLoop], wait=True, timeout=500)
 
-        # get the image still in memory
-        Img_vect = caget(PV_image)
-        Img_vect = Img_vect[0:image_size]
-        Img_tmp = np.reshape(Img_vect,[nVPix, nHPix])
+        # Trigger the CCD
+        pv.ccd_trigger.put(1, wait=True, timeout=500)
 
-        Mat3D_X[iLoop,:,:] = Img_tmp            # store the image in Mat3D
+        # gGet the image still in memory
+        img_vect = pv.ccd_image.get()
+        img_vect = img_vect[0:image_size]
+        img_tmp = np.reshape(img_vect,[nVPix, nHPix])
+
+        # Store the image in Mat3D
+        mat_3d_x[iLoop,:,:] = img_tmp            
 
         if ROI:
-    #       Im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
-            Im = Mat3D_X[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
+#           Im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
+            Im = mat_3d_x[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
         else:
-            Im = Mat3D_X[iLoop,:,:]
+            Im = mat_3d_x[iLoop,:,:]
 
-        Intensity_X[iLoop] = np.sum(Im) # store the intensity
-        print 'intensity: ', Intensity_X[iLoop]
+        intensity_x[iLoop] = np.sum(Im) # store the intensity
 
-    #       plt.imshow(Img_tmp), plt.set_cmap('gray'), plt.colorbar()
-    #       plt.set_title('Image #%i, focus:%f' % (iLoop, vect_pos_Y(iLoop)))
+        # Store the intensity
+        tmp = np.sum(Im)
+        print tmp
+        
+        # not sure what this is for:
+        #tmp[np.where(tmp < 250)] = 0
+        
+        print 'Intensity: ', intensity_x[iLoop]
+        #plt.imshow(img_tmp), plt.set_cmap('gray'), plt.colorbar()
+        #plt.set_title('Image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
 
     # Interpolate the minimum value
-    f = interpolate.interp1d(vect_pos_X, Intensity_X, kind='cubic')
-    vect_pos_X_int = np.linspace(vect_pos_X[0], vect_pos_X[-1], 50)
-    Intensity_X_int = f(vect_pos_X_int)
+    f = interpolate.interp1d(vect_pos_x, intensity_x, kind='cubic')
+    vect_pos_x_int = np.linspace(vect_pos_x[0], vect_pos_x[-1], 50)
+    intensity_x_int = f(vect_pos_x_int)
 
     # Get the motor position with the max intensity:
-    Index_max_Intensity = np.where(Intensity_X==max(Intensity_X))
+    index_max_intensity = np.where(intensity_x==max(intensity_x))
 
-    print '*** Best X position at ', vect_pos_X_int[Index_max_Intensity]
+    print '*** Best X position at ', vect_pos_x_int[index_max_intensity]
 
-    plt.plot(vect_pos_X, Intensity_X, 'go', vect_pos_X_int, Intensity_X_int, 'r-'), plt.grid()
-    plt.plot(vect_pos_X_int[Index_max_Intensity], max(Intensity_X_int), 'b*')
+    plt.plot(vect_pos_x, intensity_x, 'go', vect_pos_x_int, intensity_x_int, 'r-'), plt.grid()
+    plt.plot(vect_pos_x_int[index_max_intensity], max(intensity_x_int), 'b*')
     plt.title('Standard deviation for different X BPM positions')
     plt.show()
 
     # Move to the optimum X position:
-    caput(PV_beam_monitor_X, vect_pos_X_int[Index_max_Intensity], wait=True, timeout=500)
-    caput(PV_trigger, 1, wait=True, timeout=500) # make a last snapshot
+    pv.beam_monitor_x.put(vect_pos_x_int[index_max_intensity], wait=True, timeout=500)
 
-    return Mat3D_Y, Intensity_Y_int, vect_pos_Y, vect_pos_X_int, Mat3D_X, Intensity_X_int, vect_pos_X, vect_pos_X_int
+    # Make a last snapshot
+    pv.ccd_trigger.put(1, wait=True, timeout=500)
+
+    return mat_3d_y, intensity_y_int, vect_pos_y, vect_pos_x_int, mat_3d_x, intensity_x_int, vect_pos_x, vect_pos_x_int
 
 #import matplotlib.pylab as plt
 #plt.ion()
@@ -187,4 +214,5 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time, camera = None):
 # execfile("file name",global_vars,local_vars)
 
 
-
+if __name__ == "__main__":
+    Align_BPM(3, 3, 5, 1)
