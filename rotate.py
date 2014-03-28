@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-#import tomopy.tools.multiprocess_shared as mp
+from scipy.ndimage.interpolation import rotate
 
 # --------------------------------------------------------------------
 
-def rotate(args):
+def rotate(data, data_white, data_dark, angle):
     """
     rotate raw projection data 
 
@@ -33,41 +33,13 @@ def rotate(args):
 
     data_dark : ndarray
         rotated data_dark.
-        
-    Examples
-    --------
-    - Rotate by 0.5 deg:
-        
-        >>> import tomopy
-        >>> 
-        >>> # Load sinogram
-        >>> myfile = 'demo/data.h5'
-        >>> data, white, dark, theta = tomopy.xtomo_reader(myfile)
-        >>> 
-        >>> # Construct tomo object
-        >>> d = tomopy.xtomo_dataset(log='error')
-        >>> d.dataset(data, white, dark, theta)
-        >>> 
-        >>> # Perform rotation
-        >>> d.rotate(0.5)
-        >>> 
-        >>> # Save sinogram after rotation
-        >>> output_file='tmp/after_rotation_'
-        >>> tomopy.xtomo_writer(d.data, output_file)
-        >>> print "Images are succesfully saved at " + output_file + '...'
     """
-    # Arguments passed by multi-processing wrapper
-    ind, dshape, inputs = args
-    
-    # Function inputs
-    data = mp.tonumpyarray(mp.shared_arr, dshape) # shared-array
-    data_dark = mp.tonumpyarray(mp.shared_arr, dshape) # shared-array
-    data_white = mp.tonumpyarray(mp.shared_arr, dshape) # shared-array
-    angle = inputs
     
     for m in range(self.data.shape[0]):
-        self.data[m, :, :] = ndimage.rotate(self.data[m, :, :], angle, reshape=False)
+        data[m, :, :] = ndimage.rotate(data[m, :, :], angle, reshape=False)
     for m in range(self.data_dark.shape[0]):
-        self.data_dark[m, :, :] = ndimage.rotate(self.data_dark[m, :, :], angle, reshape=False)
+        data_dark[m, :, :] = ndimage.rotate(data_dark[m, :, :], angle, reshape=False)
     for m in range(self.data_white.shape[0]):
-        self.data_white[m, :, :] = ndimage.rotate(self.data_white[m, :, :], angle, reshape=False)
+        data_white[m, :, :] = ndimage.rotate(data_white[m, :, :], angle, reshape=False)
+        
+    return data, data_white, data_dark
