@@ -48,10 +48,10 @@ def rotate(args):
         >>> d = tomopy.xtomo_dataset(log='error')
         >>> d.dataset(data, white, dark, theta)
         >>> 
-        >>> # Perform normalization
+        >>> # Perform rotation
         >>> d.rotate(0.5)
         >>> 
-        >>> # Save sinogram after normalization
+        >>> # Save sinogram after rotation
         >>> output_file='tmp/after_rotation_'
         >>> tomopy.xtomo_writer(d.data, output_file)
         >>> print "Images are succesfully saved at " + output_file + '...'
