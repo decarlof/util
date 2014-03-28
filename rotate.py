@@ -68,6 +68,6 @@ def rotate(args):
     for m in range(self.data.shape[0]):
         self.data[m, :, :] = ndimage.rotate(self.data[m, :, :], angle, reshape=False)
     for m in range(self.data_dark.shape[0]):
-        self.data[m, :, :] = ndimage.rotate(self.data_dark[m, :, :], angle, reshape=False)
+        self.data_dark[m, :, :] = ndimage.rotate(self.data_dark[m, :, :], angle, reshape=False)
     for m in range(self.data_white.shape[0]):
-        self.data[m, :, :] = ndimage.rotate(self.data_white[m, :, :], angle, reshape=False)
+        self.data_white[m, :, :] = ndimage.rotate(self.data_white[m, :, :], angle, reshape=False)
