@@ -4,6 +4,7 @@ import process_variables as pv
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interpolate
+from epics import PV
 
 def Align_BPM(X_Range, Y_Range, steps, dwell_time):
     """
