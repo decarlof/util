@@ -58,6 +58,9 @@ ccd_camera_objective = PV('32idcTXM:xps:c2:m2.VAL')
 ccd_camera_x = PV('32idcTXM:mxv:c1:m3.VAL')
 ccd_camera_y = PV('32idcTXM:mxv:c1:m4.VAL')
 ccd_camera_z = PV('32idcTXM:mxv:c0:m2.VAL')
+# focus motor not working uder epics yet
+# for test purposes I am using the pin_hole_x PV
+ccd_focus = PV('32idcTXM:xps:c1:m3.VAL')
 
 ccd_trigger = PV('TXMNeo1:cam1:Acquire')
 ccd_dwell_time = PV('TXMNeo1:cam1:AcquireTime')

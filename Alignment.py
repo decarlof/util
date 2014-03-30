@@ -4,18 +4,17 @@ import process_variables as pv
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interpolate
-from epics import PV
 
-def Align_BPM(X_Range, Y_Range, steps, dwell_time):
+def align_bpm(x_range, y_range, steps, dwell_time):
     """
-    Align_BPM
+    align_bpm
     
     Parameters
     ----------
-    X-range : float
+    X_range : float
     Y_range : float
-    step : float
-    dwell_time: float
+    steps: number of steps inside the scanned range
+    dwell_time: dwell time for the CCD acquisition
     """
     
     # Work on a ROI
@@ -42,7 +41,7 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
     curr_BPMY_pos = pv.beam_monitor_y.get()
 
     # Define the vector containing angles
-    vect_pos_y = np.linspace(curr_BPMY_pos - Y_Range/2, curr_BPMY_pos + Y_Range/2, steps)
+    vect_pos_y = np.linspace(curr_BPMY_pos - y_range/2, curr_BPMY_pos + y_range/2, steps)
 
     # get the delta angle
 #    delta_step_Y = abs(vect_pos_y[1] - vect_pos_y[0])                       
@@ -52,7 +51,7 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
     curr_BPMX_pos = pv.beam_monitor_x.get() 
 
     # Define the vector containing angles
-    vect_pos_x = np.linspace(curr_BPMX_pos - X_Range/2, curr_BPMX_pos + X_Range/2, steps)
+    vect_pos_x = np.linspace(curr_BPMX_pos - x_range/2, curr_BPMX_pos + x_range/2, steps)
 
     # Get the delta angle
     #delta_step_X = abs(vect_pos_x[1] - vect_pos_x[0])                       
@@ -87,15 +86,15 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
         mat_3d_y[iLoop,:,:] = img_tmp            
 
         if ROI:
-#           Im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
-            Im = mat_3d_y[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
+#           im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
+            im = mat_3d_y[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
         else:
-            Im = mat_3d_y[iLoop,:,:]
+            im = mat_3d_y[iLoop,:,:]
 
-        intensity_y[iLoop] = np.sum(Im) # store the intensity
+        intensity_y[iLoop] = np.sum(im) # store the intensity
 
         # Store the intensity
-        tmp = np.sum(Im)
+        tmp = np.sum(im)
         print tmp
         
         # Not sure what this is for:
@@ -103,7 +102,7 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
         
         print 'Intensity: ', intensity_y[iLoop]
         #plt.imshow(img_tmp), plt.set_cmap('gray'), plt.colorbar()
-        #plt.set_title('Image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
+        #plt.set_title('image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
 
     # Interpolate the minimum value
     f = interpolate.interp1d(vect_pos_y, intensity_y, kind='cubic')
@@ -151,15 +150,15 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
         mat_3d_x[iLoop,:,:] = img_tmp            
 
         if ROI:
-#           Im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
-            Im = mat_3d_x[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
+#           im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
+            im = mat_3d_x[iLoop, ROI_pixV[0]:ROI_pixV[1], ROI_pixH[0]:ROI_pixH[1]]
         else:
-            Im = mat_3d_x[iLoop,:,:]
+            im = mat_3d_x[iLoop,:,:]
 
-        intensity_x[iLoop] = np.sum(Im) # store the intensity
+        intensity_x[iLoop] = np.sum(im) # store the intensity
 
         # Store the intensity
-        tmp = np.sum(Im)
+        tmp = np.sum(im)
         print tmp
         
         # not sure what this is for:
@@ -167,7 +166,7 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
         
         print 'Intensity: ', intensity_x[iLoop]
         #plt.imshow(img_tmp), plt.set_cmap('gray'), plt.colorbar()
-        #plt.set_title('Image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
+        #plt.set_title('image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
 
     # Interpolate the minimum value
     f = interpolate.interp1d(vect_pos_x, intensity_x, kind='cubic')
@@ -216,4 +215,4 @@ def Align_BPM(X_Range, Y_Range, steps, dwell_time):
 
 
 if __name__ == "__main__":
-    Align_BPM(3, 3, 5, 1)
+    align_bpm(3, 3, 5, 1)
