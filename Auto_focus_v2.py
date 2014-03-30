@@ -46,14 +46,14 @@ def auto_focus(focus_range, steps, dwell_time):
     pv.ccd_dwell_time.put(dwell_time)  
 
     # move the focus before the scan starting point to annihilate the backlash
-    pc.ccd_focus.put(vect_pos[0]-8000, wait=True, timeout=500)
+    pv.ccd_focus.put(vect_pos[0]-8000, wait=True, timeout=500)
     print '*** Starting position: ',(vect_pos[0]-8000)
  
     # start the focus scan
     for iLoop in range(0, steps):
         print '*** Step #%i / %i' % (iLoop, np.size(vect_pos))
         print '    Motor pos: ',vect_pos[iLoop]
-        pc.ccd_focus.put(vect_pos[iLoop], wait=True, timeout=500)			#
+        pv.ccd_focus.put(vect_pos[iLoop], wait=True, timeout=500)			#
 
         # Trigger the CCD
         pv.ccd_trigger.put(1, wait=True, timeout=500)
@@ -64,7 +64,7 @@ def auto_focus(focus_range, steps, dwell_time):
         img_tmp = np.reshape(img_vect,[nVPix, nHPix])
 
         # Store the image in Mat3D
-        mat_3d_y[iLoop,:,:] = img_tmp            
+        mat_3d[iLoop,:,:] = img_tmp            
 
         if ROI:
 #           im = Mat3D[iLoop, ROI_pixV[1]-ROI_pixV[0], ROI_pixH[1]-ROI_pixH[0]]
