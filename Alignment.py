@@ -25,40 +25,32 @@ def align_bpm(x_range, y_range, steps, dwell_time):
     ROI_pixV = [620, 1900]
     ROI_pixH = [1300, 1500]
     ROI_pixV = [800, 1000]
-    nVPix = pv.ccd_image_rows.get()
-    nHPix = pv.ccd_image_columns.get()
-    print nVPix, nHPix
+    nRow = pv.ccd_image_rows.get()
+    nCol = pv.ccd_image_columns.get()
+    #print nRow, nCol
 
-    image_size = nVPix * nHPix
+    image_size = nRow * nCol
     #if ROI:
         #Mat3D = np.zeros((steps, (ROI_pixV[1]-ROI_pixV[0]), (ROI_pixH[1]-ROI_pixH[0])), np.int16)
     #else:
     # Initialize the 3D matrix
-    mat_3d_x = np.zeros((steps, nVPix, nHPix), np.int16) 
+    mat_3d_x = np.zeros((steps, nRow, nCol), np.int16) 
     mat_3d_y = mat_3d_x
 
-    # Get the current focus position
+    # Get the current BPM position
     curr_BPMY_pos = pv.beam_monitor_y.get()
-
-    # Define the vector containing angles
-    vect_pos_y = np.linspace(curr_BPMY_pos - y_range/2, curr_BPMY_pos + y_range/2, steps)
-
-    # get the delta angle
-#    delta_step_Y = abs(vect_pos_y[1] - vect_pos_y[0])                       
-    intensity_y = np.arange(0,np.size(vect_pos_y),1)
-
-    # Det the current focus position
     curr_BPMX_pos = pv.beam_monitor_x.get() 
 
-    # Define the vector containing angles
+    # Define the vector containing Motor positions to be scanned:
+    vect_pos_y = np.linspace(curr_BPMY_pos - y_range/2, curr_BPMY_pos + y_range/2, steps)
     vect_pos_x = np.linspace(curr_BPMX_pos - x_range/2, curr_BPMX_pos + x_range/2, steps)
 
-    # Get the delta angle
-    #delta_step_X = abs(vect_pos_x[1] - vect_pos_x[0])                       
+    # Define the intensity vectors where intensity values will be stored:
+    intensity_y = np.arange(0,np.size(vect_pos_y),1)
     intensity_x = np.arange(0,np.size(vect_pos_x),1)
 
-    pv.ccd_dwell_time.put(dwell_time)  
-
+    # Set the dwell time:    
+    pv.ccd_dwell_time.put(dwell_time)
     # CCD mode switched to fixed
     pv.ccd_acquire_mode.put(0) 
 
@@ -80,7 +72,7 @@ def align_bpm(x_range, y_range, steps, dwell_time):
         # Get the image still in memory
         img_vect = pv.ccd_image.get()
         img_vect = img_vect[0:image_size]
-        img_tmp = np.reshape(img_vect,[nVPix, nHPix])
+        img_tmp = np.reshape(img_vect,[nRow, nCol])
 
         # Store the image in Mat3D
         mat_3d_y[iLoop,:,:] = img_tmp            
@@ -91,15 +83,9 @@ def align_bpm(x_range, y_range, steps, dwell_time):
         else:
             im = mat_3d_y[iLoop,:,:]
 
+        # Store the intensity
         intensity_y[iLoop] = np.sum(im) # store the intensity
 
-        # Store the intensity
-        tmp = np.sum(im)
-        print tmp
-        
-        # Not sure what this is for:
-        #tmp[np.where(tmp < 250)] = 0
-        
         print 'Intensity: ', intensity_y[iLoop]
         #plt.imshow(img_tmp), plt.set_cmap('gray'), plt.colorbar()
         #plt.set_title('image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
@@ -110,7 +96,7 @@ def align_bpm(x_range, y_range, steps, dwell_time):
     intensity_y_int = f(vect_pos_y_int)
 
     # Get the motor position with the max intensity:
-    index_max_intensity = np.where(intensity_y==max(intensity_y))
+    index_max_intensity = np.where(intensity_y_int==max(intensity_y_int))
 
     print '*** Best Y position at ', vect_pos_y_int[index_max_intensity]
 
@@ -121,6 +107,9 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
     # Move to the optimum Y position:
     pv.beam_monitor_y.put(vect_pos_y_int[index_max_intensity], wait=True, timeout=500)
+    pv.beam_monitor_y_set.put(1) # switch to set mode
+    pv.beam_monitor_y.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.beam_monitor_y_set.put(0) # switch to use mode
 
     # Make a last snapshot
     pv.ccd_trigger.put(1, wait=True, timeout=500) 
@@ -144,7 +133,7 @@ def align_bpm(x_range, y_range, steps, dwell_time):
         # gGet the image still in memory
         img_vect = pv.ccd_image.get()
         img_vect = img_vect[0:image_size]
-        img_tmp = np.reshape(img_vect,[nVPix, nHPix])
+        img_tmp = np.reshape(img_vect,[nRow, nCol])
 
         # Store the image in Mat3D
         mat_3d_x[iLoop,:,:] = img_tmp            
@@ -155,15 +144,9 @@ def align_bpm(x_range, y_range, steps, dwell_time):
         else:
             im = mat_3d_x[iLoop,:,:]
 
+        # Store the intensity
         intensity_x[iLoop] = np.sum(im) # store the intensity
 
-        # Store the intensity
-        tmp = np.sum(im)
-        print tmp
-        
-        # not sure what this is for:
-        #tmp[np.where(tmp < 250)] = 0
-        
         print 'Intensity: ', intensity_x[iLoop]
         #plt.imshow(img_tmp), plt.set_cmap('gray'), plt.colorbar()
         #plt.set_title('image #%i, focus:%f' % (iLoop, vect_pos_y(iLoop)))
@@ -174,7 +157,7 @@ def align_bpm(x_range, y_range, steps, dwell_time):
     intensity_x_int = f(vect_pos_x_int)
 
     # Get the motor position with the max intensity:
-    index_max_intensity = np.where(intensity_x==max(intensity_x))
+    index_max_intensity = np.where(intensity_x_int==max(intensity_x_int))
 
     print '*** Best X position at ', vect_pos_x_int[index_max_intensity]
 
@@ -185,11 +168,88 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
     # Move to the optimum X position:
     pv.beam_monitor_x.put(vect_pos_x_int[index_max_intensity], wait=True, timeout=500)
+    pv.beam_monitor_x_set.put(1) # switch to set mode
+    pv.beam_monitor_x.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.beam_monitor_x_set.put(0) # switch to use mode
 
     # Make a last snapshot
     pv.ccd_trigger.put(1, wait=True, timeout=500)
 
     return mat_3d_y, intensity_y_int, vect_pos_y, vect_pos_x_int, mat_3d_x, intensity_x_int, vect_pos_x, vect_pos_x_int
+
+
+#if __name__ == "__main__":
+#    align_bpm(3, 3, 5, 1)
+
+
+
+def align_CCD():
+    """
+    align_CCD: aligned a CCD on the gravity center of the current image. Is supposed to be launched 
+    with a pinhole in.
+    
+    Parameters
+    ----------
+    No input required
+    """
+    
+    # Check the magnification lens:
+    Objective_pos = np.round(pv.ccd_camera_objective.get())
+    if Objective_pos==-40:
+        Pix_size = 6.5/1.25/1000 # mm
+    elif Objective_pos==0:
+        Pix_size = 6.5/5/1000 # mm
+    else:
+        Pix_size = 6.5/20/1000 # mm
+
+    Threshold = 200 # threshold on pixel below which intensity is considered as noise and set to 0
+    nRow = pv.ccd_image_rows.get()
+    nCol = pv.ccd_image_columns.get()
+    image_size = nRow * nCol # size of the snapshot
+    CCD_center_X = np.round(nCol/2) # X coordinates of the image center
+    CCD_center_Y = np.round(nRow/2) # Y coordinates of the image center
+
+    # Get the current CCD position
+    curr_CCDY_pos = pv.ccd_camera_y.get()
+    curr_CCDX_pos = pv.ccd_camera_x.get() 
+
+    # CCD mode switched to fixed
+    pv.ccd_acquire_mode.put(0)
+
+    # Trigger the CCD & get the image 
+    pv.ccd_trigger.put(1, wait=True, timeout=500)
+    img_vect = pv.ccd_image.get()
+    img_vect = img_vect[0:image_size]
+    img_tmp = np.reshape(img_vect,[nRow, nCol])
+
+    # Image centroid calculation
+    img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
+    [X,Y] = np.meshgrid(np.arange(1,nCol+1), np.arange(1,nRow+1))	# used for the centroid calculation
+    centX = np.sum(np.multiply(img_tmp,X)/np.sum(img_tmp));
+    centY = np.sum(np.multiply(img_tmp,Y)/np.sum(img_tmp));
+
+    # Calculate the distance in pixel between the CCD center and the Intenisty gravity center
+    Diff_X = centX - CCD_center_X
+    Diff_Y = centY - CCD_center_Y
+
+    # Calculate the distance in mm between the CCD center and the Intenisty gravity center
+    CCD_Xpos = curr_CCDX_pos + Diff_X * Pix_size
+    CCD_Ypos = curr_CCDY_pos + Diff_Y * Pix_size
+
+    # Center the CCD in X & Y on the intensity gravity center
+    pv.ccd_camera_x.put(CCD_Xpos, wait=True, timeout=500)
+    pv.ccd_camera_x_set.put(1) # switch to set mode
+    pv.ccd_camera_x.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.ccd_camera_x_set.put(0) # switch to use mode
+    
+    pv.ccd_camera_y.put(CCD_Ypos, wait=True, timeout=500)
+    pv.ccd_camera_y_set.put(1) # switch to set mode
+    pv.ccd_camera_y.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.ccd_camera_y_set.put(0) # switch to use mode
+    
+    pv.ccd_trigger.put(1, wait=True, timeout=500) # Trigger the CCD
+
+    return
 
 #import matplotlib.pylab as plt
 #plt.ion()
@@ -212,7 +272,3 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 # os.removedirs(path)
 # execfile("Startup.py")
 # execfile("file name",global_vars,local_vars)
-
-
-if __name__ == "__main__":
-    align_bpm(3, 3, 5, 1)
