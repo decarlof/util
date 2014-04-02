@@ -4,6 +4,7 @@ import process_variables as pv
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import interpolate
+from scipy import ndimage
 
 def align_bpm(x_range, y_range, steps, dwell_time):
     """
@@ -214,7 +215,8 @@ def align_CCD():
     image_size = nRow * nCol # size of the snapshot
     CCD_center_X = np.round(nCol/2) # X coordinates of the image center
     CCD_center_Y = np.round(nRow/2) # Y coordinates of the image center
-    print CCD_center_X, CCD_center_Y
+    print "CCD_center_X", CCD_center_X
+    print "CCD_center_Y", CCD_center_Y
 
    # Set the dwell time:    
     pv.ccd_dwell_time.put(0.05)
@@ -232,11 +234,16 @@ def align_CCD():
     img_vect = img_vect[0:image_size]
     img_tmp = np.reshape(img_vect,[nRow, nCol])
 
-    # Image centroid calculation
-    img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
-    [X,Y] = np.meshgrid(np.arange(1,nCol+1), np.arange(1,nRow+1))	# used for the centroid calculation
-    centX = np.sum(np.multiply(img_tmp,X)/np.sum(img_tmp));
-    centY = np.sum(np.multiply(img_tmp,Y)/np.sum(img_tmp));
+##    # Image centroid calculation
+##    img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
+##    [X,Y] = np.meshgrid(np.arange(1,nCol+1), np.arange(1,nRow+1))	# used for the centroid calculation
+##    centX = np.sum(np.multiply(img_tmp,X)/np.sum(img_tmp));
+##    centY = np.sum(np.multiply(img_tmp,Y)/np.sum(img_tmp));
+    center = ndimage.measurements.center_of_mass(img_tmp)
+    print center
+
+    CCD_center_X = center[0]
+    CCD_center_Y = center[1]
     
     # Calculate the distance in pixel between the CCD center and the Intenisty gravity center
     Diff_X = centX - CCD_center_X
