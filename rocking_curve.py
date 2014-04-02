@@ -8,17 +8,26 @@ Created on Tue Apr  1 16:00:45 2014
 import process_variables as pv
 import matplotlib.pyplot as plt
 import numpy as np
+from time import *
 from scipy import interpolate
 
+# get the current position of the DCM 2nd crystal piezo:
+curr_pos = pv.pzt_sec_crystal.get()
+
+sleeptime = 2 # time to wait in order to register the intensity
+
 # Initialization of variables (scaning range, intensity vector)
-scan_val = linspace()
+scan_val = np.linspace(curr_pos-6*0.5, curr_pos+6*0.5, 12)
 intensity = scan_val*0
 
 # Loop acquiring the rocking curve:
-for i in scan_val:
+for i in range(0, np.size(scan_val)):
+    print '*** Step %i/%i' % (i+1, np.size(scan_val))
     print '    Motor pos: ',scan_val[i]
+#    pv.pzt_sec_crystal.put(scan_val[i], wait=True, timeout=500)
     pv.pzt_sec_crystal.put(scan_val[i], wait=True, timeout=500)
-    intensity[i] = pv.aaaaaa.get()
+    sleep(sleeptime)
+    intensity[i] = pv.ion_chamber_DCM.get()
 
 # Interpolate the rocking curve over 50 points
 f = interpolate.interp1d(scan_val, intensity, kind='cubic')
@@ -33,5 +42,6 @@ pv.pzt_sec_crystal.put(scan_val_interp[index_max_intensity], wait=True, timeout=
 
 plt.plot(scan_val, intensity, 'go', scan_val_interp, intensity_interp, 'r-'), plt.grid()
 plt.plot(scan_val_interp[index_max_intensity], max(intensity_interp), 'b*')
-plt.title('Standard deviation for different Y BPM positions')
+plt.xlabel('Crystal pos. (arcsec)'), plt.ylabel('Intensity')
+plt.title('Rocking curve of the 2nd DCM crystal')
 plt.show()

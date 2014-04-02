@@ -77,3 +77,4 @@ ccd_image_columns = PV('TXMNeo1:cam1:SizeX')
 
 # DCM
 pzt_sec_crystal = PV('32idb:pzt1_arcsec.VAL')
+ion_chamber_DCM = PV('32idc01:scaler1.S2')

@@ -183,6 +183,8 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
 
 
+#####################################
+#####################################
 def align_CCD():
     """
     align_CCD: aligned a CCD on the gravity center of the current image. Is supposed to be launched 
@@ -197,10 +199,14 @@ def align_CCD():
     Objective_pos = np.round(pv.ccd_camera_objective.get())
     if Objective_pos==-40:
         Pix_size = 6.5/1.25/1000 # mm
+        print '1X mag'
     elif Objective_pos==0:
         Pix_size = 6.5/5/1000 # mm
+        print '5X mag'
     else:
         Pix_size = 6.5/20/1000 # mm
+        print '20X mag'
+        
 
     Threshold = 200 # threshold on pixel below which intensity is considered as noise and set to 0
     nRow = pv.ccd_image_rows.get()
@@ -208,10 +214,87 @@ def align_CCD():
     image_size = nRow * nCol # size of the snapshot
     CCD_center_X = np.round(nCol/2) # X coordinates of the image center
     CCD_center_Y = np.round(nRow/2) # Y coordinates of the image center
+    print CCD_center_X, CCD_center_Y
 
+   # Set the dwell time:    
+    pv.ccd_dwell_time.put(0.05)
+ 
     # Get the current CCD position
     curr_CCDY_pos = pv.ccd_camera_y.get()
     curr_CCDX_pos = pv.ccd_camera_x.get() 
+
+    # CCD mode switched to fixed
+    pv.ccd_acquire_mode.put(0)
+
+    # Trigger the CCD & get the image 
+    pv.ccd_trigger.put(1, wait=True, timeout=500)
+    img_vect = pv.ccd_image.get()
+    img_vect = img_vect[0:image_size]
+    img_tmp = np.reshape(img_vect,[nRow, nCol])
+
+    # Image centroid calculation
+    img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
+    [X,Y] = np.meshgrid(np.arange(1,nCol+1), np.arange(1,nRow+1))	# used for the centroid calculation
+    centX = np.sum(np.multiply(img_tmp,X)/np.sum(img_tmp));
+    centY = np.sum(np.multiply(img_tmp,Y)/np.sum(img_tmp));
+    
+    # Calculate the distance in pixel between the CCD center and the Intenisty gravity center
+    Diff_X = centX - CCD_center_X
+    Diff_Y = centY - CCD_center_Y
+
+    # Calculate the distance in mm between the CCD center and the Intenisty gravity center
+    CCD_Xpos = curr_CCDX_pos + Diff_X * Pix_size
+    CCD_Ypos = curr_CCDY_pos + Diff_Y * Pix_size
+
+    # Center the CCD in X & Y on the intensity gravity center
+    pv.ccd_camera_x.put(CCD_Xpos, wait=True, timeout=500)
+    #pv.ccd_camera_x_set.put(1) # switch to set mode
+    pv.ccd_camera_x.put(0, wait=True, timeout=500) # reinitialize position to 0
+#    pv.ccd_camera_x_set.put(0) # switch to use mode
+    
+    pv.ccd_camera_y.put(CCD_Ypos, wait=True, timeout=500)
+#    pv.ccd_camera_y_set.put(1) # switch to set mode
+    pv.ccd_camera_y.put(0, wait=True, timeout=500) # reinitialize position to 0
+ #   pv.ccd_camera_y_set.put(0) # switch to use mode
+    
+    pv.ccd_trigger.put(1, wait=True, timeout=500) # Trigger the CCD
+
+    return
+
+
+def align_cond_xy():
+    """
+    align_cpndxy: aligned the condenser on the center of the CCD. Is supposed to be launched 
+    with a pinhole in.
+    
+    Parameters
+    ----------
+    No input required
+    """
+
+
+    # Check the magnification lens:
+    Objective_pos = np.round(pv.ccd_camera_objective.get())
+    if Objective_pos==-40:
+        Pix_size = 6.5/1.25/1000 # mm
+    elif Objective_pos==0:
+        Pix_size = 6.5/5/1000 # mm
+    else:
+        Pix_size = 6.5/20/1000 # mm
+
+    Threshold = 200 # threshold on pixel below whose intensity is considered as noise and set to 0
+    nRow = pv.ccd_image_rows.get()
+    nCol = pv.ccd_image_columns.get()
+    image_size = nRow * nCol # size of the snapshot
+    CCD_center_X = np.round(nCol/2) # X coordinates of the image center
+    CCD_center_Y = np.round(nRow/2) # Y coordinates of the image center
+
+   # Set the dwell time:    
+    pv.ccd_dwell_time.put(0.05) # 50 ms
+
+    # Get the current condenser position
+    curr_condY_pos = pv.condenser_y.get()
+    curr_condX_pos = pv.condenser_x.get() 
 
     # CCD mode switched to fixed
     pv.ccd_acquire_mode.put(0)
@@ -233,19 +316,91 @@ def align_CCD():
     Diff_Y = centY - CCD_center_Y
 
     # Calculate the distance in mm between the CCD center and the Intenisty gravity center
-    CCD_Xpos = curr_CCDX_pos + Diff_X * Pix_size
-    CCD_Ypos = curr_CCDY_pos + Diff_Y * Pix_size
+    cond_Xpos = curr_condX_pos + Diff_X * Pix_size
+    cond_Ypos = curr_condY_pos + Diff_Y * Pix_size
 
-    # Center the CCD in X & Y on the intensity gravity center
-    pv.ccd_camera_x.put(CCD_Xpos, wait=True, timeout=500)
-    pv.ccd_camera_x_set.put(1) # switch to set mode
-    pv.ccd_camera_x.put(0, wait=True, timeout=500) # reinitialize position to 0
-    pv.ccd_camera_x_set.put(0) # switch to use mode
+    # Center the condenser in X & Y on the intensity gravity center
+    pv.condenser_x.put(cond_Xpos, wait=True, timeout=500)
+    pv.condenser_x_set.put(1) # switch to set mode
+    pv.condenser_x.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.condenser_x_set.put(0) # switch to use mode
     
-    pv.ccd_camera_y.put(CCD_Ypos, wait=True, timeout=500)
-    pv.ccd_camera_y_set.put(1) # switch to set mode
-    pv.ccd_camera_y.put(0, wait=True, timeout=500) # reinitialize position to 0
-    pv.ccd_camera_y_set.put(0) # switch to use mode
+    pv.condenser_y.put(cond_Ypos, wait=True, timeout=500)
+    pv.condenser_y_set.put(1) # switch to set mode
+    pv.condenser_y.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.condenser_y_set.put(0) # switch to use mode
+    
+    pv.ccd_trigger.put(1, wait=True, timeout=500) # Trigger the CCD
+
+    return
+
+
+def align_pinhole():
+    """
+    align_cpndxy: aligned the condenser on the center of the CCD. Is supposed to be launched 
+    with a pinhole in.
+    
+    Parameters
+    ----------
+    No input required
+    """
+
+    # Check the magnification lens:
+    Objective_pos = np.round(pv.ccd_camera_objective.get())
+    if Objective_pos==-40:
+        Pix_size = 6.5/1.25/1000 # mm
+    elif Objective_pos==0:
+        Pix_size = 6.5/5/1000 # mm
+    else:
+        Pix_size = 6.5/20/1000 # mm
+
+    Threshold = 200 # threshold on pixel below whose intensity is considered as noise and set to 0
+    nRow = pv.ccd_image_rows.get()
+    nCol = pv.ccd_image_columns.get()
+    image_size = nRow * nCol # size of the snapshot
+    CCD_center_X = np.round(nCol/2) # X coordinates of the image center
+    CCD_center_Y = np.round(nRow/2) # Y coordinates of the image center
+
+   # Set the dwell time:    
+    pv.ccd_dwell_time.put(0.05) # 50 ms
+
+    # Get the current condenser position
+    curr_pinholeY_pos = pv.pin_hole_y.get()
+    curr_pinholeX_pos = pv.pin_hole_x.get() 
+
+    # CCD mode switched to fixed
+    pv.ccd_acquire_mode.put(0)
+
+    # Trigger the CCD & get the image 
+    pv.ccd_trigger.put(1, wait=True, timeout=500)
+    img_vect = pv.ccd_image.get()
+    img_vect = img_vect[0:image_size]
+    img_tmp = np.reshape(img_vect,[nRow, nCol])
+
+    # Image centroid calculation
+    img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
+    [X,Y] = np.meshgrid(np.arange(1,nCol+1), np.arange(1,nRow+1))	# used for the centroid calculation
+    centX = np.sum(np.multiply(img_tmp,X)/np.sum(img_tmp));
+    centY = np.sum(np.multiply(img_tmp,Y)/np.sum(img_tmp));
+
+    # Calculate the distance in pixel between the CCD center and the Intenisty gravity center
+    Diff_X = centX - CCD_center_X
+    Diff_Y = centY - CCD_center_Y
+
+    # Calculate the distance in mm between the CCD center and the Intenisty gravity center
+    cond_Xpos = curr_pinholeX_pos + Diff_X * Pix_size
+    cond_Ypos = curr_pinholeY_pos + Diff_Y * Pix_size
+
+    # Center the pinhole in X & Y on the intensity gravity center
+    pv.pin_hole_x.put(cond_Xpos, wait=True, timeout=500)
+    pv.pin_hole_x_set.put(1) # switch to set mode
+    pv.pin_hole_x.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.pin_hole_x_set.put(0) # switch to use mode
+    
+    pv.pin_hole_y.put(cond_Ypos, wait=True, timeout=500)
+    pv.pin_hole_y_set.put(1) # switch to set mode
+    pv.pin_hole_y.put(0, wait=True, timeout=500) # reinitialize position to 0
+    pv.pin_hole_y_set.put(0) # switch to use mode
     
     pv.ccd_trigger.put(1, wait=True, timeout=500) # Trigger the CCD
 
