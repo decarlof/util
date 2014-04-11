@@ -17,8 +17,13 @@ curr_pos = pv.pzt_sec_crystal.get()
 sleeptime = 2 # time to wait in order to register the intensity
 
 # Initialization of variables (scaning range, intensity vector)
-scan_val = np.linspace(curr_pos-6*0.5, curr_pos+6*0.5, 12)
+scan_val = np.linspace(curr_pos-10*0.5, curr_pos+6*0.5, 15)
 intensity = scan_val*0
+
+pv.ion_chamber_auto.put(0, wait=True, timeout=500) # switch automatic to 1 shot mode
+dwelltime = pv.ion_chamber_autodwelltime.get() # get the dwell time of the auto mode
+pv.ion_chamber_dwelltime.put(dwelltime, wait=True, timeout=500) # assigned the dwell time to the oneshot mode
+pv.ion_chamber_trigger.put(1) # trigger once fisrt to avoid a reading bug
 
 # Loop acquiring the rocking curve:
 for i in range(0, np.size(scan_val)):
@@ -27,7 +32,11 @@ for i in range(0, np.size(scan_val)):
 #    pv.pzt_sec_crystal.put(scan_val[i], wait=True, timeout=500)
     pv.pzt_sec_crystal.put(scan_val[i], wait=True, timeout=500)
     sleep(sleeptime)
+    pv.ion_chamber_trigger.put(1)
     intensity[i] = pv.ion_chamber_DCM.get()
+    print intensity[i]
+
+pv.ion_chamber_auto.put(1, wait=True, timeout=500) # come back to automatic mode
 
 # Interpolate the rocking curve over 50 points
 f = interpolate.interp1d(scan_val, intensity, kind='cubic')

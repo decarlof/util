@@ -20,8 +20,11 @@ beam_stop_y = PV('32idcTXM:xps:c1:m2.VAL')
 
 # Condenser
 condenser_x = PV('32idcTXM:xps:c0:m7.VAL')
+condenser_x_set = PV('32idcTXM:xps:c0:m7.SET')
 condenser_y = PV('32idcTXM:mxv:c1:m1.VAL')
+condenser_y_set = PV('32idcTXM:mxv:c1:m1.SET')
 condenser_z = PV('32idcTXM:mxv:c0:m1.VAL')
+condenser_z_set = PV('32idcTXM:mxv:c0:m1.SET')
 condenser_yaw = PV('32idcTXM:xps:c0:m8.VAL')
 condenser_pitch = PV('32idcTXM:mxv:c1:m2.VAL')
 condenser_shaker_x = PV('32idcTXM:jena1:2:VAL')
@@ -30,8 +33,11 @@ condenser_shaker_z = PV('32idcTXM:jena1:0:VAL')
 
 # Pin Hole
 pin_hole_x = PV('32idcTXM:xps:c1:m3.VAL')
+pin_hole_x_set = PV('32idcTXM:xps:c1:m3.SET')
 pin_hole_y = PV('32idcTXM:xps:c1:m4.VAL')
+pin_hole_y_set = PV('32idcTXM:xps:c1:m4.SET')
 pin_hole_z = PV('32idcTXM:xps:c1:m5.VAL')
+pin_hole_z_set = PV('32idcTXM:xps:c1:m5.SET')
 
 # Sample
 sample_top_x = PV('32idcTXM:mmc:c0:m1.VAL')
@@ -78,3 +84,8 @@ ccd_image_columns = PV('TXMNeo1:cam1:SizeX')
 # DCM
 pzt_sec_crystal = PV('32idb:pzt1_arcsec.VAL')
 ion_chamber_DCM = PV('32idc01:scaler1.S2')
+ion_chamber_trigger = PV('32idc01:scaler1.CNT')
+ion_chamber_auto = PV('32idc01:scaler1.CONT')
+ion_chamber_dwelltime = PV('32idc01:scaler1.TP')
+ion_chamber_autodwelltime = PV('32idc01:scaler1.TP1')
+
