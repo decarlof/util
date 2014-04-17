@@ -66,6 +66,7 @@ docs/build
 # Test files #
 ##############
 test.py
+Test.py
 main.py
 
 # Distribution / packaging #
