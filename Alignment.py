@@ -215,8 +215,6 @@ def align_CCD():
         Pix_size_V = 1/198.*1.25/20 # motor unit
         print '20x mag'
 
-    Threshold = 200 # threshold on pixel below which intensity is considered as noise and set to 0
-
     nRow = pv.ccd_image_rows.get()
     nCol = pv.ccd_image_columns.get()
     image_size = nRow * nCol # size of the snapshot
@@ -229,7 +227,7 @@ def align_CCD():
     curr_CCDX_pos = pv.ccd_camera_x.get() 
 
     # Trigger the CCD & get the image
-    pv.ccd_dwell_time.put(0.05) # Set the dwell time at 50 ms
+    pv.ccd_dwell_time.put(0.1) # Set the dwell time at 100 ms
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
@@ -238,6 +236,9 @@ def align_CCD():
     img_tmp = np.reshape(img_vect,[nRow, nCol])
 
     print "Image Shape: (", img_tmp.shape[0], ", ", img_tmp.shape[1], ")"
+
+    Im_max = np.max(np.max(img_tmp))
+    Threshold = Im_max*0.25 # threshold on pixel below which intensity is considered as noise and set to 0 (<15% of the max value)
     
 ##    # Image centroid calculation
     img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
@@ -306,7 +307,6 @@ def align_cond_xy():
         Pix_size_V = 1/800.*5/20 # motor unit
         print '20x mag'
 
-    Threshold = 200 # threshold on pixel below whose intensity is considered as noise and set to 0
     nRow = pv.ccd_image_rows.get()
     nCol = pv.ccd_image_columns.get()
     image_size = nRow * nCol # size of the snapshot
@@ -318,13 +318,16 @@ def align_cond_xy():
     curr_condX_pos = pv.condenser_x.get() 
 
     # Trigger the CCD & get the image
-    pv.ccd_dwell_time.put(0.05) # Set the dwell time at 50 ms
+    pv.ccd_dwell_time.put(0.1) # Set the dwell time at 50 ms
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
     img_vect = pv.ccd_image.get()
     img_vect = img_vect[0:image_size]
     img_tmp = np.reshape(img_vect,[nRow, nCol])
+
+    Im_max = np.max(np.max(img_tmp))
+    Threshold = Im_max*0.25 # threshold on pixel below which intensity is considered as noise and set to 0 (<15% of the max value)
 
     # Image centroid calculation
     img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
@@ -387,7 +390,6 @@ def align_pinhole():
         Pix_size_V = 1/800.*5/20 # motor unit
         print '20x mag'
 
-    Threshold = 200 # threshold on pixel below whose intensity is considered as noise and set to 0
     nRow = pv.ccd_image_rows.get()
     nCol = pv.ccd_image_columns.get()
     image_size = nRow * nCol # size of the snapshot
@@ -399,13 +401,16 @@ def align_pinhole():
     curr_phlX_pos = pv.pin_hole_x.get() 
 
     # Trigger the CCD & get the image
-    pv.ccd_dwell_time.put(0.05) # Set the dwell time at 50 ms
+    pv.ccd_dwell_time.put(0.1) # Set the dwell time at 50 ms
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
     img_vect = pv.ccd_image.get()
     img_vect = img_vect[0:image_size]
     img_tmp = np.reshape(img_vect,[nRow, nCol])
+
+    Im_max = np.max(np.max(img_tmp))
+    Threshold = Im_max*0.25 # threshold on pixel below which intensity is considered as noise and set to 0 (<15% of the max value)
 
     # Image centroid calculation
     img_tmp[np.where(img_tmp < Threshold)] = 0; # attribute 0 to pixels with intensity < threshold
