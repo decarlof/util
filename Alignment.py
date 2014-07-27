@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import process_variables as pv
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy import interpolate
-from scipy import ndimage
 
 def align_bpm(x_range, y_range, steps, dwell_time):
-    """
-    align_bpm
-    
-    Parameters
-    ----------
-    X_range : float
-    Y_range : float
-    steps: number of steps inside the scanned range
-    dwell_time: dwell time for the CCD acquisition
-    """
+#    """
+#    align_bpm
+#    
+#    Parameters
+#    ----------
+#    X_range : float
+#    Y_range : float
+#    steps: number of steps inside the scanned range
+#    dwell_time: dwell time for the CCD acquisition
+#    """
     
     # Work on a ROI
     ROI=0
@@ -401,7 +396,7 @@ def align_pinhole():
     curr_phlX_pos = pv.pin_hole_x.get() 
 
     # Trigger the CCD & get the image
-    pv.ccd_dwell_time.put(0.1) # Set the dwell time at 50 ms
+    pv.ccd_dwell_time.put(0.01) # Set the dwell time at 50 ms
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
