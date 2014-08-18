@@ -6,7 +6,8 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
 
     # Pre-defined & set parameters
     ####################################################################
-    sleeptime = 0.1
+    Threshold = 200
+    sleeptime = 0.05
     wait = 100
     nPt_gaus = 50
 
@@ -14,7 +15,7 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
     curr_Motor_pos = Motor.get()
 
     # Record the current ccd bin values:
-#    curr_bin_status = pv.ccd_binning.get()
+    curr_bin_status = pv.ccd_binning.get()
 
     # Define the vector containing Motor positions to be scanned:
     vect_pos_x = np.linspace(X_start, X_end, n_steps)
@@ -27,7 +28,7 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
     # CCD mode switched to fixed
     pv.ccd_acquire_mode.put(0, wait=True, timeout=wait)
     # CCD binning
-#    pv.ccd_binning.put(4, wait=True, timeout=wait) # state = 5 --> 8x8 bin
+    pv.ccd_binning.put(4, wait=True, timeout=wait) # state = 5 --> 8x8 bin
 
     nRow = pv.ccd_image_rows.get()
     nCol = pv.ccd_image_columns.get()
@@ -42,8 +43,7 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
 
     # Start the scan
     for iLoop in range(0, n_steps):
-        print '*** Step %i/%i' % (iLoop+1, np.size(vect_pos_x))
-        print '    Motor pos: ',vect_pos_x[iLoop]
+        print '*** Step %i/%i, -- Motor pos: %.3f' % (iLoop+1, np.size(vect_pos_x), vect_pos_x[iLoop])
         Motor.put(vect_pos_x[iLoop], wait=True, timeout=wait)
 
         sleep(sleeptime) # pause
@@ -55,6 +55,7 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
         img_vect = pv.ccd_image.get()
         img_vect = img_vect[0:image_size]
         img_tmp = np.reshape(img_vect,[nRow, nCol])
+        img_tmp[np.where(img_tmp < Threshold)] = 0
 
         # Store the intensity
         intensity[iLoop] = np.sum(img_tmp) # store the intensity
@@ -67,9 +68,9 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
     Motor.put(curr_Motor_pos, wait=True, timeout=wait) # move the sample stage back to the first location
 
     # Come back to the initial CCD binning values:
-#    pv.ccd_binning.put(curr_bin_status, wait=True, timeout=wait) # state = 5 --> 8x8 bin
-#    if curr_bin_status==0: # because of the Areadetector bug
-#        pv.ccd_image_columns.put(2560, wait=True, timeout=wait)
+    pv.ccd_binning.put(curr_bin_status, wait=True, timeout=wait) # state = 5 --> 8x8 bin
+    if curr_bin_status==0: # because of the Areadetector bug
+        pv.ccd_image_columns.put(2560, wait=True, timeout=wait)
 
     ################################  DATA PROCESSING
     # Calculate the derivative of the intensity profile:
@@ -93,21 +94,33 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
     mean_x = np.mean(x)
     sigma = np.std(x)
 
+    # Fit a gaussian on the knife edge derivative
     y = deriv_int
     amp = np.max(y)
-    popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
-    param = popt[0]
-    sigma1 = param[2]
-    deriv_int_fit = gaus(x_HR, param[0], param[1], param[2])
+    try:
+        popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
+        param = popt[0]
+        sigma1 = param[2]
+        deriv_int_fit = gaus(x_HR, param[0], param[1], param[2])
+    except (runtimeError, TypeError, NameError):
+        deriv_int_fit = deriv_int
+        sigma1 = 0
     FWHM_1 = sigma1 * 2.3548
+    #--------------------------------------------
 
+    # Fit a gaussian on the filtered knife edge derivative
     y = deriv_int_filt
     amp = np.max(y)
-    popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
-    param = popt[0]
-    sigma2 = param[2]
-    deriv_int_filt_fit = gaus(x_HR, param[0], param[1], param[2])
+    try:
+        popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
+        param = popt[0]
+        sigma2 = param[2]
+        deriv_int_filt_fit = gaus(x_HR, param[0], param[1], param[2])
+    except (runtimeError, TypeError, NameError):
+        deriv_int_fit = deriv_int
+        sigma2 = 0
     FWHM_2 = sigma2 * 2.3548
+    #--------------------------------------------
 
     if disp:
         plt.subplot(2,2,1) # knife edge

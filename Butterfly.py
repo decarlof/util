@@ -2,15 +2,15 @@
 
 
 ######################### INPUT ##########################
-n_cond_zstep = 10
-cond_z_start = -1
-cond_z_end = 1
+n_cond_zstep = 20
+cond_z_start = 1
+cond_z_end = 5.8
 
 # param for knife-edge scan
-knife_xend = -1.2020  # sample x
-knife_xstart = -0.9     # sample x
-knife_xstep = 20
-knife_acq_time = 0.5
+knife_xend = -1.35  # sample x
+knife_xstart = -1.15     # sample x
+knife_xstep = 25
+knife_acq_time = 0.7
 disp = 0 # display each knife edge; will pause the scan!!!
 ##########################################################
 
@@ -37,7 +37,8 @@ pv.ccd_trigger.put(1, wait=True, timeout=100) # trigger once fisrt to avoid a re
 plt.figure
 
 for iLoop in range(0, n_cond_zstep):
-    print '::: Knife edge # %i/%i' % (iLoop+1, np.size(vect_pos_z))
+    print '\n ####################################'
+    print '::: Knife edge # %i/%i\n' % (iLoop+1, np.size(vect_pos_z))
     print '    Motor pos: ',vect_pos_z[iLoop]
     pv.condenser_z.put(vect_pos_z[iLoop], wait=True, timeout=100)
 
@@ -56,6 +57,9 @@ print ' --> Focus @ condenser z posisiton = %.3f ' % vect_pos_z[index_waist]
 
 # Display the map of the Butterfly:
 plt.figure
+plt.subplot(1,2,1)
 plt.imshow(intensities, cmap='jet', extent = [knife_xstart, knife_xend, vect_pos_z[0], vect_pos_z[-1]], aspect="auto")
 plt.xlabel('sample x position'), plt.ylabel('Condenser z pozition'), plt.colorbar()
-plt.show()
+plt.subplot(1,2,2), plt.plot(vect_pos_z, FWHMs, 'g-'), plt.grid(), plt.show()
+
+
