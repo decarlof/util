@@ -276,6 +276,9 @@ def align_CCD():
     return
 
 
+###########################################
+###########################################
+
 def align_cond_xy():
     """
     align_condxy: aligned the condenser on the center of the CCD. Is supposed to be launched 
@@ -298,8 +301,8 @@ def align_cond_xy():
         Pix_size_V = 1/800. # motor unit
         print '5x mag'
     else:
-        Pix_size_H = 1/800.*5/20 # motor unit
-        Pix_size_V = 1/800.*5/20 # motor unit
+        Pix_size_H = 1/800.*5/10 # motor unit
+        Pix_size_V = 1/800.*5/10 # motor unit
         print '20x mag'
 
     nRow = pv.ccd_image_rows.get()
@@ -381,8 +384,8 @@ def align_pinhole():
         Pix_size_V = 1/800. # motor unit
         print '5x mag'
     else:
-        Pix_size_H = 1/800.*5/20 # motor unit
-        Pix_size_V = 1/800.*5/20 # motor unit
+        Pix_size_H = 1/800.*5/10 # motor unit
+        Pix_size_V = 1/800.*5/10 # motor unit
         print '20x mag'
 
     nRow = pv.ccd_image_rows.get()

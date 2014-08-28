@@ -6,9 +6,9 @@
 #"""
 
 ########################### input ###############################
-sleeptime = 1.5 # time to wait in order to register the intensity
-nSteps = 15
-range_scanned = 10
+sleeptime = 2.5 # time to wait in order to register the intensity
+nSteps = 5
+range_scanned = 4
 nPt_interp = 50
 wait = 100
 #################################################################
