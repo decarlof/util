@@ -6,6 +6,14 @@ Transmission X-ray Microscope process variables grouped by component
 
 from epics import PV
 
+# Beamline Status
+current = PV('S:SRcurrentAI')
+undulator_energy = PV('ID32ds:Energy.VAL')
+undulator_gap = PV('ID32ds:Gap.VAL')
+energy_dcm = PV('32ida:BraggEAO.VAL')
+mirror_x  = PV('32idbMIR:m1.RBV')
+mirror_y  = PV('32idbMIR:m2.RBV')
+
 # Beam Monitor
 beam_monitor_x = PV('32idcTXM:nf:c0:m1.VAL')
 beam_monitor_x_set = PV('32idcTXM:nf:c0:m1.SET')
@@ -87,9 +95,9 @@ if 1:
     ccd_image_rows = PV('TXMNeo1:cam1:ArraySizeY_RBV')
     ccd_image_columns = PV('TXMNeo1:cam1:ArraySizeX_RBV')
     ccd_binning = PV('TXMNeo1:cam1:A3Binning') # states from 0 to 4
-    ccd_EnableCallbacks = PV('XMNeo1:cam1:EnableCallbacks') # (for background corrections) states: 0 or 1 
-    ccd_EnableFlatField = PV('XMNeo1:cam1:EnableFlatField') # states: 0 or 1
-    ccd_SaveFlatField = PV('XMNeo1:cam1:SaveFlatField')
+    ccd_EnableCallbacks = PV('TXMNeo1:Proc1:EnableCallbacks') # (for background corrections) states: 0 or 1 
+    ccd_EnableFlatField = PV('TXMNeo1:Proc1:EnableFlatField') # states: 0 or 1
+    ccd_SaveFlatField = PV('TXMNeo1:Proc1:SaveFlatField')
     ccd_Image_number = PV('TXMNeo1:cam1:NumImages')
 
 if 0:

@@ -222,7 +222,7 @@ def align_CCD():
     curr_CCDX_pos = pv.ccd_camera_x.get() 
 
     # Trigger the CCD & get the image
-    pv.ccd_dwell_time.put(0.1) # Set the dwell time at 100 ms
+    pv.ccd_dwell_time.put(0.005) # Set the dwell time at 100 ms
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
@@ -313,7 +313,7 @@ def align_cond_xy():
     curr_condX_pos = pv.condenser_x.get() 
 
     # Trigger the CCD & get the image
-    pv.ccd_dwell_time.put(0.1) # Set the dwell time at 50 ms
+    pv.ccd_dwell_time.put(0.01) # Set the dwell time at 50 ms
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition

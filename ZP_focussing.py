@@ -13,6 +13,8 @@ output_path = '/local/data/2014_07/TXM_commissioning/Battery/ZP_focus3'
 output_path = '/local/data/2014_07/TXM_commissioning/test/Obj_compare/ZP_focus/'
 output_path = '/local/data/2014_07/gecko/ZP_focus2/'
 output_path = '/local/data/2014_08/IUPUI/ZP_focus/'
+output_path = '/local/data/2014_08/2014_08_Walid/ZP_focus'
+output_path = '/local/data/2014_08/Stock/ZP_focus'
 
 #zp_focus(output_path, zone_plate_z,-0.4, 0.4, 40, 10, 1)
 #zp_focus(output_path, condenser_z, -7, 7, 200, 0.02, 1)
