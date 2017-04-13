@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-TomoPy example script to reconstruct the HZG nano tomography data as
-original tiff.
+TomoPy example to reconstruct the HZG nano tomography data after data have been realigned.
+The script shows an example of how to reconstruct with gridrec and with sirtfbp
+
 """
 
 from __future__ import print_function
@@ -14,7 +15,7 @@ import sirtfilter
 
 if __name__ == '__main__':
     # Set path to the micro-CT data to reconstruct.
-    fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/radios/image_00000.tiff'
+    fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_100/radios/image_00000.tiff'
 
     sample_detector_distance = 18.8e2
     detector_pixel_size_x = 19.8e-7
@@ -42,11 +43,13 @@ if __name__ == '__main__':
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
     # Write data as stack of TIFs.
-    dxchange.write_tiff_stack(rec, fname='/local/decarlo/data/hzg/nanotomography/recon_dir/aligned_gridrec/recon')
+    fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_100/recon_dir/aligned_gridrec/recon'
+    dxchange.write_tiff_stack(rec, fname)
 
-    data = proj
+    # Reconstruct object using sirt-fbp algorithm:
     # Use test_sirtfbp_iter = True to test which number of iterations is suitable for your dataset
     # Filters are saved in .mat files in "./¨
+    data = proj
     test_sirtfbp_iter = True
     if test_sirtfbp_iter:
         nCol = data.shape[2]
@@ -65,15 +68,12 @@ if __name__ == '__main__':
     sirtfbp_filter = sirtfilter.getfilter(nCol, theta, num_iter, filter_dir='./')
     tomopy_filter = sirtfilter.convert_to_tomopy_filter(sirtfbp_filter, nCol)
     rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='custom2d', filter_par=tomopy_filter)
-
-    # Reconstruct object using Gridrec algorithm.
-#    rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', nchunk=1)
-    
+   
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
     # Write data as stack of TIFs.
-    fname='/local/decarlo/data/hzg/nanotomography/recon_dir/aligned_sirtfbp/recon'
+    fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_100/recon_dir/aligned_sirtfbp/recon'
     dxchange.write_tiff_stack(rec, fname=fname)
 
 

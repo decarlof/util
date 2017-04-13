@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-TomoPy example script to reconstruct the HZG nano tomography data as
-original tiff.
+TomoPy example to reconstruct with gridrec the HZG nano tomography projections.
 """
 
 from __future__ import print_function
@@ -47,8 +46,7 @@ if __name__ == '__main__':
     #proj = tomopy.minus_log(proj)
 
     # Find rotation center.
-#    rot_center = tomopy.find_center(proj, theta, emission=False, init=1024,
-#                                    ind=0, tol=0.5)
+    #rot_center = tomopy.find_center(proj, theta, emission=False, init=1024, ind=0, tol=0.5)
     
     rot_center = 1002
     print("Center of rotation: ", rot_center)
@@ -62,4 +60,4 @@ if __name__ == '__main__':
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
     # Write data as stack of TIFs.
-    dxchange.write_tiff_stack(rec, fname='/local/decarlo/data/hzg/nanotomography/recon_dir/raw_recon/recon')
+    dxchange.write_tiff_stack(rec, fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections/recon_dir/recon')

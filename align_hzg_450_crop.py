@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-TomoPy example script to reconstruct the HZG nano tomography data as
-original tiff.
+TomoPy example to align the HZG nano tomography projections.
 """
 
 from __future__ import print_function
@@ -48,19 +47,19 @@ if __name__ == '__main__':
     #data = tomopy.downsample(data, level=4, axis=2)
     print(data.shape)
     
-    cprj, sx, sy, conv = alignment.align_seq(data, theta, iters=30, pad=(10, 10), blur=True, save=True, debug=True)
+    cprj, sx, sy, conv = alignment.align_seq(data, theta, iters=100, pad=(10, 10), blur=True, save=True, debug=True)
     #cprj, sx, sy, conv = alignment.align_joint(data, theta, iters=10, pad=(10, 10), blur=True, save=True, debug=True)
 
     print(sx, sy)
     
-    rot_center = (cprj.shape[2]) / 2.0
+    ##rot_center = (cprj.shape[2]) / 2.0
     # Reconstruct object using Gridrec algorithm.
-    rec = tomopy.recon(cprj, theta, center=rot_center, algorithm='gridrec')
+    ##rec = tomopy.recon(cprj, theta, center=rot_center, algorithm='gridrec')
 
     # Mask each reconstructed slice with a circle.
-    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+    ##rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
     # Write data as stack of TIFs.
-    dxchange.write_tiff_stack(rec, fname='/local/decarlo/conda/util/align/rec/image')
-    dxchange.write_tiff_stack(cprj, fname='/local/decarlo/conda/util/align/radios/image')
+    ##dxchange.write_tiff_stack(rec, fname='/local/decarlo/conda/util/align/rec/image')
+    dxchange.write_tiff_stack(cprj, fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_100/radios/image')
 
