@@ -9,23 +9,25 @@ from __future__ import print_function
 import tomopy
 import dxchange
 import alignment
+import numpy as np
 
 if __name__ == '__main__':
-    # Set path to the micro-CT data to reconstruct.
-    fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop/'
-
-    sample_detector_distance = 18.8e2
-    detector_pixel_size_x = 19.8e-7
-    monochromator_energy = 11.0
-
-    # for scan_renamed_450projections
+    # Set path to the micro-CT data to align.
+    fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop'
+    
+    # Set for scan_renamed_450projections
     proj_start = 0
     proj_end = 451
     flat_start = 0
     flat_end = 93
     dark_start = 0
     dark_end = 10
+    
+    # Set binning and number of iterations
+    binning = 4
+    iters = 7
 
+    # Selec ranges
     ind_tomo = range(proj_start, proj_end)
     ind_flat = range(flat_start, flat_end)
     ind_dark = range(dark_start, dark_end)
@@ -39,27 +41,20 @@ if __name__ == '__main__':
     # Flat-field correction of raw data.
     data = tomopy.normalize(proj, flat, dark)
 
-
     data = tomopy.minus_log(data)
 
     print(data.shape)
-    #data = tomopy.downsample(data, level=4, axis=1)
-    #data = tomopy.downsample(data, level=4, axis=2)
+    data = tomopy.downsample(data, level=binning, axis=1)
+    data = tomopy.downsample(data, level=binning, axis=2)
     print(data.shape)
     
-    cprj, sx, sy, conv = alignment.align_seq(data, theta, iters=100, pad=(10, 10), blur=True, save=True, debug=True)
-    #cprj, sx, sy, conv = alignment.align_joint(data, theta, iters=10, pad=(10, 10), blur=True, save=True, debug=True)
+    fdir = fname + '_aligned' + '/align_iter_' + str(iters)
+    print(fdir)
+    cprj, sx, sy, conv = alignment.align_seq(data, theta, fdir=fdir, iters=iters, pad=(10, 10), blur=True, save=True, debug=True)
 
-    print(sx, sy)
-    
-    ##rot_center = (cprj.shape[2]) / 2.0
-    # Reconstruct object using Gridrec algorithm.
-    ##rec = tomopy.recon(cprj, theta, center=rot_center, algorithm='gridrec')
+    np.save(fdir + '/shift_x', sx)
+    np.save(fdir + '/shift_y', sy)
 
-    # Mask each reconstructed slice with a circle.
-    ##rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
-
-    # Write data as stack of TIFs.
-    ##dxchange.write_tiff_stack(rec, fname='/local/decarlo/conda/util/align/rec/image')
-    dxchange.write_tiff_stack(cprj, fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_100/radios/image')
+    # Write aligned projections as stack of TIFs.
+    dxchange.write_tiff_stack(cprj, fname=fdir + '/radios/image')
 
