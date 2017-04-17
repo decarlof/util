@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
 
-    folder = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_15/'
+    #folder = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_40/'
+    folder = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/'
     unique_filename = uuid.uuid4()
     print(unique_filename)
     sx = np.load(folder + 'shift_x.npy')
