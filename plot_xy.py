@@ -35,7 +35,6 @@ def setplot(fname, nplot, xplot, yplot, label=False):
 
 if __name__ == '__main__':
 
-
     fig = plt.figure()
     fig.suptitle('  Noise Level', fontsize=14, fontweight='bold')
     fig.subplots_adjust(top=0.94)
@@ -79,5 +78,7 @@ if __name__ == '__main__':
     c30, ax_c30 = setplot('./plots/hist_cnn30.npy', 6, 2, 12)
     ax_c30.fill(c30)
 
+    plt.savefig('plot.eps', format='eps', dpi=1000)
+    plt.savefig('plot.png')
     plt.show()
 
