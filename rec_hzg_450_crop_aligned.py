@@ -16,7 +16,8 @@ import sirtfilter
 if __name__ == '__main__':
     # Set path to the micro-CT data to reconstruct.
     ##fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_40/radios/image_00000.tiff'
-    fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/radios/image_00000.tiff'
+    ##fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/radios/image_00000.tiff'
+    fname = '/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_40/radios/image_00000.tiff'
 
     sample_detector_distance = 18.8e2
     detector_pixel_size_x = 19.8e-7
@@ -45,7 +46,8 @@ if __name__ == '__main__':
 
     # Write data as stack of TIFs.
     ##fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_40/recon_dir/aligned_gridrec/recon'
-    fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/recon_dir/aligned_gridrec/recon'
+    ##fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/recon_dir/aligned_gridrec/recon'
+    fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_40/recon_dir/aligned_gridrec/recon'
     dxchange.write_tiff_stack(rec, fname)
 
     # Reconstruct object using sirt-fbp algorithm:
@@ -76,7 +78,8 @@ if __name__ == '__main__':
 
     # Write data as stack of TIFs.
     ##fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_aligned/align_iter_40/recon_dir/aligned_sirtfbp/recon'
-    fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/recon_dir/aligned_sirtfbp/recon'
+    ##fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_39/recon_dir/aligned_sirtfbp/recon'
+    fname='/local/decarlo/data/hzg/nanotomography/scan_renamed_450projections_crop_rotate_aligned/align_iter_40/recon_dir/aligned_sirtfbp/recon'
     dxchange.write_tiff_stack(rec, fname=fname)
 
 
