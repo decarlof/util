@@ -18,7 +18,8 @@ import sirtfilter
 # python setup.py install
 
 # sirtfilter:
-# conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter# conda install -c astra-toolbox astra-toolbox
+# conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter
+# conda install -c astra-toolbox astra-toolbox
 if __name__ == '__main__':
 
     sample_name = 'INF_T1_200mPsBr_005a_s01a'
