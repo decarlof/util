@@ -46,9 +46,9 @@ if __name__ == '__main__':
             # Select sinogram range to reconstruct.
             sino = None
             
-            start = 700
-            end = 701
-            sino = (start, end)
+            ##start = 700
+            ##end = 701
+            ##sino = (start, end)
             
             # Read APS 32-ID raw data.
             proj, flat, dark, theta = dxchange.read_aps_32id(fname, sino=sino)
@@ -72,7 +72,7 @@ if __name__ == '__main__':
             rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
             # Write data as stack of TIFs.
-            ##fname = top +'rec_' + prefix + index + '/recon'
-            fname = top +'rec_slice_' + prefix + '/recon'
+            fname = top +'full_rec/' + prefix + index + '/recon'
+            ##fname = top +'rec_slice_' + prefix + '/recon'
             print("Rec: ", fname)
             dxchange.write_tiff_stack(rec, fname=fname)
