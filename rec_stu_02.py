@@ -34,6 +34,11 @@ if __name__ == '__main__':
     281: {"0281": 1273.5}, 282: {"0282": 1273.5}, 283: {"0283": 1273.5}, 284: {"0284": 1273.5}, 285: {"0285": 1273.5}, 286: {"0286": 1273.5}, 287: {"0287": 1273.5}, 288: {"0288": 1273.5}, 289: {"0289": 1273.5}, 290: {"0290": 1273.5}, 
     291: {"0291": 1280.0}, 292: {"0292": 1280.0}, 293: {"0293": 1280.0}, 294: {"0294": 1280.0}, 295: {"0295": 1280.0}, 296: {"0296": 1280.0}, 297: {"0297": 1280.0}, 298: {"0298": 1280.0}, 299: {"0299": 1280.0}, 300: {"0300": 1280.0},
     301: {"0301": 1280.0}, 302: {"0302": 1280.0}, 303: {"0303": 1280.0}, 304: {"0304": 1280.0}} 
+
+    sample_detector_distance = 60      # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
+    monochromator_energy = 24.9        # Energy of incident wave in keV
+
     for key in dictionary:
         dict2 = dictionary[key]
         for key2 in dict2:
@@ -59,8 +64,11 @@ if __name__ == '__main__':
             # remove stripes
             proj = tomopy.remove_stripe_fw(proj,level=5,wname='sym16',sigma=1,pad=True)
 
+            # phase retrieval
+            #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=8e-3,pad=True)
+
             # Find rotation center
-            #rot_center1 = tomopy.find_center(proj, theta, init=rot_center, ind=start, tol=0.5)
+            #rot_center = tomopy.find_center(proj, theta, init=rot_center, ind=start, tol=0.5)
             print(index, rot_center)
 
             proj = tomopy.minus_log(proj)
@@ -73,6 +81,6 @@ if __name__ == '__main__':
 
             # Write data as stack of TIFs.
             fname = top +'full_rec/' + prefix + index + '/recon'
-            ##fname = top +'rec_slice_' + prefix + '/recon'
+            ##fname = top +'rec_slice/' + prefix + index + '_recon'
             print("Rec: ", fname)
             dxchange.write_tiff_stack(rec, fname=fname)

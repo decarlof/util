@@ -23,6 +23,11 @@ if __name__ == '__main__':
     51: {"0051": 1122.5}, 56: {"0056": 1122.5}, 77: {"0077": 1122.5}, 92: {"0092": 1122.5}, 98: {"0098": 1122.5}, 99: {"0099": 1122.5}, 100: {"0100": 1122.5},
     101: {"0101": 1129.0}, 102: {"0102": 1131.5}, 103: {"0103": 1130.0}, 104: {"0104": 1131.5}, 105: {"0105": 1129.0}, 106: {"0106": 1131.5}, 107: {"0107": 1129.0}, 108: {"0108": 1129.0}, 109: {"0109": 1132.5}, 110: {"0110": 1132.5}, 
     111: {"0111": 1131.5}, 112: {"0112": 1131.5}, 113: {"0113": 1131.5}, 114: {"0114": 1131.5}, 115: {"0115": 1131.5}, 116: {"0116": 1131.5}, 117: {"0117": 1131.5}, 118: {"0118": 1131.5}, 119: {"0119": 1131.5}, 120: {"0120": 1131.5}} 
+
+    sample_detector_distance = 60      # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
+    monochromator_energy = 24.9        # Energy of incident wave in keV
+
     for key in dictionary:
         dict2 = dictionary[key]
         for key2 in dict2:
@@ -35,9 +40,9 @@ if __name__ == '__main__':
             # Select sinogram range to reconstruct.
             sino = None
             
-            ##start = 285
-            ##end = 286
-            ##sino = (start, end)
+            #start = 285
+            #end = 286
+            #sino = (start, end)
             
             # Read APS 32-ID raw data.
             proj, flat, dark, theta = dxchange.read_aps_32id(fname, sino=sino)
@@ -48,8 +53,11 @@ if __name__ == '__main__':
             # remove stripes
             proj = tomopy.remove_stripe_fw(proj,level=5,wname='sym16',sigma=1,pad=True)
 
+            # phase retrieval
+            #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=8e-3,pad=True)
+
             # Find rotation center
-            #rot_center1 = tomopy.find_center(proj, theta, init=rot_center, ind=start, tol=0.5)
+            #rot_center = tomopy.find_center(proj, theta, init=rot_center, ind=start, tol=0.5)
             print(index, rot_center)
 
             proj = tomopy.minus_log(proj)
@@ -62,6 +70,6 @@ if __name__ == '__main__':
 
             # Write data as stack of TIFs.
             fname = top +'full_rec/' + prefix + index + '/recon'
-            ##fname = top +'rec_slice_' + prefix + '/recon'
+            ##fname = top +'rec_slice/' + prefix + index + '_recon'
             print("Rec: ", fname)
             dxchange.write_tiff_stack(rec, fname=fname)
