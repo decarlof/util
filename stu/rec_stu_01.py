@@ -30,11 +30,10 @@ if __name__ == '__main__':
 
     for key in dictionary:
         dict2 = dictionary[key]
-        for key2 in dict2:
+        for h5name in dict2:
             prefix = 'exp_'
-            index = key2
-            fname = top + prefix + index + '/proj_' + index + '.hdf'
-            rot_center = dict2[key2]
+            fname = top + prefix + h5name + '/proj_' + h5name + '.hdf'
+            rot_center = dict2[h5name]
             #print(fname, rot_center)
 
             # Select sinogram range to reconstruct.
@@ -58,7 +57,7 @@ if __name__ == '__main__':
 
             # Find rotation center
             #rot_center = tomopy.find_center(proj, theta, init=rot_center, ind=start, tol=0.5)
-            print(index, rot_center)
+            print(h5name, rot_center)
 
             proj = tomopy.minus_log(proj)
 
@@ -69,7 +68,7 @@ if __name__ == '__main__':
             rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
             # Write data as stack of TIFs.
-            fname = top +'full_rec/' + prefix + index + '/recon'
-            ##fname = top +'rec_slice/' + prefix + index + '_recon'
+            fname = top +'full_rec/' + prefix + h5name + '/recon'
+            ##fname = top +'slice_rec/' + prefix + h5name + '_recon'
             print("Rec: ", fname)
             dxchange.write_tiff_stack(rec, fname=fname)
