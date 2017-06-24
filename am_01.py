@@ -18,6 +18,7 @@ from scipy.ndimage import gaussian_filter
 import skimage.segmentation as seg
 import skimage
 from skimage.morphology import square
+import scipy
 
 def update(val):
     frame = int(np.around(sframe.val))
@@ -40,6 +41,22 @@ if __name__ == '__main__':
     fname = top + template
     # Read the tiff raw data.
     rdata = dxchange.read_tiff_stack(fname, ind=ind_tomo)
+
+    print(rdata[0].shape)
+    edge = np.sum(rdata[0], axis=1)
+    x = np.arange(0, edge.shape[0], 1)
+    y = edge
+
+    print(x.shape)
+    print(edge.shape)
+    spl = scipy.interpolate.splrep(x,y,k=3) # no smoothing, 3rd order spline
+    ddy = scipy.interpolate.splev(x,spl,der=2) # use those knots to get second derivative 
+
+    print("1:", ddy.shape)
+    print("2:", min(ddy))
+    print("3:", np.argmin(ddy))
+    print("4:", np.argmin(ddy[np.argmin(ddy - 0).argmin()]))
+    print("5:", ddy[np.argmin(ddy - 0).argmin()])
 
 
     # Set the [start, end] index of the blocked images, flat and dark.
@@ -66,7 +83,7 @@ if __name__ == '__main__':
         #ndata[index, :, :] = seg.find_boundaries(ndata[index, :, :])
         #ndata[index, :, :] = feature.canny(ndata[index, :, :])
         ndata[index, :, :] = filters.sobel(ndata[index, :, :])
-        ndata[index, :, :] = filters.rank.threshold(ndata[index, :, :], square(3))
+        #ndata[index, :, :] = filters.rank.threshold(ndata[index, :, :], square(3))
         #ndata[index, :, :] = skimage.img_as_float(ndata[index, :, :])
         #ndata[index, :, :]  = gaussian_filter(ndata[index, :, :] , 1)
     ax = pl.subplot(111)
