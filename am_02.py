@@ -4,54 +4,65 @@
 """
 Python example of how to read am images.
 """
-
 from __future__ import print_function
-import tomopy
+import sys
+import argparse
+from os.path import expanduser
 import dxchange
 import numpy as np
-import matplotlib as mpl
-import matplotlib.pylab as pl
-from matplotlib.widgets import Slider
-from skimage import data, io, filters
-from skimage import feature
-from scipy.ndimage import gaussian_filter
-import skimage.segmentation as seg
-import skimage
-from skimage.morphology import square
-import scipy
+import scipy.ndimage as ndi
+import matplotlib.pyplot as plt
 
-if __name__ == '__main__':
-    # Set path to the micro-CT data to reconstruct.
-    top = '/Users/decarlo/Desktop/data/am/'
-    template = '102_Ti_T046mm_U18G13_04mps_p70_D100um_100ps_longpath_S10156.tif'
-    index_start = 10156
-    index_end = 10162
+def particle_bed_location(image, plot=False):
+    edge = np.sum(image, axis=1)
+    x = np.arange(0, edge.shape[0], 1)
+    y = ndi.gaussian_filter(edge/float(np.amax(edge)), 5)
+    if plot:
+        plt.plot(x, y)
+        plt.show()
+    return np.abs(y - 0.5).argmin()
 
-    top = '/Users/decarlo/Desktop/data/Ti_126/'
-    template = '126_Ti_T1mm_U18G13_0.3mps_p90_D100um_500ns_across_S10001.tif'
-    index_start = 10001
-    index_end = 10401
+def laser_on(rdata, particle_bed_ref, alpha=0.8):
+    nimages = rdata.shape[0]
+    status = np.empty(nimages)
 
-    ind_tomo = range(index_start, index_end)
+    for index in range(nimages):
+        ndata = rdata[index]
+        edge = np.sum(ndata, axis=1)
+        y = ndi.gaussian_filter(edge/float(np.amax(edge)), 5)
+        particle_bed = np.abs(y - 0.5).argmin()
+
+        if particle_bed_ref >= particle_bed :
+            status[index] = False
+        else:
+            status[index] = True
+            particle_bed_ref = particle_bed_ref * alpha
+    return status
+
+def main(arg):
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("top", help="top directory where the tiff images are located: /data/")
+    parser.add_argument("template", help="file name to be used as template: file_00001.tif")
+    parser.add_argument("index_start", help="index of the first image: 10001")
+    parser.add_argument("index_end", help="index of the last  image: 10401")
+
+    args = parser.parse_args()
+    top = args.top
+    template = args.template
+    index_start = int(args.index_start)
+    index_end = int(args.index_end)
 
     fname = top + template
+    ind_tomo = range(index_start, index_end)
+
     # Read the tiff raw data.
     rdata = dxchange.read_tiff_stack(fname, ind=ind_tomo)
 
-    print(rdata[0].shape)
-    edge = np.sum(rdata[0], axis=1)
-    x = np.arange(0, edge.shape[0], 1)
-    y = edge
+    particle_bed_reference = particle_bed_location(rdata[0], plot=False)
 
-    print(x.shape)
-    print(edge.shape)
-    spl = scipy.interpolate.splrep(x,y,k=3) # no smoothing, 3rd order spline
-    ddy = scipy.interpolate.splev(x,spl,der=2) # use those knots to get second derivative 
+    print("Particle bed location: ", particle_bed_reference)
+    print("Laser on?: ", laser_on(rdata, particle_bed_reference))
 
-    print("1:", ddy.shape)
-    print("2:", min(ddy))
-    print("3:", np.argmin(ddy))
-    print("4:", np.argmin(ddy[np.argmin(ddy - 0).argmin()]))
-    print("5:", ddy[np.argmin(ddy - 0).argmin()])
-
-
+if __name__ == "__main__":
+    main(sys.argv[1:])
