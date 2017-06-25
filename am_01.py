@@ -44,6 +44,15 @@ class slider():
         self.frame = int(np.around(self.sframe.val))
         self.l.set_data(self.data[self.frame,:,:])
 
+def shutter_off(image, alpha=0.7, plot=False):
+    flat_sum = np.sum(image[0, :, :])
+    nimages = image.shape[0]
+    for index in range(nimages):
+        image_sum = np.sum(image[index, :, :])
+        if image_sum < alpha * flat_sum :
+            return index
+    return None
+
 def particle_bed_location(image, plot=False):
     edge = np.sum(image, axis=1)
     x = np.arange(0, edge.shape[0], 1)
@@ -70,6 +79,23 @@ def laser_on(rdata, particle_bed_ref, alpha=0.8):
             particle_bed_ref = particle_bed_ref * alpha
     return status
 
+def scale_to_one(ndata):
+    ndata_max = np.amax(ndata)
+    ndata_min = np.amin(ndata)
+    nimages = ndata.shape[0]
+    for index in range(nimages):
+        # normalize between [0,1]
+        ndata_max = np.amax(ndata[index, :, :])
+        ndata_min = np.amin(ndata[index, :, :])
+        ndata[index, :, :] = (ndata[index, :, :] - ndata_min) / (ndata_max - ndata_min)
+    return ndata
+
+def sobel_stack(ndata):
+    nimages = ndata.shape[0]
+    for index in range(nimages):
+        ndata[index, :, :] = ski.filters.sobel(ndata[index, :, :])
+    return ndata
+    
 def main(arg):
 
     parser = argparse.ArgumentParser()
@@ -87,74 +113,39 @@ def main(arg):
     index_end = index_start + nfile
     ind_tomo = range(index_start, index_end)
 
-#    print("1:", ind_tomo)
     fname = top + template
 
     # Read the tiff raw data.
-#    print("2: ", index_start, index_end, fname)
     rdata = dxchange.read_tiff_stack(fname, ind=ind_tomo)
     particle_bed_reference = particle_bed_location(rdata[0], plot=False)
     print("Particle bed location: ", particle_bed_reference)
 
+    # Cut the images to remove the particle bed
     cdata = rdata[:, 0:particle_bed_reference, :]
+
+    # Find the image when the shutter starts to close
+    dark_index = shutter_off(rdata)
 
     # Set the [start, end] index of the blocked images, flat and dark.
     flat_range = [0, 1]
-    data_range = [1, nfile-19]
+    data_range = [1, dark_index]
+    dark_range = [dark_index, nfile]
+
+    # for fast testing
     #data_range = [100, 120]
-    dark_range = [nfile-19, nfile]
 
     flat = cdata[flat_range[0]:flat_range[1], :, :]
     proj = cdata[data_range[0]:data_range[1], :, :]
-    dark = cdata[dark_range[0]:dark_range[1], :, :]
+    dark = np.zeros((dark_range[1]-dark_range[0], proj.shape[1], proj.shape[2]))  
+
+    # if you want to use the shutter closed images as dark uncomment this:
+    #dark = cdata[dark_range[0]:dark_range[1], :, :]  
 
     ndata = tomopy.normalize(proj, flat, dark)
     ndata = tomopy.normalize_bg(ndata, air=ndata.shape[2]/2.5)
 
-    # normalize between [0,1]
-    ##ndata_max = np.amax(ndata)
-    ##ndata_min = np.amin(ndata)
-    ##ndata = (ndata - ndata_min) / (ndata_max - ndata_min)
- 
-    ndata_max = np.amax(ndata)
-    ndata_min = np.amin(ndata)
-    #print(ndata_min, ndata_max)
-    nimages = ndata.shape[0]
-    #print(np.amin(ndata[0, :, :]), np.amax(ndata[0, :, :]))
-    for index in range(nimages):
-        # normalize between [0,1]
-        ndata_max = np.amax(ndata[index, :, :])
-        ndata_min = np.amin(ndata[index, :, :])
-        ndata[index, :, :] = (ndata[index, :, :] - ndata_min) / (ndata_max - ndata_min)
-        print(np.amin(ndata[index, :, :]), np.amax(ndata[index, :, :]))
-        ndata[index, :, :] = (ndata[index, :, :])
-        #ndata[index, :, :] = chan_vese(ndata[index, :, :])
-        #ndata[index, :, :] = seg.find_boundaries(ndata[index, :, :])
-        #ndata[index, :, :] = ski.feature.canny(ndata[index, :, :])
-        ###ndata[index, :, :] = ski.filters.sobel(ndata[index, :, :])
-        ##ndata[index, :, :] = ski.img_as_float(ndata[index, :, :])
-        #tr = ski.filters.threshold_mean(ndata[index, :, :])
-        ##tr = ski.filters.threshold_li(ndata[index, :, :])
-        ###imin = np.amin(ndata[index, :, :])
-        ###imax = np.amax(ndata[index, :, :])
-        ###print(imin, imax, (imax+imin)/2.0)
-        ###ndata[index, :, :] = (ndata[index, :, :] > 0)
-        ###radius = 15
-        ###selem = morth.disk(radius)
-        ###local_otsu = ski.filters.rank.otsu(ndata[index, :, :], selem)
-        ###threshold_global_otsu = ski.filters.threshold_otsu(ndata[index, :, :])
-        #ndata[index, :, :] = ski.filters.threshold_local(ndata[index, :, :], 7)
-        #ndata[index, :, :] = ski.filters.rank.threshold(ndata[index, :, :], morth.square(3))
-        #ndata[index, :, :]  = ndi.gaussian_filter(ndata[index, :, :] , 1)
-
-
-    for index in range(nimages):
-        #ndata[index, :, :] = (ndata[index, :, :])
-        #radius = 15
-        #selem = morth.disk(radius)
-        #local_otsu = ski.filters.rank.otsu(ndata[index, :, :], selem)
-        #threshold_global_otsu = ski.filters.threshold_otsu(ndata[index, :, :])
-        ndata[index, :, :] = ski.filters.sobel(ndata[index, :, :])
+    ndata = scale_to_one(ndata)
+    nddata = sobel_stack(ndata)
     slider(ndata)
 
 if __name__ == "__main__":
