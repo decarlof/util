@@ -17,11 +17,13 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pylab as pl
 import matplotlib.widgets as wdg
+import matplotlib.pyplot as plt
 
 import skimage as ski
 import skimage.segmentation as seg
 import skimage.morphology as morth
 import scipy.ndimage as ndi
+import scipy
 
 class slider():
     def __init__(self, data):
@@ -95,7 +97,17 @@ def sobel_stack(ndata):
     for index in range(nimages):
         ndata[index, :, :] = ski.filters.sobel(ndata[index, :, :])
     return ndata
-    
+
+def label(ndata, blur_radius=1.0, threshold=1):
+
+    nimages = ndata.shape[0]
+    for index in range(nimages):
+        ndata[index, :, :] = ndi.gaussian_filter(ndata[index, :, :], blur_radius)
+        ndata[index, :, :], nr_objects = scipy.ndimage.label(ndata[index, :, :] > threshold) 
+        print ("Image %d contains %d particles" % (index, nr_objects))
+        # print(np.amin(ndata[index, :, :]), np.amax(ndata[index, :, :]), np.mean(ndata[index, :, :]))
+    return ndata, nr_objects
+
 def main(arg):
 
     parser = argparse.ArgumentParser()
@@ -119,20 +131,20 @@ def main(arg):
     rdata = dxchange.read_tiff_stack(fname, ind=ind_tomo)
     particle_bed_reference = particle_bed_location(rdata[0], plot=False)
     print("Particle bed location: ", particle_bed_reference)
-
+    
     # Cut the images to remove the particle bed
     cdata = rdata[:, 0:particle_bed_reference, :]
 
     # Find the image when the shutter starts to close
     dark_index = shutter_off(rdata)
-
+    print("shutter closes on image: ", dark_index)
     # Set the [start, end] index of the blocked images, flat and dark.
     flat_range = [0, 1]
-    data_range = [1, dark_index]
+    data_range = [48, dark_index]
     dark_range = [dark_index, nfile]
 
-    # for fast testing
-    #data_range = [100, 120]
+    # # for fast testing
+    # data_range = [48, dark_index]
 
     flat = cdata[flat_range[0]:flat_range[1], :, :]
     proj = cdata[data_range[0]:data_range[1], :, :]
@@ -143,10 +155,23 @@ def main(arg):
 
     ndata = tomopy.normalize(proj, flat, dark)
     ndata = tomopy.normalize_bg(ndata, air=ndata.shape[2]/2.5)
+    ndata = tomopy.minus_log(ndata)
+    slider(ndata)
 
     ndata = scale_to_one(ndata)
-    nddata = sobel_stack(ndata)
+    ndata = sobel_stack(ndata)
     slider(ndata)
+
+    ndata = tomopy.normalize(proj, flat, dark)
+    ndata = tomopy.normalize_bg(ndata, air=ndata.shape[2]/2.5)
+    ndata = tomopy.minus_log(ndata)
+
+    blur_radius = 3.0
+    threshold = .04
+    nddata = label(ndata, blur_radius, threshold)
+    slider(ndata)
+
+    # http://www.scipy-lectures.org/packages/scikit-image/auto_examples/plot_labels.html
 
 if __name__ == "__main__":
     main(sys.argv[1:])
