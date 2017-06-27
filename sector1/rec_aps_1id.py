@@ -14,9 +14,9 @@ if __name__ == '__main__':
     # Set path to the micro-CT data to reconstruct.
     fname = '/local/dataraid/sector1/g120f5/g120f5_'
 
-    sample_detector_distance = 60      # Propagation distance of the wavefront in cm
+    sample_detector_distance = 10      # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 1.2e-4     # Detector pixel size in cm
-    monochromator_energy = 50.0        # Energy of incident wave in keV
+    monochromator_energy = 61.332        # Energy of incident wave in keV
 
     # Select the sinogram range to reconstruct.
     start = 100
