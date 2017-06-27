@@ -20,8 +20,7 @@ if __name__ == '__main__':
 
     # Select the sinogram range to reconstruct.
     start = 100
-    end = 600
-    end = 111
+    end = 101
 
     # Read the APS 1-ID raw data.
     proj, flat, dark = dxchange.read_aps_1id(fname, sino=(start, end))
