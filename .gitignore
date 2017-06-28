@@ -106,3 +106,6 @@ coverage.xml
 *.sublime-project
 *.sublime-workspace
 docs/trunk/*
+
+# tomopy by products
+*.mat
