@@ -14,7 +14,7 @@ import sirtfilter
 if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
-    fname = '/local/decarlo/data/sector1/g120f5/g120f5_'
+    fname = '/local/dataraid/sector1/g120f5/g120f5_'
 
     sample_detector_distance = 10      # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 1.2e-4     # Detector pixel size in cm
