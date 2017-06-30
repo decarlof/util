@@ -48,15 +48,18 @@ def main(arg):
     sino, sflat, sdark, th = dxchange.read_aps_32id(fname)
 
     slider(sino)
+    proj = np.swapaxes(sino,0,1)
+    flat = np.swapaxes(sflat,0,1)
+    dark = np.swapaxes(sdark,0,1)
 
     # Set data collection angles as equally spaced between 0-180 degrees.
-    theta = tomopy.angles(sino.shape[1], ang1=0.0, ang2=180.0)
+    theta = tomopy.angles(proj.shape[0], ang1=0.0, ang2=180.0)
 
-    print(sino.shape, sdark.shape, sflat.shape, theta.shape)
+    print(proj.shape, dark.shape, flat.shape, theta.shape)
 
-    # Quick normalization just to see something ....
-    ndata = sino / float(np.amax(sino))
-    slider(ndata)
+    # Flat-field correction of raw data.
+    ndata = tomopy.normalize(proj, flat, dark)
+    #slider(ndata)
 
     # Find rotation center.
     rot_center = 980
@@ -68,7 +71,7 @@ def main(arg):
     ndata = tomopy.minus_log(ndata)
     
     # Reconstruct object using Gridrec algorithm.
-    rec = tomopy.recon(ndata, theta, center=rot_center, sinogram_order=True, algorithm='gridrec')
+    rec = tomopy.recon(ndata, theta, center=rot_center, algorithm='gridrec')
 
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
