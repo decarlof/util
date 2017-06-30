@@ -24,6 +24,7 @@ import skimage.segmentation as seg
 import skimage.morphology as morth
 import scipy.ndimage as ndi
 import scipy
+import cv2
 
 class slider():
     def __init__(self, data):
@@ -108,6 +109,20 @@ def label(ndata, blur_radius=1.0, threshold=1):
         # print(np.amin(ndata[index, :, :]), np.amax(ndata[index, :, :]), np.mean(ndata[index, :, :]))
     return ndata, nr_objects
 
+def sharpening(ndata):
+    kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+    nimages = ndata.shape[0]
+    for index in range(nimages):
+        ndata[index, :, :] = cv2.filter2D(ndata[index, :, :], -1, kernel)
+    return ndata
+   
+def circle_detection(ndata):
+    nimages = ndata.shape[0]
+    for index in range(nimages):
+        ndata[index, :, :] = cv2.filter2D(ndata[index, :, :], -1, kernel)
+    return ndata
+
+
 def main(arg):
 
     parser = argparse.ArgumentParser()
@@ -156,20 +171,21 @@ def main(arg):
     ndata = tomopy.normalize(proj, flat, dark)
     ndata = tomopy.normalize_bg(ndata, air=ndata.shape[2]/2.5)
     ndata = tomopy.minus_log(ndata)
+    sharpening(ndata)
     slider(ndata)
 
-    ndata = scale_to_one(ndata)
-    ndata = sobel_stack(ndata)
-    slider(ndata)
+#    ndata = scale_to_one(ndata)
+#    ndata = sobel_stack(ndata)
+#    slider(ndata)
 
-    ndata = tomopy.normalize(proj, flat, dark)
-    ndata = tomopy.normalize_bg(ndata, air=ndata.shape[2]/2.5)
-    ndata = tomopy.minus_log(ndata)
+#    ndata = tomopy.normalize(proj, flat, dark)
+#    ndata = tomopy.normalize_bg(ndata, air=ndata.shape[2]/2.5)
+#    ndata = tomopy.minus_log(ndata)
 
-    blur_radius = 3.0
-    threshold = .04
-    nddata = label(ndata, blur_radius, threshold)
-    slider(ndata)
+#    blur_radius = 3.0
+#    threshold = .04
+#    nddata = label(ndata, blur_radius, threshold)
+#    slider(ndata)
 
     # http://www.scipy-lectures.org/packages/scikit-image/auto_examples/plot_labels.html
 

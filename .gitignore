@@ -109,3 +109,4 @@ docs/trunk/*
 
 # tomopy by products
 *.mat
+recon_dir
