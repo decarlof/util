@@ -42,7 +42,7 @@ class slider():
    
 def main(arg):
 
-    fname = '/local/decarlo/elettra/Oak_16bit_slice343_all_repack.h5'
+    fname = '/local/dataraid/elettra/Oak_16bit_slice343_all_repack.h5'
     
     # Read the hdf raw data.
     sino, sflat, sdark, th = dxchange.read_aps_32id(fname)
@@ -62,7 +62,7 @@ def main(arg):
     #slider(ndata)
 
     # Find rotation center.
-    rot_center = 980
+    rot_center = 962
 
     binning = 1
     ndata = tomopy.downsample(ndata, level=int(binning))
