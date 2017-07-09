@@ -114,21 +114,44 @@ def mse(x, y):
 
 def main(arg):
 
-    top = '/local/dataraid/elettra/rockoil/'
-    img_ref = 'Rockoil_slice1021_original_noPhRet.tif'
-    img_01 = 'Rockoil_slice1021_q50_noPhRet.tif'
-    img_02 = 'Rockoil_slice1021_q100_noPhRet.tif'
-    img_03 = 'Rockoil_slice1021_q150_noPhRet.tif'
-    img_label = 'Rockoil'
-    img_01_label = ' q50'
-    img_02_label = ' q100'
-    img_03_label = ' q150'
+    img_label = 'Composite'
+    img_label = 'Composite'
+    #img_label = 'Foam'
+    # img_label = 'Oak'
+    top = '/Users/decarlo/Desktop/data/elettra/' + img_label  + '/'
+
+    img_ref = 'slice_0000.tif'
+    img_01 = 'slice_0050.tif'
+    img_02 = 'slice_0100.tif'
+    img_03 = 'slice_0150.tif'
+    img_01_label = ' q = 50'
+    img_02_label = ' q = 100'
+    img_03_label = ' q = 150'
     
+
+    # img_label = 'Rockoil'
+    # top = '/Users/decarlo/Desktop/data/elettra/' + img_label  + '/'
+    # img_ref = 'Rockoil_slice1021_original_noPhRet.tif'
+    # img_01 = 'Rockoil_slice1021_q50_noPhRet.tif'
+    # img_02 = 'Rockoil_slice1021_q100_noPhRet.tif'
+    # img_03 = 'Rockoil_slice1021_q150_noPhRet.tif'
+
     # Read the tiff raw data.
     rdata_01 = dxchange.read_tiff(top + img_01)
     rdata_02 = dxchange.read_tiff(top + img_02)
     rdata_03 = dxchange.read_tiff(top + img_03)
     reference =  dxchange.read_tiff(top + img_ref)
+
+    # # Read the tiff raw data.
+    # rdata_011 = dxchange.read_tiff(top + img_01)
+    # rdata_021 = dxchange.read_tiff(top + img_02)
+    # rdata_031 = dxchange.read_tiff(top + img_03)
+    # reference1 =  dxchange.read_tiff(top + img_ref)
+    # Mask each reconstructed slice with a circle.
+    # rdata_01 = rdata_011[512:1536, 212:1436]
+    # rdata_02 = rdata_021[512:1536, 212:1436]
+    # rdata_03 = rdata_031[512:1536, 212:1436]
+    # reference = reference1[512:1536, 212:1436]
 
 
 
@@ -152,22 +175,22 @@ def main(arg):
     mse_noise_03 = mse(reference, rdata_03)
     ssim_noise_03 = ssim(reference, rdata_03, data_range=rdata_03.max() - rdata_03.min())
 
-    label = 'MSE: {:.2f}, SSIM: {:.2f}'
+    label = 'SSIM: {:.2f}'
     ax[0].imshow(reference, cmap=plt.cm.gray)
-    ax[0].set_xlabel(label.format(mse_none, ssim_none))
+    ax[0].set_xlabel(label.format(ssim_none))
     ax[0].set_title('Original')
 
     ax[1].imshow(rdata_01, cmap=plt.cm.gray)
-    ax[1].set_xlabel(label.format(mse_noise_01, ssim_noise_01))
-    ax[1].set_title('Compressed'+ img_01_label)
+    ax[1].set_xlabel(label.format(ssim_noise_01))
+    ax[1].set_title(img_01_label)
 
     ax[2].imshow(rdata_02, cmap=plt.cm.gray)
-    ax[2].set_xlabel(label.format(mse_noise_02, ssim_noise_02))
-    ax[2].set_title('Compressed'+ img_02_label)
+    ax[2].set_xlabel(label.format(ssim_noise_02))
+    ax[2].set_title(img_02_label)
 
     ax[3].imshow(rdata_03, cmap=plt.cm.gray)
-    ax[3].set_xlabel(label.format(mse_noise_03, ssim_noise_03))
-    ax[3].set_title('Compressed'+ img_03_label)
+    ax[3].set_xlabel(label.format(ssim_noise_03))
+    ax[3].set_title(img_03_label)
 
 
     plt.suptitle(img_label)
