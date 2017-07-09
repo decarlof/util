@@ -47,7 +47,7 @@ if __name__ == '__main__':
     top = '/local/dataraid/Dinc/'
 
     # Auto generated dictionary by find_center to contain {exp_number : center of rotation}
-    dictionary = dictionary = read_rot_centers('arun.json')
+    dictionary = read_rot_centers('arun.json')
 
     sample_detector_distance = 5       # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
