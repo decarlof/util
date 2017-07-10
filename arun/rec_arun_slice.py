@@ -47,6 +47,9 @@ if __name__ == '__main__':
     # Set path to the micro-CT data to reconstruct.
     top = '/local/dataraid/Dinc/'
 
+    # Set path to the file containing the rotation axis positions.
+    jfname = "arun.json"
+
        
     sample_detector_distance = 5       # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
@@ -55,7 +58,7 @@ if __name__ == '__main__':
     zinger_level = 1000                # Zinger level for projections
     zinger_level_w = 1000              # Zinger level for white
     
-    dictionary = read_rot_centers('arun.json')
+    dictionary = read_rot_centers(jfname)
     
     for key in dictionary:
         dict2 = dictionary[key]
@@ -63,7 +66,7 @@ if __name__ == '__main__':
             prefix = 'exp_'
             fname = top + prefix + h5name + '/proj_' + h5name + '.hdf'
             rot_center = dict2[h5name]
-            print(fname, rot_center)
+            ##print(fname, rot_center)
 
             # Select sinogram range to reconstruct.
             sino = None
@@ -73,7 +76,7 @@ if __name__ == '__main__':
             sino = (start, end)
 
             # Read APS 2-BM raw data.
-            if (key > 6):            
+            if (int(key) > 6):            
                 proj, flat, dark, theta = read_aps_2bm_custom(fname, sino=sino)
             else:
                 proj, flat, dark, theta = dxchange.read_aps_2bm(fname, sino=sino)
@@ -107,6 +110,6 @@ if __name__ == '__main__':
 
             # Write data as stack of TIFs.
             ##fname = top +'full_rec/' + prefix + h5name + '/recon'
-            fname = top +'slice_rec2/' + prefix + h5name + '_recon'
+            fname = top +'slice_rec/' + prefix + h5name + '_recon'
             print("Rec: ", fname)
             dxchange.write_tiff_stack(rec, fname=fname)

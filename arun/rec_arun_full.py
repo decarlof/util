@@ -45,9 +45,12 @@ if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
     top = '/local/dataraid/Dinc/'
+    
+    # Set path to the file containing the rotation axis positions.
+    jfname = "arun.json"
 
     # Auto generated dictionary by find_center to contain {exp_number : center of rotation}
-    dictionary = read_rot_centers('arun.json')
+    dictionary = read_rot_centers(jfname)
 
     sample_detector_distance = 5       # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
@@ -87,7 +90,7 @@ if __name__ == '__main__':
                 sino = (sino_chunk_start, sino_chunk_end)
                 
                 # Read APS 2-BM raw data.
-                if (key > 6):            
+                if (int(key) > 6):            
                     proj, flat, dark, theta = read_aps_2bm_custom(fname, sino=sino)
                 else:
                     proj, flat, dark, theta = dxchange.read_aps_2bm(fname, sino=sino)
