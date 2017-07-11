@@ -14,12 +14,14 @@ import sys
 def main(arg):
 
     #print(imageio.help('JPEG-XR-FI'))
-    im = imageio.imread("/Users/decarlo/Downloads/Original/bike_orig.bmp")
-    imageio.imsave("/Users/decarlo/Desktop/data/test.jxr", im)
-    imageio.imsave("/Users/decarlo/Desktop/data/test.tiff", im)
-    imageio.imsave("/Users/decarlo/Desktop/data/test.png", im)
-    imageio.imsave("/Users/decarlo/Desktop/data/test100.jpeg", im, Xc=100)
-    imageio.imsave("/Users/decarlo/Desktop/data/test50.jpeg", im, flag='JPEG_QUALITYBAD')
+#    im = imageio.imread("/local/decarlo/conda/tomopy_decarlof/tomopy/data/lena.tif")
+    im = imageio.imread("/local/decarlo/conda/util/elettra/img/SMALLTOMATO.jxr")
+    print(imageio.help())
+    imageio.imwrite("./test.jxr", im, flags=1)
+    imageio.imwrite("./test.tiff", im)
+    imageio.imwrite("./test.png", im)
+    imageio.imwrite("./test100.jpeg", im, X=100)
+    imageio.imwrite("./test50.jpeg", im, flag='JPEG_QUALITYBAD')
 
 
 if __name__ == "__main__":
