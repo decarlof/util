@@ -14,6 +14,7 @@ import sys
 def main(arg):
 
     top = '/Users/decarlo/Desktop/util/elettra/img/'
+    #top = '/local/decarlo/conda/util/elettra/img/'
     print(imageio.help('JPEG-XR-FI'))
     # im = imageio.imread(top + "SMALLTOMATO.jxr")
     # imageio.imsave(top + "test.jxr", im)
