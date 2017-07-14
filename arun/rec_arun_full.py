@@ -45,7 +45,8 @@ if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
     top = '/local/dataraid/Dinc/'
-    
+    ##top = '/media/student/APS_NiTi_2_UC/APS_2BM_2017_06/'
+
     # Set path to the file containing the rotation axis positions.
     jfname = "arun.json"
 
@@ -87,7 +88,7 @@ if __name__ == '__main__':
                 if sino_chunk_end > sino_end: 
                     break
 
-                sino = (sino_chunk_start, sino_chunk_end)
+                sino = (int(sino_chunk_start), int(sino_chunk_end))
                 
                 # Read APS 2-BM raw data.
                 if (int(key) > 6):            
