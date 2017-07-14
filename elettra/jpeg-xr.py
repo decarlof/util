@@ -13,14 +13,15 @@ import sys
   
 def main(arg):
 
-    top = '/Users/decarlo/Desktop/util/elettra/img/'
-    #top = '/local/decarlo/conda/util/elettra/img/'
+    #top = '/Users/decarlo/Desktop/util/elettra/img/'
+    top = '/local/decarlo/conda/util/elettra/img/'
     print(imageio.help('JPEG-XR-FI'))
     # im = imageio.imread(top + "SMALLTOMATO.jxr")
     # imageio.imsave(top + "test.jxr", im)
     
     im = imageio.imread(top + "lena.tif")
-    imageio.imsave(top + "test_00.jxr", im)
+    print(im.shape)
+    imageio.imsave(top + "test_00.jxr", im, format='JXR')
     imageio.imsave(top + "test_01.tiff", im)
     imageio.imsave(top + "test_02.png", im)
     imageio.imsave(top + "test_03.jpeg", im, X=100)
