@@ -14,7 +14,10 @@ import sirtfilter
 if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
-    fname = '/local/dataraid/sector1/g120f5/g120f5_'
+    top = '/local/dataraid/segment/sector1/microCT/'
+
+    sname = 'g120f5'
+    fname = top + sname + '/' + sname + '_'
 
     sample_detector_distance = 10      # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 1.2e-4     # Detector pixel size in cm
@@ -22,7 +25,7 @@ if __name__ == '__main__':
 
     # Select the sinogram range to reconstruct.
     start = 100
-    end = 110
+    end = 300
 
     # Read the APS 1-ID raw data.
     proj, flat, dark = dxchange.read_aps_1id(fname, sino=(start, end))
@@ -80,7 +83,7 @@ if __name__ == '__main__':
         # Mask each reconstructed slice with a circle.
         rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
         # Write data as stack of TIFs.
-        dxchange.write_tiff_stack(rec, fname='recon_dir/recon')
+        dxchange.write_tiff_stack(rec, fname=top + 'recon' + '/recon')
 
     elif rec_method == 'sirt':
         print("sirt")
@@ -89,7 +92,7 @@ if __name__ == '__main__':
         # Mask each reconstructed slice with a circle.
         rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
         # Write data as stack of TIFs.
-        dxchange.write_tiff_stack(rec, fname='recon_dir/recon')
+        dxchange.write_tiff_stack(rec, fname=top + 'recon' + '/recon')
 
     else: #rec_method == 'gridrec':
         print("gridrec")
@@ -98,6 +101,6 @@ if __name__ == '__main__':
         # Mask each reconstructed slice with a circle.
         rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
         # Write data as stack of TIFs.
-        dxchange.write_tiff_stack(rec, fname='recon_dir/recon')
+        dxchange.write_tiff_stack(rec, fname=top + 'recon' + '/recon')
 
 

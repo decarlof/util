@@ -36,7 +36,7 @@ if __name__ == '__main__':
             sino = None
             
             start = 300
-            end = 301
+            end = 401
             sino = (start, end)
             
             # Read APS 32-ID raw data.
