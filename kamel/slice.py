@@ -14,7 +14,8 @@ if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
     top = '/local/dataraid/2017-08/kamel/'
-    h5name = 'test.h5'
+    h5name = 'test'
+    ext = 'h5'
           
     sample_detector_distance = 5       # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
@@ -24,9 +25,7 @@ if __name__ == '__main__':
     zinger_level_w = 1000              # Zinger level for white
     
     
-    prefix = 'exp_'
-    fname = top + prefix + h5name + '/proj_' + h5name + '.hdf'
-    ##print(fname, rot_center)
+    fname = top + h5name + '.' + ext
 
     # Select sinogram range to reconstruct.
     sino = None
@@ -68,6 +67,7 @@ if __name__ == '__main__':
 
     # Write data as stack of TIFs.
     ##fname = top +'full_rec/' + prefix + h5name + '/recon'
-    fname = top +'slice_rec/' + prefix + h5name + '_recon'
+
+    fname = top + h5name + '_slice_rec/' + 'recon'
     print("Rec: ", fname)
     dxchange.write_tiff_stack(rec, fname=fname)
