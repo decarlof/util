@@ -13,13 +13,13 @@ import numpy as np
 if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
-    top = '/local/dataraid/2017-08/kamel/'
-    h5name = 'test'
+    top = '/local/dataraid/2017-08/Todd/'
+    h5name = 'SNDK_10_10_000'
     ext = 'h5'
           
-    sample_detector_distance = 5       # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 0.65e-4    # Detector pixel size in cm
-    monochromator_energy = 27.0        # Energy of incident wave in keV
+    sample_detector_distance = 30       # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 2.93e-4    # Detector pixel size in cm (1.17e-4)
+    monochromator_energy = 25.74        # Energy of incident wave in keV
     alpha = 1e-02                      # Phase retrieval coeff.
     zinger_level = 1000                # Zinger level for projections
     zinger_level_w = 1000              # Zinger level for white
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     # Select sinogram range to reconstruct.
     sino = None
     
-    start = 1000
-    end = 1001
+    start = 500
+    end = 501
     sino = (start, end)
 
     # Read APS 32-BM raw data.
@@ -53,11 +53,11 @@ if __name__ == '__main__':
     ##data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     # Find rotation center
-    #rot_center = tomopy.find_center(data, theta, init=rot_center, ind=start, tol=0.5)
-    rot_center = 1024
+    # rot_center = 955
+    rot_center = tomopy.find_center_vo(data)   
     print(h5name, rot_center)
 
-    data = tomopy.minus_log(data)
+    data = tomopy.minus_log(data, ind=0)
 
     # Reconstruct object using Gridrec algorithm.
     rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec')
