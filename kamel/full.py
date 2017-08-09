@@ -89,7 +89,7 @@ if __name__ == '__main__':
         # Write data as stack of TIFs.
         ##fname = top +'full_rec/' + prefix + h5name + '/recon'
 
-        fname = top + h5name + '_full_rec/' + 'recon'
-        print("Rec: ", fname)
-        dxchange.write_tiff_stack(rec, fname=fname, start=strt)
+        rname = top + h5name + '_full_rec/' + 'recon'
+        print("Rec: ", rname)
+        dxchange.write_tiff_stack(rec, fname=rname, start=strt)
         strt += data.shape[1]
