@@ -15,9 +15,7 @@ SECTIONS['general'] = {
         'default': NAME,
         'type': str,
         'help': "File name of configuration",
-        'metavar': 'FILE'}}
-
-SECTIONS['consumer'] = {
+        'metavar': 'FILE'},
     'verbose': {
         'default': False,
         'help': 'Verbose output',
@@ -27,21 +25,32 @@ SECTIONS['consumer'] = {
         'type': str,
         'help': "File name of optional log",
         'metavar': 'FILE'}}
+
+SECTIONS['consumer'] = {
+    'ttverbose': {
+        'default': False,
+        'help': 'Verbose output',
+        'action': 'store_true'},
+    'ttlog': {
+        'default': None,
+        'type': str,
+        'help': "File name of optional log",
+        'metavar': 'FILE'}}
  
 SECTIONS['data-tags'] = {
-    'normalization-mode': {
-        'choices': ['average', 'bg', 'roi'],
-        'default': "average",
+    'data': {
+        'default': "/exchange/data",
         'type': str,
-        'help': "Flat-field correction method"},
-    'fix-nan-and-inf': {
-        'default': False,
-        'help': "Fix nan and inf",
-        'action': 'store_true'},
-    'minus-log': {
-        'default': True,
-        'action': 'store_true',
-        'help': 'Do minus log'}}
+        'help': "projection data hdf tag"},
+    'data_dark': {
+        'default': "/exchange/data_dark",
+        'type': str,
+        'help': "dark images hdf tag"},
+    'data_white': {
+        'default': "/exchange/data_white",
+        'type': str,
+        'help': "white images hdf tag"},
+}
 
 SECTIONS['dependencies'] = {
     'retrieval-method': {
@@ -75,10 +84,78 @@ SECTIONS['dependencies'] = {
         'help': "Chunk size for each core"}}
 
 SECTIONS['limits'] = {
-    'pass-size': {
-        'type': int,
+    'data_mean_low_limit': {
+        'type': float,
+        'default': 400,
+        'help': "data mean value min"},
+    'data_mean_high_limit': {
+        'type': float,
+        'default': 600,
+        'help': "data mean value max"}, 
+    'data_stat_mean_low_limit': {
+        'type': float,
+        'default': -150,
+        'help': "data stat mean value min"}, 
+    'data_stat_mean_high_limit': {
+        'type': float,
+        'default': 150,
+        'help': "data stat mean value max"}, 
+    'data_std_low_limit': {
+        'type': float,
+        'default': 150,
+        'help': "data std min"}, 
+    'data_std_high_limit': {
+        'type': float,
+        'default': 200,
+        'help': "data std max"},
+    'data_dark_mean_low_limit': {
+        'type': float,
         'default': 0,
-        'help': 'Number of sinograms to process per pass'}}
+        'help': "dark mean value min"},
+    'data_dark_mean_high_limit': {
+        'type': float,
+        'default': 110,
+        'help': "dark mean value max"}, 
+    'data_dark_stat_mean_low_limit': {
+        'type': float,
+        'default': -5,
+        'help': "stat mean value min"}, 
+    'data_dark_stat_mean_high_limit': {
+        'type': float,
+        'default': 5,
+        'help': "dark stat mean value max"}, 
+    'data_dark_std_low_limit': {
+        'type': float,
+        'default': 1.5,
+        'help': "dark std min"}, 
+    'data_dark_std_high_limit': {
+        'type': float,
+        'default': 10,
+        'help': "dark std max"},        
+    'data_white_mean_low_limit': {
+        'type': float,
+        'default': 650,
+        'help': "white mean value min"},
+    'data_white_mean_high_limit': {
+        'type': float,
+        'default': 900,
+        'help': "white mean value max"}, 
+    'data_white_stat_mean_low_limit': {
+        'type': float,
+        'default': -150,
+        'help': "white stat mean value min"}, 
+    'data_white_stat_mean_high_limit': {
+        'type': float,
+        'default': 150,
+        'help': "white stat mean value max"}, 
+    'data_white_std_low_limit': {
+        'type': float,
+        'default': 100,
+        'help': "white std min"}, 
+    'data_white_std_high_limit': {
+        'type': float,
+        'default': 260,
+        'help': "white std max"}}
 
 SECTIONS['pvs'] = {
     'slice-start': {

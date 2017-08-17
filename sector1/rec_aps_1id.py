@@ -24,8 +24,8 @@ if __name__ == '__main__':
     monochromator_energy = 61.332    # Energy of incident wave in keV
 
     # Select the sinogram range to reconstruct.
-    start = 100
-    end = 300
+    start = 600
+    end = 900
 
     # Read the APS 1-ID raw data.
     proj, flat, dark = dxchange.read_aps_1id(fname, sino=(start, end))
@@ -42,13 +42,13 @@ if __name__ == '__main__':
     ndata = tomopy.remove_stripe_sf(ndata)
     
     # phase retrieval
-    ndata = tomopy.prep.phase.retrieve_phase(ndata, pixel_size=detector_pixel_size_x, dist=sample_detector_distance, energy=monochromator_energy, alpha=8e-3, pad=True)
+    # ndata = tomopy.prep.phase.retrieve_phase(ndata, pixel_size=detector_pixel_size_x, dist=sample_detector_distance, energy=monochromator_energy, alpha=8e-3, pad=True)
 
     # Find rotation center.
     #rot_center = tomopy.find_center(ndata, theta, init=1024, ind=0, tol=0.5)
     rot_center = 576
 
-    binning = 1
+    binning = 0
     ndata = tomopy.downsample(ndata, level=int(binning))
     rot_center = rot_center/np.power(2, float(binning))    
 
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     rec_method = None
 
-    rec_method = 'sirf-fbp'
+    #rec_method = 'sirf-fbp'
     if rec_method == 'sirf-fbp':
         # Reconstruct object using sirt-fbp algorithm.
         # Use test_sirtfbp_iter = True to test which number of iterations is suitable for your dataset

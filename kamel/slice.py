@@ -13,9 +13,9 @@ import numpy as np
 if __name__ == '__main__':
 
     # Set path to the micro-CT data to reconstruct.
-    top = '/local/dataraid/2017-08/Todd/'
+    top = '/local/dataraid/Todd/'
     #h5name = 'SNDK_10_10_000'
-    h5name = 'Sample_01_0_000'
+    h5name = 'SNDB_20_41_000'
     ext = 'h5'
           
     sample_detector_distance = 30       # Propagation distance of the wavefront in cm
@@ -55,9 +55,9 @@ if __name__ == '__main__':
 
     # Find rotation center
     # rot_center = 955
-    rot_center = 953.25
+    # rot_center = 953.25
     # rot_center = tomopy.find_center(data, theta, init=rot_center, ind=0, tol=0.5)
-    # rot_center = tomopy.find_center_vo(data)   
+    rot_center = tomopy.find_center_vo(data)   
     print(h5name, rot_center)
 
     data = tomopy.minus_log(data)

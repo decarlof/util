@@ -20,7 +20,6 @@ def init(args):
 
 def update(args):
     try:
-        a = 1
         config.write(args.config)
         print("update")
         #gui.main(args)
@@ -39,7 +38,7 @@ def main():
     print(tomo_params)
     
     cmd_parsers = [
-        ('init',    init,   tomo_params,    "Create configuration file"),
+        ('init',    init,   (),    "Create configuration file"),
         ('update',  update, tomo_params,    "Update configuration file"),
     ]
 
