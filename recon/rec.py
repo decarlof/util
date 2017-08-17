@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-TomoPy example script to reconstruct 2017-08/Kamel data sets.
+TomoPy example script to reconstruct multiple data sets.
 """
 
 from __future__ import print_function
@@ -14,9 +14,37 @@ import argparse
 import numpy as np
 import collections
 
+import h5py
 import tomopy
 import dxchange
    
+def get_dx_dims(fname, dataset):
+    """
+    Read array size of a specific group of Data Exchange file.
+    Parameters
+    ----------
+    fname : str
+        String defining the path of file or file name.
+    dataset : str
+        Path to the dataset inside hdf5 file where data is located.
+    Returns
+    -------
+    ndarray
+        Data set size.
+    """
+
+    grp = '/'.join(['exchange', dataset])
+
+    with h5py.File(fname, "r") as f:
+        try:
+            data = f[grp]
+        except KeyError:
+            return None
+
+        shape = data.shape
+
+    return shape
+
 def read_rot_centers(fname):
 
     try:
@@ -28,6 +56,7 @@ def read_rot_centers(fname):
 
     except Exception as error: 
         print("ERROR: the json file containing the rotation axis locations is missing")
+        print("ERROR: run find_centers.py to create one first")
         return None
         
 def rec_full(h5fname, nsino, rot_center):
@@ -37,8 +66,16 @@ def rec_full(h5fname, nsino, rot_center):
     monochromator_energy = 25.74        # Energy of incident wave in keV
     alpha = 1e-02                       # Phase retrieval coeff.
 
+    data_size = get_dx_dims(h5fname, 'data')
+    print(data_size)
     print("FULL")
-    
+ 
+class Range(object):
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+    def __eq__(self, other):
+        return self.start <= other <= self.end   
     
 def rec_slice(h5fname, nsino, rot_center):
     
@@ -83,7 +120,7 @@ def main(arg):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("top", help="top directory where the hdf5 datasets are located: /data/")
-    parser.add_argument("nsino", nargs='?', const=1, type=int, default=1, help="index of the sinogram used by find center: 1024 (default 1)")
+    parser.add_argument("nsino", nargs='?', type=float, choices=[Range(0.0, 1.0)], default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.6 (default 0.5)")
     parser.add_argument("type", nargs='?', type=str, default="slice", help="reconstruction type: full (default slice)")
 
     args = parser.parse_args()
