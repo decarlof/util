@@ -45,6 +45,14 @@ def get_dx_dims(fname, dataset):
 
     return shape
 
+
+def restricted_float(x):
+    x = float(x)
+    if x < 0.0 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
+    return x
+
+
 def read_rot_centers(fname):
 
     try:
@@ -107,7 +115,7 @@ def rec_full(h5fname, rot_center):
         # phase retrieval
         data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
-        print(h5name, rot_center)
+        print(h5fname, rot_center)
         data = tomopy.minus_log(data)
 
         # Reconstruct object using Gridrec algorithm.
@@ -122,11 +130,6 @@ def rec_full(h5fname, rot_center):
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += data.shape[1]
      
-def restricted_float(x):
-    x = float(x)
-    if x < 0.0 or x > 1.0:
-        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
-    return x
     
 def rec_slice(h5fname, nsino, rot_center):
     
@@ -173,8 +176,8 @@ def main(arg):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("top", help="top directory where the hdf5 datasets are located: /data/")
-    parser.add_argument("nsino", nargs='?', type=restricted_float, default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.6 (default 0.5)")
     parser.add_argument("type", nargs='?', type=str, default="slice", help="reconstruction type: full (default slice)")
+    parser.add_argument("nsino", nargs='?', type=restricted_float, default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.6 (default 0.5)")
 
     args = parser.parse_args()
 
