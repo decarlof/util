@@ -59,7 +59,7 @@ def read_rot_centers(fname):
         print("ERROR: run find_centers.py to create one first")
         return None
         
-def rec_full(h5fname, nsino, rot_center):
+def rec_full(h5fname, rot_center):
     
     sample_detector_distance = 30       # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 2.93e-4     # Detector pixel size in cm (1.17e-4)
@@ -67,15 +67,66 @@ def rec_full(h5fname, nsino, rot_center):
     alpha = 1e-02                       # Phase retrieval coeff.
 
     data_size = get_dx_dims(h5fname, 'data')
-    print(data_size)
-    print("FULL")
- 
-class Range(object):
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-    def __eq__(self, other):
-        return self.start <= other <= self.end   
+    print(int(data_size[1]))
+
+    # Select sinogram range to reconstruct.
+    sino_start = 0
+    sino_end = data_size[1]
+
+    chunks = 16         # number of sinogram chunks to reconstruct
+                        # only one chunk at the time is reconstructed
+                        # allowing for limited RAM machines to complete a full reconstruction
+
+    nSino_per_chunk = (sino_end - sino_start)/chunks
+    print("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((sino_end - sino_start), sino_start, sino_end, chunks, nSino_per_chunk))            
+    strt = 0
+
+    for iChunk in range(0,chunks):
+        print('\n  -- chunk # %i' % (iChunk+1))
+        sino_chunk_start = sino_start + nSino_per_chunk*iChunk 
+        sino_chunk_end = sino_start + nSino_per_chunk*(iChunk+1)
+        print('\n  --------> [%i, %i]' % (sino_chunk_start, sino_chunk_end))
+                
+        if sino_chunk_end > sino_end: 
+            break
+
+        sino = (int(sino_chunk_start), int(sino_chunk_end))
+        # Read APS 32-BM raw data.
+        proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+        
+        # zinger_removal
+        #proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+        #flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+
+        # Flat-field correction of raw data.
+        data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+
+        # remove stripes
+        data = tomopy.remove_stripe_fw(data,level=5,wname='sym16',sigma=1,pad=True)
+
+        # phase retrieval
+        data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+
+        print(h5name, rot_center)
+        data = tomopy.minus_log(data)
+
+        # Reconstruct object using Gridrec algorithm.
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec')
+
+        # Mask each reconstructed slice with a circle.
+        rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+
+        # Write data as stack of TIFs.
+        fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        print("Rec: ", fname)
+        dxchange.write_tiff_stack(rec, fname=fname, start=strt)
+        strt += data.shape[1]
+     
+def restricted_float(x):
+    x = float(x)
+    if x < 0.0 or x > 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
+    return x
     
 def rec_slice(h5fname, nsino, rot_center):
     
@@ -84,10 +135,13 @@ def rec_slice(h5fname, nsino, rot_center):
     monochromator_energy = 25.74        # Energy of incident wave in keV
     alpha = 1e-02                       # Phase retrieval coeff.
 
+    data_size = get_dx_dims(h5fname, 'data')
+    ssino = int(data_size[1] * nsino)
+
     # Select sinogram range to reconstruct
     sino = None
         
-    start = nsino
+    start = ssino
     end = start + 1
     sino = (start, end)
 
@@ -111,7 +165,6 @@ def rec_slice(h5fname, nsino, rot_center):
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
 
-    #fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_slice_rec/' + 'recon'
     fname = os.path.dirname(h5fname) + '/' + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
     dxchange.write_tiff_stack(rec, fname=fname)
     print("Rec: ", fname)
@@ -120,14 +173,14 @@ def main(arg):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("top", help="top directory where the hdf5 datasets are located: /data/")
-    parser.add_argument("nsino", nargs='?', type=float, choices=[Range(0.0, 1.0)], default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.6 (default 0.5)")
+    parser.add_argument("nsino", nargs='?', type=restricted_float, default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.6 (default 0.5)")
     parser.add_argument("type", nargs='?', type=str, default="slice", help="reconstruction type: full (default slice)")
 
     args = parser.parse_args()
 
     # Set path to the micro-CT data to reconstruct.
     top = args.top
-    nsino = int(args.nsino)
+    nsino = float(args.nsino)
 
     slice = False
     if args.type == "slice":
@@ -136,9 +189,7 @@ def main(arg):
     # Load the the rotation axis positions.
     jfname = top + "rotation_axis.json"
     
-    print (jfname)
     dictionary = read_rot_centers(jfname)
-    print(dictionary)
     
     for key in dictionary:
         dict2 = dictionary[key]
@@ -148,7 +199,7 @@ def main(arg):
             if slice:             
                 rec_slice(fname, nsino, rot_center)
             else:
-                rec_full(fname, nsino, rot_center)
+                rec_full(fname, rot_center)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
