@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-TomoPy example script to reconstruct 2017-06/Arun data sets.
+Find rotation axis location for all datasets in a folder.
 """
 
 from __future__ import print_function
