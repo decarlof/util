@@ -82,35 +82,50 @@ def find_rotation_axis(h5fname, nsino):
 def main(arg):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("top", help="top directory where the hdf5 datasets are located: /data/")
-    parser.add_argument("nsino", nargs='?', type=restricted_float, default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.6 (default 0.5)")
+    parser.add_argument("fname", help="directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
+    parser.add_argument("nsino", nargs='?', type=restricted_float, default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.5 (default 0.5)")
 
     args = parser.parse_args()
 
     # Set path to the micro-CT data to reconstruct.
-    top = args.top
+    fname = args.fname
     nsino = float(args.nsino)
 
-    # Set the file name that will store the rotation axis positions.
-    jfname = top + "rotation_axis.json"
+    if os.path.isfile(fname):       
+        rot_center = find_rotation_axis(fname, nsino)
+        print(fname, rot_center)
+        
+    elif os.path.isdir(fname):
+        # Add a trailing slash if missing
+        top = os.path.join(fname, '')
+    
+        # Set the file name that will store the rotation axis positions.
+        jfname = top + "rotation_axis.json"
 
-    h5_file_list = filter(lambda x: x.endswith('.h5'), os.listdir(top))
+        h5_file_list = filter(lambda x: x.endswith('.h5'), os.listdir(top))
 
-    dic_centers = {}
-    i=0
-    for fname in h5_file_list:
-        h5fname = top + fname
-        rot_center = find_rotation_axis(h5fname, nsino)
-        case =  {fname : rot_center}
-        print(case)
-        dic_centers[i] = case
-        i += 1
+        print("Found: ", h5_file_list)
+        print("Determining the rotation axis location ...")
+        
+        dic_centers = {}
+        i=0
+        for fname in h5_file_list:
+            h5fname = top + fname
+            rot_center = find_rotation_axis(h5fname, nsino)
+            case =  {fname : rot_center}
+            print(case)
+            dic_centers[i] = case
+            i += 1
 
-    # Save json file containing the rotation axis
-    json_dump = json.dumps(dic_centers)
-    f = open(jfname,"w")
-    f.write(json_dump)
-    f.close()
+        # Save json file containing the rotation axis
+        json_dump = json.dumps(dic_centers)
+        f = open(jfname,"w")
+        f.write(json_dump)
+        f.close()
+        print("Rotation axis locations save in: ", jfname)
+    
+    else:
+        print("Directory or File Name does not exist: ", fname)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
