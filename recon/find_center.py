@@ -101,8 +101,9 @@ def main(arg):
     
         # Set the file name that will store the rotation axis positions.
         jfname = top + "rotation_axis.json"
-
-        h5_file_list = filter(lambda x: x.endswith('.h5'), os.listdir(top))
+        print(os.listdir(top))
+        
+        h5_file_list = filter(lambda x: x.endswith(('.h5', '.hdf')), os.listdir(top))
 
         print("Found: ", h5_file_list)
         print("Determining the rotation axis location ...")
