@@ -43,12 +43,12 @@ def save_dx(fname, proj, flat, dark, theta):
     sample_name = fname
     experiment_prosal = 'GUP-53902'
     experiment_title = 'Investigating the Phase and Kirkendall Pore Evolution in Ti-coated Ni Wires using X-Ray Tomographic Microscopy'
-    experimenter_name = 'Dinc Erdeniz'
+    experimenter_name = 'Ashley Paz y Puente'
     experimenter_role = 'PI'
-    experimenter_affiliation = 'Northwestern University'
-    experimenter_phone = '847-467-2595'
-    experimenter_email = 'd-erdeniz@northwestern.edu'
-    experimenter_facility_user_id = '243924'
+    experimenter_affiliation = 'Northwestern University, University of Cincinnati'
+    experimenter_phone = '847-467-5416'
+    experimenter_email = 'ashleyewh2012@u.northwestern.edu'
+    experimenter_facility_user_id = '233967'
   
     instrument_name = '2-BM micro-CT'
     instrument_comment = 'A Hutch'  
