@@ -103,7 +103,7 @@ def main(arg):
         jfname = top + "rotation_axis.json"
         print(os.listdir(top))
         
-        h5_file_list = filter(lambda x: x.endswith(('.h5', '.hdf')), os.listdir(top))
+        h5_file_list = list(filter(lambda x: x.endswith(('.h5', '.hdf')), os.listdir(top)))
 
         print("Found: ", h5_file_list)
         print("Determining the rotation axis location ...")
@@ -111,6 +111,7 @@ def main(arg):
         dic_centers = {}
         i=0
         for fname in h5_file_list:
+            print("==============>", fname)
             h5fname = top + fname
             rot_center = find_rotation_axis(h5fname, nsino)
             case =  {fname : rot_center}
