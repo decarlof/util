@@ -124,19 +124,24 @@ def reconstruct(h5fname, sino, rot_center, algorithm='gridrec'):
     data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     # phase retrieval
-    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    # data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
 
     data = tomopy.minus_log(data)
 
+
+    binning = 2
+    rot_center = rot_center/np.power(2, float(binning))
+    data = tomopy.downsample(data, 2) 
+
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
     else:
         algorithm = 'gridrec'
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec')
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='parzen')
         
     print("Algorithm: ", algorithm)
 
@@ -148,11 +153,11 @@ def reconstruct(h5fname, sino, rot_center, algorithm='gridrec'):
 
 def rec_full(h5fname, rot_center, algorithm):
     
-    data_size = get_dx_dims(h5fname, 'data')
+    data_shape = get_dx_dims(h5fname, 'data')
 
     # Select sinogram range to reconstruct.
     sino_start = 0
-    sino_end = data_size[1]
+    sino_end = data_shape[1]
 
     chunks = 16         # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
@@ -185,8 +190,8 @@ def rec_full(h5fname, rot_center, algorithm):
 
 def rec_slice(h5fname, nsino, rot_center, algorithm):
     
-    data_size = get_dx_dims(h5fname, 'data')
-    ssino = int(data_size[1] * nsino)
+    data_shape = get_dx_dims(h5fname, 'data')
+    ssino = int(data_shape[1] * nsino)
 
     # Select sinogram range to reconstruct
     sino = None
@@ -195,9 +200,6 @@ def rec_slice(h5fname, nsino, rot_center, algorithm):
     end = start + 1
     sino = (start, end)
 
-    # Reconstruct.
-    # print("============> ", h5fname, sino, rot_center, algorithm)
-    # print("============> ", type(h5fname), type(sino), type(rot_center), type(algorithm))
     rec = reconstruct(h5fname, sino, rot_center, algorithm)
 
     fname = os.path.dirname(h5fname) + '/' + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
@@ -205,14 +207,37 @@ def rec_slice(h5fname, nsino, rot_center, algorithm):
     print("Rec: ", fname)
     print("Slice: ", start)
     
-   
+def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm):
+    
+    data_shape = get_dx_dims(h5fname, 'data')
+    print(data_shape)
+    ssino = int(data_shape[1] * nsino)
+
+    # Select sinogram range to reconstruct
+    sino = None
+        
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    center_range = (rot_center-center_search_width, rot_center+center_search_width, 0.5)
+    fname = os.path.dirname(h5fname) + '/' + 'try_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
+    index = 0
+    for axis in np.arange(*center_range):
+        rec = reconstruct(h5fname, sino, axis, algorithm)
+        index = index + 1
+        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
+        print("Reconstructions: ", rfname)
+        dxchange.write_tiff(rec, fname=rfname, overwrite=True)
+
 def main(arg):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("fname", help="directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
-    parser.add_argument("--axis", nargs='?', type=str, default="1024.0", help="rotation axis location: 1024.0 (default 1024.0)")
+    parser.add_argument("--axis", nargs='?', type=str, default="0", help="rotation axis location: 1024.0 (default 1/2 image horizontal size)")
     parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="reconstruction algorithm: sirtfbp (default gridrec)")
-    parser.add_argument("--type", nargs='?', type=str, default="slice", help="reconstruction type: full (default slice)")
+    parser.add_argument("--type", nargs='?', type=str, default="slice", help="reconstruction type: full, slice, try (default slice)")
+    parser.add_argument("--csw", nargs='?', type=int, default=10, help="center search width: 10 (default 10)")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="location of the sinogram used by find center (0 top, 1 bottom): 0.5 (default 0.5)")
 
     args = parser.parse_args()
@@ -221,19 +246,29 @@ def main(arg):
     fname = args.fname
     algorithm = args.method
     rot_center = float(args.axis)
+
     nsino = float(args.nsino)
 
-    slice = False
-    if args.type == "slice":
-        slice = True
+    rec_type = args.type
+    center_search_width = args.csw
 
-    if os.path.isfile(fname):       
-        if slice:             
-            rec_slice(fname, nsino, rot_center, algorithm=algorithm)
-        else:
+    print(center_search_width)
+    if os.path.isfile(fname):    
+
+        print("IS A FILE")   
+        # Set default rotation axis location
+        if rot_center == 0:
+            data_shape = get_dx_dims(fname, 'data')
+            rot_center =  data_shape[2]/2
+        if rec_type == "try":            
+            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm)
+        elif rec_type == "full":
             rec_full(fname, rot_center, algorithm=algorithm)
+        else:
+            rec_slice(fname, nsino, rot_center, algorithm=algorithm)
 
     elif os.path.isdir(fname):
+        print("IS A FOLDER")   
         # Add a trailing slash if missing
         top = os.path.join(fname, '')
         
@@ -247,10 +282,16 @@ def main(arg):
             for h5fname in dict2:
                 rot_center = dict2[h5fname]
                 fname = top + h5fname
-                if slice:             
-                    rec_slice(fname, nsino, rot_center, algorithm=algorithm)
-                else:
+                # Set default rotation axis location
+                if rot_center == 0:
+                    data_shape = get_dx_dims(fname, 'data')
+                    rot_center =  data_shape[2]/2
+                if rec_type == "try":            
+                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm)
+                elif rec_type == "full":
                     rec_full(fname, rot_center, algorithm=algorithm)
+                else:
+                    rec_slice(fname, nsino, rot_center, algorithm=algorithm)
     else:
         print("Directory or File Name does not exist: ", fname)
 
