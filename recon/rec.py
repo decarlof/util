@@ -11,12 +11,14 @@ import os
 import sys
 import json
 import argparse
-import numpy as np
 import collections
 
 import h5py
 import tomopy
+import tomopy.util.dtype as dtype
 import dxchange
+
+import numpy as np
 
 # sirtfilter:
 # conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter
@@ -99,54 +101,6 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
     rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='custom2d', filter_par=tomopy_filter)
     
     return rec
-
-
-def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
-
-    sample_detector_distance = 30       # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 1.17e-4     # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 25.74        # Energy of incident wave in keV
-    alpha = 1e-02                       # Phase retrieval coeff.
-    zinger_level = 1000                 # Zinger level for projections
-    zinger_level_w = 1000               # Zinger level for white
-
-    # Read APS 32-BM raw data.
-    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
-        
-    # zinger_removal
-    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-    flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
-
-    # Flat-field correction of raw data.
-    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
-
-    # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
-
-    # phase retrieval
-    # data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
-
-    print("Raw data: ", h5fname)
-    print("Center: ", rot_center)
-
-    data = tomopy.minus_log(data)
-
-
-    rot_center = rot_center/np.power(2, float(binning))
-    data = tomopy.downsample(data, binning) 
-    # Reconstruct object.
-    if algorithm == 'sirtfbp':
-        rec = rec_sirtfbp(data, theta, rot_center)
-    else:
-        algorithm = 'gridrec'
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='parzen')
-        
-    print("Algorithm: ", algorithm)
-
-    # Mask each reconstructed slice with a circle.
-    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
-    
-    return rec
         
 
 def rec_full(h5fname, rot_center, algorithm, binning):
@@ -205,7 +159,8 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
     print("Rec: ", fname)
     print("Slice: ", start)
     
-def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning):
+
+def rec_try_old(h5fname, nsino, rot_center, center_search_width, algorithm, binning):
     
     data_shape = get_dx_dims(h5fname, 'data')
     print(data_shape)
@@ -226,6 +181,111 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
         print("Reconstructions: ", rfname)
         dxchange.write_tiff(rec, fname=rfname, overwrite=True)
 
+
+def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
+
+    sample_detector_distance = 30       # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 1.17e-4     # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
+    monochromator_energy = 25.74        # Energy of incident wave in keV
+    alpha = 1e-02                       # Phase retrieval coeff.
+    zinger_level = 1000                 # Zinger level for projections
+    zinger_level_w = 1000               # Zinger level for white
+
+    # Read APS 32-BM raw data.
+    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+        
+    # zinger_removal
+    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+
+    # Flat-field correction of raw data.
+    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+
+    # remove stripes
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+
+    # phase retrieval
+    # data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+
+    print("Raw data: ", h5fname)
+    print("Center: ", rot_center)
+
+    data = tomopy.minus_log(data)
+
+
+    rot_center = rot_center/np.power(2, float(binning))
+    data = tomopy.downsample(data, binning) 
+    # Reconstruct object.
+    if algorithm == 'sirtfbp':
+        rec = rec_sirtfbp(data, theta, rot_center)
+    else:
+        algorithm = 'gridrec'
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='parzen')
+        
+    print("Algorithm: ", algorithm)
+
+    # Mask each reconstructed slice with a circle.
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+    
+    return rec
+
+
+def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning):
+    
+    data_shape = get_dx_dims(h5fname, 'data')
+    print(data_shape)
+    ssino = int(data_shape[1] * nsino)
+
+    center_range = (rot_center-center_search_width, rot_center+center_search_width, 0.5)
+    #print(sino,ssino, center_range)
+    #print(center_range[0], center_range[1], center_range[2])
+
+    # Select sinogram range to reconstruct
+    sino = None
+        
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    # Read APS 32-BM raw data.
+    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+        
+    # Flat-field correction of raw data.
+    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+
+    # remove stripes
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+
+
+    print("Raw data: ", h5fname)
+    print("Center: ", rot_center)
+
+    data = tomopy.minus_log(data)
+
+    stack = np.empty((len(np.arange(*center_range)), data_shape[0], data_shape[2]))
+
+    index = 0
+    for axis in np.arange(*center_range):
+        stack[index] = data[:, 0, :]
+        index = index + 1
+
+    # Reconstruct the same slice with a range of centers.
+    rec = tomopy.recon(stack, theta, center=np.arange(*center_range), sinogram_order=True, algorithm='gridrec', nchunk=1)
+
+    # Mask each reconstructed slice with a circle.
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+
+    # Save images to a temporary folder.
+    index = 0
+    fname = os.path.dirname(h5fname) + '/' + 'try_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
+    for axis in np.arange(*center_range):
+        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
+        #print("Reconstructions: ", rfname)
+        dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
+        index = index + 1
+
+    print("Reconstructions: ", fname)
+       
 def main(arg):
 
     parser = argparse.ArgumentParser()
