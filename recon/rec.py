@@ -133,15 +133,19 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
     data = tomopy.minus_log(data)
 
-    data = tomopy.remove_nan(data, val=0., ncore=None)
+    data = tomopy.remove_nan(data, val=0.0)
+    data = tomopy.remove_neg(data, val=0.00)
+    data[np.where(data == np.inf)] = 0.00
 
     rot_center = rot_center/np.power(2, float(binning))
-    data = tomopy.downsample(data, binning) 
+    data = tomopy.downsample(data, level=binning) 
+    data = tomopy.downsample(data, level=binning, axis=1)
+
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
     else:
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen', nchunk=1, ncore=1)
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
         
     print("Algorithm: ", algorithm)
 
@@ -156,7 +160,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     data_shape = get_dx_dims(h5fname, 'data')
 
     # Select sinogram range to reconstruct.
-    sino_start = 1
+    sino_start = 0
     sino_end = data_shape[1]
 
     chunks = 16         # number of sinogram chunks to reconstruct
