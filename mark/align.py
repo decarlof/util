@@ -92,15 +92,15 @@ def main(arg):
     ndata = tomopy.minus_log(ndata)
 
     # Set binning and number of iterations
-    binning = 1
-    iters = 40
+    binning = 2
+    iters = 21
 
     print("Original", ndata.shape)
-    #ndata = tomopy.downsample(ndata, level=binning, axis=1)
-    #ndata = tomopy.downsample(ndata, level=binning, axis=2)
+    ndata = tomopy.downsample(ndata, level=binning, axis=1)
+    ndata = tomopy.downsample(ndata, level=binning, axis=2)
     print("Processing:", ndata.shape)
 
-    fdir = 'aligned' + '/iter_' + str(iters) + '_bin_' + str(binning) 
+    fdir = 'aligned' + '/noblur_iter_' + str(iters) + '_bin_' + str(binning) 
 
     print(fdir)
     cprj, sx, sy, conv = alignment.align_seq(ndata, theta, fdir=fdir, iters=iters, pad=(10, 10), blur=False, save=True, debug=True)

@@ -81,11 +81,6 @@ def main(arg):
     # Read the tiff raw data.
     ndata = dxchange.read_tiff_stack(fname, ind=ind_tomo, slc=(sino, None))
     
-    #ndata_max = np.amax(ndata[:,:,:])
-    #ndata = ndata / float(ndata_max)
-
-    ## slider(ndata)
-
     # Set data collection angles as equally spaced between 0-180 degrees.
     theta = tomopy.angles(ndata.shape[0])
    
