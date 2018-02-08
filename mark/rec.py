@@ -74,12 +74,17 @@ def main(arg):
 
 
     # Select the sinogram range to reconstruct.
-    start = 600
-    end = 602
+    start = 0
+    end = 512
     sino=(start, end)
 
     # Read the tiff raw data.
     ndata = dxchange.read_tiff_stack(fname, ind=ind_tomo, slc=(sino, None))
+
+    print(ndata.shape)
+    binning = 8
+    ndata = tomopy.downsample(ndata, level=binning, axis=1)
+    print(ndata.shape)
     
     # Normalize to 1 using the air counts
     ndata = tomopy.normalize_bg(ndata, air=5)

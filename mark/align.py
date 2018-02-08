@@ -77,7 +77,7 @@ def main(arg):
 
     # Select the sinogram range to reconstruct.
     start = 0
-    end = 480
+    end = 512
     sino=(start, end)
 
     # Read the tiff raw data.
@@ -92,12 +92,12 @@ def main(arg):
     ndata = tomopy.minus_log(ndata)
 
     # Set binning and number of iterations
-    binning = 2
+    binning = 8
     iters = 21
 
     print("Original", ndata.shape)
     ndata = tomopy.downsample(ndata, level=binning, axis=1)
-    ndata = tomopy.downsample(ndata, level=binning, axis=2)
+#    ndata = tomopy.downsample(ndata, level=binning, axis=2)
     print("Processing:", ndata.shape)
 
     fdir = 'aligned' + '/noblur_iter_' + str(iters) + '_bin_' + str(binning) 
