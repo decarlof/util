@@ -279,7 +279,7 @@ def main(arg):
     parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: sirtfbp (default gridrec)")
     parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try (default slice)")
     parser.add_argument("--csw", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
-    parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram used by find center (0 top, 1 bottom): 0.5 (default 0.5)")
+    parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
 
     args = parser.parse_args()
 
