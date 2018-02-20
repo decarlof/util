@@ -46,9 +46,9 @@ def read_header(filename):
 	
 	file_size = os.path.getsize(filename)
 	with open(filename, 'rb') as bdata:
-	    header_size = 88 # in bytes           
+	    header_size = 96 # in bytes           
 	    bheader = bdata.read(header_size)
-	    header_data = struct.unpack('iiiiiiiiiiiiiiiiiidii', bheader)
+	    header_data = struct.unpack('iiiiiiiiiiiiiiiiiidiiii', bheader)
 	    data_type = header_data[0]
 	    ndims = header_data[1]
 	    size_x = header_data[2]
@@ -70,10 +70,12 @@ def read_header(filename):
 	    adimec_ts = header_data[18]
 	    epics_time_sec = header_data[19]
 	    epics_time_ns = header_data[20]
+	    nflat = header_data[21]
+	    ndark = header_data[22]
 
-	number_of_images = (file_size - 512) / size_x / size_y
+	nimg = (file_size - 512) / size_x / size_y
 
-	return number_of_images, size_y, size_x
+	return nflat, ndark, nimg, size_y, size_x
 
 
 def main(arg):
@@ -84,9 +86,10 @@ def main(arg):
     args = parser.parse_args()
 
     fname = args.fname
-    nproj, height, width = read_header(fname)
+    nflat, ndark, nimg, height, width = read_header(fname)
     print("Image Size:", width, height)
-    print("Number of projections:", nproj)
+    print("Number of images:", nimg)
+    print("Number of flat, dark images:", nimg, nflat, ndark)
     data = read_data(fname, width, height)
 
     slider(data)
