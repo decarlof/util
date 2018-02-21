@@ -96,9 +96,6 @@ def read_adimec_header(filename):
 def read_adimec_stack(filename, img=None, sino=None, dtype=None):
 
     nflat, ndark, nimg, height, width = read_adimec_header(filename)
-    print("Image Size:", width, height)
-    print("Number of images:", nimg)
-    print("Number of projection, flat, dark images:", (nimg-nflat-ndark), nflat, ndark)
 
     img_skip = img[0]*width*height
     img_load = (img[1]-img[0])*width*height
@@ -113,7 +110,6 @@ def read_adimec_stack(filename, img=None, sino=None, dtype=None):
     # Reshape the data into a 3D array. (-1 is a placeholder for however many
     # images are in the file... E.g. 2000)
 	data = rdata.reshape((-1, height, width))
-	print(data.shape)
     return data
 
 
@@ -131,14 +127,18 @@ def main(arg):
     end = args.start + args.nimg
 
     nflat, ndark, nimg, height, width = read_adimec_header(fname)
+    print("Image Size:", width, height)
 
     proj = read_adimec_stack(fname, img=(start, end))
+    print("Projection:", proj.shape)
     slider(proj)
 
     flat = read_adimec_stack(fname, img=(nimg-20, nimg-9))
+    print("Flat:", flat.shape)
     slider(flat)
 
     dark = read_adimec_stack(fname, img=(nimg-9, nimg))
+    print("Dark:", dark.shape)
     slider(dark)
 
 
