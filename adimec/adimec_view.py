@@ -32,17 +32,33 @@ class slider():
         self.l.set_data(self.data[self.frame,:,:])
 
 
-def read_data(filename, width, height):
-    with open(filename, 'r') as infile:
-        # Skip the header
-        infile.seek(512)
-        data = np.fromfile(infile, dtype=np.uint8)
-    # Reshape the data into a 3D array. (-1 is a placeholder for however many
-    # images are in the file... E.g. 2000)
-    return data.reshape((-1, height, width))
+def _slice_array(arr, slc):
+    """
+    Perform slicing on ndarray.
+
+    Parameters
+    ----------
+    arr : ndarray
+        Input array to be sliced.
+    slc : sequence of tuples
+        Range of values for slicing data in each axis.
+        ((start_1, end_1, step_1), ... , (start_N, end_N, step_N))
+        defines slicing parameters for each axis of the data matrix.
+
+    Returns
+    -------
+    ndarray
+        Sliced array.
+    """
+    if slc is None:
+        logger.debug('No slicing applied to image')
+        return arr[:]
+    axis_slice = _make_slice_object_a_tuple(slc)
+    logger.debug('Data sliced according to: %s', axis_slice)
+    return arr[axis_slice]
 
 
-def read_header(filename):
+def read_adimec_header(filename):
 	
 	file_size = os.path.getsize(filename)
 	with open(filename, 'rb') as bdata:
@@ -77,22 +93,54 @@ def read_header(filename):
 
 	return nflat, ndark, nimg, size_y, size_x
 
+def read_adimec_stack(filename, img=None, sino=None, dtype=None):
+
+    nflat, ndark, nimg, height, width = read_adimec_header(filename)
+    print("Image Size:", width, height)
+    print("Number of images:", nimg)
+    print("Number of projection, flat, dark images:", (nimg-nflat-ndark), nflat, ndark)
+
+    img_skip = img[0]*width*height
+    img_load = (img[1]-img[0])*width*height
+
+    # Select projection range to read.
+    with open(filename, 'r') as infile:
+        # Skip the header
+        infile.seek(512)
+        if (img != None): 
+            infile.seek(img_skip, 1)
+        rdata = np.fromfile(infile, dtype=np.uint8, count=img_load)
+    # Reshape the data into a 3D array. (-1 is a placeholder for however many
+    # images are in the file... E.g. 2000)
+	data = rdata.reshape((-1, height, width))
+	print(data.shape)
+    return data
+
 
 def main(arg):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("fname", help="Full file name: /data/fname.raw")
+    parser.add_argument("--start", nargs='?', type=int, default=0, help="First image to read")
+    parser.add_argument("--nimg", nargs='?', type=int, default=1, help="Number of images to read")
 
     args = parser.parse_args()
 
     fname = args.fname
-    nflat, ndark, nimg, height, width = read_header(fname)
-    print("Image Size:", width, height)
-    print("Number of images:", nimg)
-    print("Number of flat, dark images:", nimg, nflat, ndark)
-    data = read_data(fname, width, height)
+    start = args.start
+    end = args.start + args.nimg
 
-    slider(data)
+    nflat, ndark, nimg, height, width = read_adimec_header(fname)
+
+    proj = read_adimec_stack(fname, img=(start, end))
+    slider(proj)
+
+    flat = read_adimec_stack(fname, img=(nimg-20, nimg-9))
+    slider(flat)
+
+    dark = read_adimec_stack(fname, img=(nimg-9, nimg))
+    slider(dark)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
