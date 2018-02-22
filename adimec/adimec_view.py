@@ -10,6 +10,8 @@ import matplotlib.pylab as pl
 import matplotlib.pyplot as plt
 import matplotlib.widgets as wdg
 
+import tomopy
+
 class slider():
     def __init__(self, data):
         self.data = data
@@ -139,16 +141,18 @@ def main(arg):
 
     proj = read_adimec_stack(fname, img=(start, end))
     print("Projection:", proj.shape)
-    slider(proj)
+    # slider(proj)
 
     flat = read_adimec_stack(fname, img=(nimg-ndark-nflat, nimg-ndark))
     print("Flat:", flat.shape)
-    slider(flat)
+    # slider(flat)
 
     dark = read_adimec_stack(fname, img=(nimg-ndark, nimg))
     print("Dark:", dark.shape)
-    slider(dark)
+    # slider(dark)
 
+    proj = tomopy.normalize(proj, flat, dark)
+    slider(proj)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
