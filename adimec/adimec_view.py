@@ -97,16 +97,16 @@ def read_adimec_stack(filename, img=None, sino=None, dtype=None):
 
     nflat, ndark, nimg, height, width = read_adimec_header(filename)
 
-    img_skip = img[0]*width*height
-    img_load = (img[1]-img[0])*width*height
+    img_to_skip = img[0]*width*height
+    img_to_load= (img[1]-img[0])*width*height
 
     # Select projection range to read.
     with open(filename, 'r') as infile:
         # Skip the header
         infile.seek(512)
         if (img != None): 
-            infile.seek(img_skip, 1)
-        rdata = np.fromfile(infile, dtype=np.uint8, count=img_load)
+            infile.seek(img_to_skip, 1)
+        rdata = np.fromfile(infile, dtype=np.uint8, count=img_to_load)
     # Reshape the data into a 3D array. (-1 is a placeholder for however many
     # images are in the file... E.g. 2000)
 	data = rdata.reshape((-1, height, width))
@@ -119,6 +119,8 @@ def main(arg):
     parser.add_argument("fname", help="Full file name: /data/fname.raw")
     parser.add_argument("--start", nargs='?', type=int, default=0, help="First image to read")
     parser.add_argument("--nimg", nargs='?', type=int, default=1, help="Number of images to read")
+    parser.add_argument("--ndark", nargs='?', type=int, default=10, help="Number of dark images")
+    parser.add_argument("--nflat", nargs='?', type=int, default=10, help="Number of white images")
 
     args = parser.parse_args()
 
@@ -129,15 +131,21 @@ def main(arg):
     nflat, ndark, nimg, height, width = read_adimec_header(fname)
     print("Image Size:", width, height)
 
+    # override nflat and ndark from header with the passed parameter
+    # comment the two lines below if the meta data in the binary 
+    # file for nflat and ndark is correct
+    nflat = args.nflat
+    ndark = args.ndark
+
     proj = read_adimec_stack(fname, img=(start, end))
     print("Projection:", proj.shape)
     slider(proj)
 
-    flat = read_adimec_stack(fname, img=(nimg-20, nimg-9))
+    flat = read_adimec_stack(fname, img=(nimg-ndark-nflat, nimg-ndark))
     print("Flat:", flat.shape)
     slider(flat)
 
-    dark = read_adimec_stack(fname, img=(nimg-9, nimg))
+    dark = read_adimec_stack(fname, img=(nimg-ndark, nimg))
     print("Dark:", dark.shape)
     slider(dark)
 
