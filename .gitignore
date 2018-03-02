@@ -52,6 +52,8 @@ docs/build
 *egg-info
 *.egg
 .settings
+.ipynb_checkpoints
+
 
 # LaTex generated files #
 #########################
@@ -106,3 +108,7 @@ coverage.xml
 *.sublime-project
 *.sublime-workspace
 docs/trunk/*
+
+# tomopy by products
+*.mat
+recon_dir
