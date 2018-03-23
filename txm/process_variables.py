@@ -6,6 +6,14 @@ Transmission X-ray Microscope process variables grouped by component
 
 from epics import PV
 
+# Beamline Status
+current = PV('S:SRcurrentAI')
+undulator_energy = PV('ID32ds:Energy.VAL')
+undulator_gap = PV('ID32ds:Gap.VAL')
+energy_dcm = PV('32ida:BraggEAO.VAL')
+mirror_x  = PV('32idbMIR:m1.RBV')
+mirror_y  = PV('32idbMIR:m2.RBV')
+
 # Beam Monitor
 beam_monitor_x = PV('32idcTXM:nf:c0:m1.VAL')
 beam_monitor_x_set = PV('32idcTXM:nf:c0:m1.SET')
@@ -46,6 +54,7 @@ pin_hole_z_set = PV('32idcTXM:xps:c1:m5.SET')
 sample_top_x = PV('32idcTXM:mmc:c0:m1.VAL')
 sample_top_z = PV('32idcTXM:mmc:c0:m2.VAL')
 sample_rotary = PV('32idcTXM:hydra:c0:m1.VAL')
+sample_rotary_home = PV('32idcTXM:hydra:c0:m1.HOMF')
 sample_x = PV('32idcTXM:xps:c1:m8.VAL')
 sample_y = PV('32idcTXM:xps:c1:m7.VAL')
 
