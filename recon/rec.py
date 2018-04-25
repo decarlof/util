@@ -105,11 +105,11 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
 
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
-    sample_detector_distance = 30       # Propagation distance of the wavefront in cm
+    sample_detector_distance = 3        # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 1.17e-4     # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 25.74        # Energy of incident wave in keV
+    monochromator_energy = 22.7         # Energy of incident wave in keV
     alpha = 1e-02                       # Phase retrieval coeff.
-    zinger_level = 1000                 # Zinger level for projections
+    zinger_level = 800                  # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
 
     # Read APS 32-BM raw data.
@@ -123,13 +123,13 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
 
     # remove stripes
-    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
     data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
-    # data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
@@ -153,7 +153,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     print("Algorithm: ", algorithm)
 
     # Mask each reconstructed slice with a circle.
-    ##rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
     
     return rec
       
@@ -166,7 +166,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     sino_start = 0
     sino_end = data_shape[1]
 
-    chunks = 16         # number of sinogram chunks to reconstruct
+    chunks = 8          # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
@@ -323,6 +323,7 @@ def main(arg):
             for h5fname in dict2:
                 rot_center = dict2[h5fname]
                 fname = top + h5fname
+                print("Reconstructing ", h5fname)
                 # Set default rotation axis location
                 if rot_center == 0:
                     data_shape = get_dx_dims(fname, 'data')

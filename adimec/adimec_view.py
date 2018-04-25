@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.widgets as wdg
 
 import tomopy
+import dxchange 
 
 class slider():
     def __init__(self, data):
@@ -132,6 +133,7 @@ def main(arg):
 
     nflat, ndark, nimg, height, width = read_adimec_header(fname)
     print("Image Size:", width, height)
+    print("Dataset metadata (nflat, ndark, nimg:", nflat, ndark, nimg)
 
     # override nflat and ndark from header with the passed parameter
     # comment the two lines below if the meta data in the binary 
@@ -151,8 +153,34 @@ def main(arg):
     print("Dark:", dark.shape)
     # slider(dark)
 
-    proj = tomopy.normalize(proj, flat, dark)
+    nproj = tomopy.normalize(proj, flat, dark)
+    print("Normalized projection:", nproj.shape)
+    # slider(proj)
+
+    
+    proj = nproj[:,100:110, :]
+    print("Sino chunk:", proj.shape)
     slider(proj)
+    
+    theta = tomopy.angles(proj.shape[0])
+    print(theta.shape)
+
+    proj = tomopy.minus_log(proj)
+
+    proj = tomopy.remove_nan(proj, val=0.0)
+    proj = tomopy.remove_neg(proj, val=0.00)
+    proj[np.where(proj == np.inf)] = 0.00
+
+    rot_center = 1280
+    # Reconstruct object using Gridrec algorithm.
+    rec = tomopy.recon(proj, theta, center=rot_center, algorithm='gridrec')
+
+    # Mask each reconstructed slice with a circle.
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+
+    # Write data as stack of TIFs.
+    dxchange.write_tiff_stack(rec, fname='recon_dir/recon')
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
