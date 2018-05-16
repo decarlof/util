@@ -42,6 +42,7 @@ ehthumbs.db
 Thumbs.db
 .spyderworkspace
 *.*~
+core
 
 # Python pyproducts #
 #####################
@@ -53,7 +54,6 @@ docs/build
 *.egg
 .settings
 .ipynb_checkpoints
-
 
 # LaTex generated files #
 #########################
@@ -110,5 +110,6 @@ coverage.xml
 docs/trunk/*
 
 # tomopy by products
+####################
 *.mat
 recon_dir
