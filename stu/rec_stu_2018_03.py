@@ -115,7 +115,6 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     # Read APS 32-BM raw data.
     data, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
 
-    theta = theta / np.pi * 180.0        
     # # zinger_removal
     # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
     # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
@@ -137,9 +136,9 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
     data = tomopy.minus_log(data)
 
-    data = tomopy.remove_nan(data, val=0.0)
-    data = tomopy.remove_neg(data, val=0.00)
-    data[np.where(data == np.inf)] = 0.00
+##    data = tomopy.remove_nan(data, val=0.0)
+##    data = tomopy.remove_neg(data, val=0.00)
+##    data[np.where(data == np.inf)] = 0.00
 
     rot_center = rot_center/np.power(2, float(binning))
     data = tomopy.downsample(data, level=binning) 
@@ -167,7 +166,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     sino_start = 0
     sino_end = data_shape[1]
 
-    chunks = 8          # number of sinogram chunks to reconstruct
+    chunks = 3          # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
