@@ -21,10 +21,12 @@ patch_size = (dim_img, dim_img)
 
 # read the training data
 
-img_x = dxchange.read_tiff('data/training_input_vda.tiff')
-img_y = dxchange.read_tiff('data/training_output_vda.tiff')
+train_folder ='/local/dataraid/cnn/Al-10Sn-4Si-1Cu-Er-Zr/train/'
+
+img_x = dxchange.read_tiff(train_folder + 'training_input.tiff')
+img_y = dxchange.read_tiff(train_folder + 'training_output3.tiff')
 
 # train and save the model
 model = train(img_x, img_y, patch_size, patch_step, dim_img, nb_filters, nb_conv, batch_size, nb_epoch)
-model.save_weights('transform_training_weights_vda.h5')
+model.save_weights('transform_training_weights_al10_3.h5')
 
