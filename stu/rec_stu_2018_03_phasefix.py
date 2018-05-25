@@ -24,11 +24,12 @@ print(fname)
 proj, flat, dark, theta = dxchange.read_aps_32id(h5fname)
     
 # zinger_removal
-proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+##proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+##flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
 # Flat-field correction of raw data.
-data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
+##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
+data = tomopy.normalize(proj, flat, dark)
 
 # remove stripes
 data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)

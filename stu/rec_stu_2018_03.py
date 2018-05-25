@@ -113,32 +113,33 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level_w = 1000               # Zinger level for white
 
     # Read APS 32-BM raw data.
-    data, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+        
+    # zinger_removal
+    ##proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    ##flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
-    # # zinger_removal
-    # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-    # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+    # Flat-field correction of raw data.
+    ##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
+    data = tomopy.normalize(proj, flat, dark)
 
-    # # Flat-field correction of raw data.
-    # data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
+    # remove stripes
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
-    # # remove stripes
-    # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    #data = tomopy.remove_stripe_ti(data, alpha=1.5)
+    data = tomopy.remove_stripe_sf(data, size=150)
 
-    # #data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    # data = tomopy.remove_stripe_sf(data, size=150)
-
-    # # phase retrieval
-    # #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    # phase retrieval
+    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
 
     data = tomopy.minus_log(data)
 
-##    data = tomopy.remove_nan(data, val=0.0)
-##    data = tomopy.remove_neg(data, val=0.00)
-##    data[np.where(data == np.inf)] = 0.00
+    data = tomopy.remove_nan(data, val=0.0)
+    data = tomopy.remove_neg(data, val=0.00)
+    data[np.where(data == np.inf)] = 0.00
 
     rot_center = rot_center/np.power(2, float(binning))
     data = tomopy.downsample(data, level=binning) 
@@ -166,7 +167,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     sino_start = 0
     sino_end = data_shape[1]
 
-    chunks = 3          # number of sinogram chunks to reconstruct
+    chunks = 6          # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
