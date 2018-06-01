@@ -20,7 +20,7 @@ mdl.load_weights('transform_training_weights_al10.h5')
 
 print('Predicting')
 
-folder = '/local/dataraid/cnn/Al-10Sn-4Si-1Cu-Er-Zr/reconstructed/'
+folder = '/local/tomo/data/cnn/Al-10Sn-4Si-1Cu-Er-Zr/reconstructed/'
 files = [f for f in sorted(os.listdir(folder)) if re.match(r'.+.tif', f)]
 
 for fname in files:

@@ -21,7 +21,7 @@ patch_size = (dim_img, dim_img)
 
 # read the training data
 
-train_folder ='/local/dataraid/cnn/Al-10Sn-4Si-1Cu-Er-Zr/train/'
+train_folder ='/local/tomo/data/cnn/Al-10Sn-4Si-1Cu-Er-Zr/train/'
 
 img_x = dxchange.read_tiff(train_folder + 'Slice_0563-segmentation.tiff')
 img_y = dxchange.read_tiff(train_folder + 'Slice_0563.tiff')
