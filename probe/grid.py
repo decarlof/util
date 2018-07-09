@@ -9,12 +9,16 @@ n = 10
 # Dummy data
 np.random.seed(19680801)
 x = np.arange(0, n, 1)
-y = np.random.rand(n) * 5.
+y = np.arange(0, n, 1)
+#y = np.random.rand(n) * 5.
 
 # Dummy errors (above and below)
-x_size = np.random.rand(2, n) + 0.1
-y_size = np.random.rand(2, n) + 0.2
+#x_size = np.random.rand(2, n) + 0.1
+#y_size = np.random.rand(2, n) + 0.2
+x_size = np.ones((2, n))
+y_size = np.ones((2, n))
 print(x_size)
+
 
 def make_error_boxes(ax, xdata, ydata, x_sizeor, y_sizeor, facecolor='r',
                      edgecolor='None', alpha=0.5):
@@ -45,7 +49,7 @@ def make_error_boxes(ax, xdata, ydata, x_sizeor, y_sizeor, facecolor='r',
 fig, ax = plt.subplots(1)
 
 # Call function to create error boxes
-_ = make_error_boxes(ax, x, y, x_size, y_size)
+_ = make_error_boxes(ax, x, y, x_size/2, y_size/2)
 
 plt.show()
 

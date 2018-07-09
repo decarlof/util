@@ -15,6 +15,7 @@ depth=np.array([3.04, 9.45, 16.37, 23.90])
 
 #create mesh
 X, Y = np.meshgrid(loni, depi)
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX", X)
 XI, YI = np.meshgrid(lon,depth)
 
 #interp
