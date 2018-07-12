@@ -45,28 +45,28 @@ while True:
     data = sock.recv()
     cnt += 1
     if cnt % 5 == 0:
-      read_image = serializer.deserialize(serialized_image=data)
-      my_image = read_image.TdataAsNumpy()
+      read_proj = serializer.deserialize(serialized_image=data)
+      proj = read_proj.TdataAsNumpy()
   
-      my_image.dtype = np.uint16
-      my_image = my_image.reshape((read_image.Dims().Y(), read_image.Dims().X()))
+      proj.dtype = np.uint16
+      proj = proj.reshape((read_proj.Dims().Y(), read_proj.Dims().X()))
       if im1 is None:
-          im1 = ax1.imshow(my_image, cmap='gray', vmin=2300, vmax=3800)
+          im1 = ax1.imshow(proj, cmap='gray', vmin=2300, vmax=3800)
       else:
-          im1.set_data(my_image)
+          im1.set_data(proj)
       fig.canvas.draw_idle()
       plt.pause(0.01)
   if recon_sock in socks and socks[recon_sock] == zmq.POLLIN:
     print ("got recon data")
-    image = recon_sock.recv_pyobj()
-    print(image.shape)
+    recon = recon_sock.recv_pyobj()
+    print(recon.shape)
 
     if im2 is None:
-        im2 = ax2.imshow(image[0], cmap='gray')
+        im2 = ax2.imshow(recon[0], cmap='gray')
     else:
-        im2.set_data(image[0])
-        #im2.set_clim(np.min(image[0]), np.max(image[0])*0.7)
-        im2.set_clim(1e-4, 5e-4)#np.max(image[0])*0.7)
+        im2.set_data(recon[0])
+        #im2.set_clim(np.min(recon[0]), np.max(recon[0])*0.7)
+        im2.set_clim(1e-4, 5e-4)#np.max(recon[0])*0.7)
     fig.canvas.draw_idle()
     plt.pause(0.01)
   if not socks:
