@@ -21,8 +21,8 @@ import dxchange
 import numpy as np
 
 # sirtfilter:
-# conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter
 # conda install -c astra-toolbox astra-toolbox
+# conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter
 import sirtfilter
    
 def get_dx_dims(fname, dataset):
