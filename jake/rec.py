@@ -116,18 +116,18 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
     # zinger_removal
-    ##proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-    ##flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
     # Flat-field correction of raw data.
     ##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    ##data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    ## data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
-    #data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    ##data = tomopy.remove_stripe_sf(data, size=150)
+    ##data = tomopy.remove_stripe_ti(data, alpha=1.5)
+    data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
     ##data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
@@ -155,7 +155,6 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     return rec
       
 
@@ -163,7 +162,6 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     
     data_shape = get_dx_dims(h5fname, 'data')
 
-    print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", data_shape)
     # Select sinogram range to reconstruct.
     sino_start = 0
     sino_end = data_shape[1]
