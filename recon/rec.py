@@ -4,7 +4,6 @@
 """
 TomoPy example script to reconstruct a single data set.
 """
-
 from __future__ import print_function
 
 import os
@@ -105,9 +104,9 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
 
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
-    sample_detector_distance = 3        # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 1.17e-4     # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 22.7         # Energy of incident wave in keV
+    sample_detector_distance = 8        # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 2.247e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
+    monochromator_energy = 24.9         # Energy of incident wave in keV
     alpha = 1e-02                       # Phase retrieval coeff.
     zinger_level = 800                  # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
@@ -116,21 +115,21 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
     # zinger_removal
-    ##proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-    ##flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
     # Flat-field correction of raw data.
     ##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
     data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
-    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
@@ -177,15 +176,14 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     strt = 0
     for iChunk in range(0,chunks):
         print('\n  -- chunk # %i' % (iChunk+1))
-        sino_chunk_start = sino_start + nSino_per_chunk*iChunk 
-        sino_chunk_end = sino_start + nSino_per_chunk*(iChunk+1)
+        sino_chunk_start = np.int(sino_start + nSino_per_chunk*iChunk)
+        sino_chunk_end = np.int(sino_start + nSino_per_chunk*(iChunk+1))
         print('\n  --------> [%i, %i]' % (sino_chunk_start, sino_chunk_end))
                 
         if sino_chunk_end > sino_end: 
             break
 
         sino = (int(sino_chunk_start), int(sino_chunk_end))
-
         # Reconstruct.
         rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
                 
