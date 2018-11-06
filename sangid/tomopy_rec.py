@@ -92,87 +92,6 @@ def reconstruct(h5fname, sino, rot_center, blocked_views=None):
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
 
-
-    # Phase retrieval for tomobank id from 00032 to 00056
-    # sample_detector_distance = 60
-    # detector_pixel_size_x = 0.65e-4
-    # monochromator_energy = 27.4
-
-    # Phase retrieval for tomobank id 00058 and tomobank id 00059
-    # sample_detector_distance = 60
-    # detector_pixel_size_x = 0.65e-4
-    # monochromator_energy = 27.4
-
-    # Phase retrieval for tomobank id 00060 and tomobank id 00063
-    # sample_detector_distance = 25
-    # detector_pixel_size_x = 0.65e-4
-    # monochromator_energy = 27.4
-
-    # Phase retrieval for tomobank id 00064
-    # sample_detector_distance = 58
-    # detector_pixel_size_x = 1.4e-4
-    # monochromator_energy = 55.0
-
-    # Phase retrieval for tomobank id 00065
-    # sample_detector_distance = 158
-    # detector_pixel_size_x = 1.4e-4
-    # monochromator_energy = 55.0
-
-    # Phase retrieval for tomobank id 00066
-    # sample_detector_distance = 58
-    # detector_pixel_size_x = 1.4e-4
-    # monochromator_energy = 55.0
-
-    # Phase retrieval for tomobank id 00067
-    # sample_detector_distance = 308
-    # detector_pixel_size_x = 1.4e-4
-    # monochromator_energy = 55.0
-
-    # Phase retrieval for tomobank id 00068
-    # sample_detector_distance = 150
-    # detector_pixel_size_x = 4.1e-4
-    # monochromator_energy = 14.0
-
-    # Phase retrieval for tomobank id 00069
-    # sample_detector_distance = 4 
-    # detector_pixel_size_x = 3.7e-4
-    # monochromator_energy = 36.085
-
-    # Phase retrieval for tomobank id 00070
-    # sample_detector_distance = 8
-    # detector_pixel_size_x = 0.65e-4
-    # monochromator_energy = 24.999
-
-    # Phase retrieval for tomobank id 00071
-    # sample_detector_distance = 15
-    # detector_pixel_size_x = 0.65e-4
-    # monochromator_energy = 24.999
-
-    # Phase retrieval for tomobank id 00072
-    # sample_detector_distance = 15
-    # detector_pixel_size_x = 1.43e-4
-    # monochromator_energy = 20.0
-
-    # Phase retrieval for tomobank id 00073
-    # sample_detector_distance = 10
-    # detector_pixel_size_x = 0.74e-4
-    # monochromator_energy = 25.0
-
-    # Phase retrieval for tomobank id 00074
-    # sample_detector_distance = 10
-    # detector_pixel_size_x = 0.74e-4
-    # monochromator_energy = 25.0
-
-    # Phase retrieval for tomobank id 00075
-    # sample_detector_distance = 110
-    # detector_pixel_size_x = 1.43e-4
-    # monochromator_energy = 60
-
-    # Phase retrieval for tomobank id 00076
-    # sample_detector_distance = 90
-    # detector_pixel_size_x = 2.2e-4
-    # monochromator_energy = 65
-
     # # phase retrieval
     # data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=8e-3,pad=True)
 
@@ -273,55 +192,9 @@ def main(arg):
 
     blocked_views = None
 
-    # Missing angles for tomobank id from 00007 to 00021
+    # Missing angles
     # uncomment "blocked_views" for the dataset you want to reconstruct
-
-    # tomo_00007 best_center = 1232; slice_first = 740; slice_last = 1700; 
     blocked_views = [650,835]
-
-    # tomo_00008 best_center = 1321; slice_first = 1000; slice_last = 1440; 
-    # blocked_views = [141,228]
-
-    # tomo_00009 best_center = 1219; slice_first = 550; slice_last = 1370; 
-    # blocked_views = [147,233]
-
-    # tomo_00010 best_center = 1286; slice_first = 740; slice_last = 1500; 
-    # blocked_views = [142,227]
-
-    # tomo_00011 best_center = 1292; slice_first = 620; slice_last = 1320; 
-    # blocked_views = [140,226]
-
-    # tomo_00012 best_center = 1116; slice_first = 800; slice_last = 1200; 
-    # blocked_views = [140,225]
-
-    # tomo_00013 best_center = 1314; slice_first = 610; slice_last = 1500; 
-    # blocked_views = [71,113]
-
-    # tomo_00014 best_center = 1140; slice_first = 610; slice_last = 1200; 
-    # blocked_views = [140,226]
-
-    # tomo_00015 best_center = 1124; slice_first = 740; slice_last = 1270; 
-    # blocked_views = [140,227]
-
-    # tomo_00016 best_center = 1338; slice_first = 760; slice_last = 1180; 
-    # blocked_views = [140,227]
-
-    # tomo_00017 best_center = 1232; slice_first = 710; slice_last = 1210; 
-    # blocked_views = [140,227]
-
-    # tomo_00018 best_center = 1292; slice_first = 700; slice_last = 1180; 
-    # blocked_views = [138,225]
-
-    # tomo_00019 best_center = 1114; slice_first = 740; slice_last = 1210; 
-    # blocked_views = [141,228]
-
-    # tomo_00020 best_center = 1352; slice_first = 750; slice_last = 1230; 
-    # blocked_views = [138, 224]
-
-    # tomo_00021 best_center = 1352; slice_first = 630; slice_last = 1100; 
-    # blocked_views = [138, 224]
-
-
 
     slice = False
     if args.type == "slice":
