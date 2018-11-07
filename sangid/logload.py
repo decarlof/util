@@ -9,18 +9,8 @@ import time
 
 from epics import PV
 
-variableDict = {'PreDarkImages': 0,
-        'PreWhiteImages': 0,
-        'Projections': 1500,
-        'PostDarkImages': 20,
-        'PostWhiteImages': 20,
-        'SampleXIn': 0.0,
-        'SampleXOut': 5,
-        'SampleRotStart': 0.0,
-        'SampleRotEnd': 180.0,
-        'ExposureTime': 0.1,
+variableDict = {
         'IOC_Prefix': 'PCOIOC3:', 
-        'EnergyMono': 24.9,
         'Station': '2-BM-A'
         }
 
@@ -44,10 +34,10 @@ def main():
     try:
         with open(fname, 'a+') as f:
             while True:
-                f.write('%s %s; Load: %4.4f V %4.4f N\n' % (global_PVs['HDF1_FullFileName_RBV'].get(), \
+                f.write('%s %s; Load: %4.4f N (%4.4f V)\n' % (global_PVs['HDF1_FullFileName_RBV'].get(), \
                         datetime.datetime.now().isoformat(), global_PVs['LoadNewton'].get(), \
                         global_PVs['LoadVoltage'].get()))
-                print('%s %s; Load: %4.4f V %4.4f N' % (global_PVs['HDF1_FullFileName_RBV'].get(), \
+                print('%s %s; Load: %4.4f N (%4.4f V)' % (global_PVs['HDF1_FullFileName_RBV'].get(), \
                         datetime.datetime.now().isoformat(), global_PVs['LoadNewton'].get(), \
                         global_PVs['LoadVoltage'].get()))
                 time.sleep(2)	
