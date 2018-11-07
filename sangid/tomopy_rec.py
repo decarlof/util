@@ -118,7 +118,7 @@ def rec_full(h5fname, rot_center, blocked_views):
     sino_start = 0
     sino_end = data_size[1]
 
-    chunks = 16         # number of sinogram chunks to reconstruct
+    chunks = 10         # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
