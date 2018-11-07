@@ -44,11 +44,12 @@ def main():
     try:
         with open(fname, 'a+') as f:
             while True:
-                f.write('%s %s %4.4f V %4.4f N\n' % (global_PVs['HDF1_FullFileName_RBV'].get(), datetime.datetime.now().isoformat(), global_PVs['LoadVoltage'].get(), global_PVs['LoadNewton'].get()))
-                print('Time: ', datetime.datetime.now().isoformat()) 
-                print('Sample %s' % global_PVs['HDF1_FullFileName_RBV'].get())
-                print('Load %s V' % global_PVs['LoadVoltage'].get())
-                print('Load %s N' % global_PVs['LoadNewton'].get())
+                f.write('%s %s; Load: %4.4f V %4.4f N\n' % (global_PVs['HDF1_FullFileName_RBV'].get(), \
+                        datetime.datetime.now().isoformat(), global_PVs['LoadNewton'].get(), \
+                        global_PVs['LoadVoltage'].get()))
+                print('%s %s; Load: %4.4f V %4.4f N' % (global_PVs['HDF1_FullFileName_RBV'].get(), \
+                        datetime.datetime.now().isoformat(), global_PVs['LoadNewton'].get(), \
+                        global_PVs['LoadVoltage'].get()))
                 time.sleep(2)	
     except KeyboardInterrupt:
 	
