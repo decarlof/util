@@ -128,20 +128,17 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     fnflat = fbase + '_' + fnum_flat + fext
     fndark = fbase + '_' + fnum_dark + fext
 
-    # Read APS 32-BM raw data.
+    # Read APS 2-BM DIMAX raw data.
     proj, dum, dum2, theta = dxchange.read_aps_32id(fnproj, sino=sino)
-
-    #h5fname = '/local/data/2018-11/Chawla/wood_0011.hdf'
-    dumX, flat, dum3, dum4 = dxchange.read_aps_32id(fnflat, sino=sino)
-
-    #h5fname = '/local/data/2018-11/Chawla/wood_0012.hdf'        
-    dum5, dum6, dark, dum7 = dxchange.read_aps_32id(fndark, sino=sino)
+    dum3, flat, dum4, dum5 = dxchange.read_aps_32id(fnflat, sino=sino)      
+    dum6, dum7, dark, dum8 = dxchange.read_aps_32id(fndark, sino=sino)
 
     # Flat-field correction of raw data.
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
 
     # remove stripes
     data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)        
+    
     # zinger_removal
     proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
     flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
@@ -245,12 +242,11 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
 def main(arg):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("fname", help="Directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
+    parser.add_argument("fname", help="File name of the dimax projection file (larger file with lower index number in a group of 3): /data/sample_0001.h5")
     parser.add_argument("--axis", nargs='?', type=str, default="0", help="Rotation axis location (pixel): 1024.0 (default 1/2 image horizontal size)")
     parser.add_argument("--bin", nargs='?', type=int, default=0, help="Reconstruction binning factor as power(2, choice) (default 0, no binning)")
     parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: sirtfbp (default gridrec)")
     parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice (default slice)")
-    parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
 
     args = parser.parse_args()
@@ -264,7 +260,6 @@ def main(arg):
     nsino = float(args.nsino)
 
     rec_type = args.type
-    center_search_width = args.srs
 
     if os.path.isfile(fname):    
 
@@ -278,30 +273,6 @@ def main(arg):
         else:
             rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
 
-    elif os.path.isdir(fname):
-        print("Reconstructing a folder containing multiple files")   
-        # Add a trailing slash if missing
-        top = os.path.join(fname, '')
-        
-        # Load the the rotation axis positions.
-        jfname = top + "rotation_axis.json"
-        
-        dictionary = read_rot_centers(jfname)
-            
-        for key in dictionary:
-            dict2 = dictionary[key]
-            for h5fname in dict2:
-                rot_center = dict2[h5fname]
-                fname = top + h5fname
-                print("Reconstructing ", h5fname)
-                # Set default rotation axis location
-                if rot_center == 0:
-                    data_shape = get_dx_dims(fname, 'data')
-                    rot_center =  data_shape[2]/2
-                if rec_type == "full":
-                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
-                else:
-                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
     else:
         print("Directory or File Name does not exist: ", fname)
 
