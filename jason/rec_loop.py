@@ -129,11 +129,10 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     fnproj = fbase + '_' + fnum + fext
     fnflat = fbase + '_' + fnum_flat + fext
     fndark = fbase + '_' + fnum_dark + fext
-    
-    fnflat = '/local/data/2018-11/Chawla/M_P_SB/M_P_SB_0005.h5'
-    fndark = '/local/data/2018-11/Chawla/M_P_SB/M_P_SB_0006.h5'
 
-    print('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ')
+    fnflat = '/local/data/2018-11/Chawla/1G_A/1G_A_0002.hdf'
+    fndark = '/local/data/2018-11/Chawla/1G_A/1G_A_0003.hdf'
+
     print('proj', fnproj)
     print('flat', fnflat)
     print('dark', fndark)
