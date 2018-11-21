@@ -104,14 +104,14 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
 
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
-    sample_detector_distance = 25       # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 2.143e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    #monochromator_energy = 24.9        # Energy of incident wave in keV
+    sample_detector_distance = 31      # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 1.17e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
+    monochromator_energy = 65    # Energy of incident wave in keV
     # used pink beam
 
-    alpha = 1e-02                       # Phase retrieval coeff.
-    zinger_level = 800                  # Zinger level for projections
-    zinger_level_w = 1000               # Zinger level for white
+    alpha = 1*1e-4                       # Phase retrieval coeff.
+    zinger_level = 400                  # Zinger level for projections
+    zinger_level_w = 500               # Zinger level for white
 
     # Read APS 2-BM raw data.
     # DIMAX saves 3 files: proj, flat, dark
@@ -160,7 +160,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
-    #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+#    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
@@ -175,12 +175,21 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.downsample(data, level=binning) 
     data = tomopy.downsample(data, level=binning, axis=1)
 
+    # padding 
+    N = data.shape[2]
+    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
+    data_pad[:,:,N//4:5*N//4] = data
+    data_pad[:,:,0:N//4] = np.tile(np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+    data_pad[:,:,5*N//4:] = np.tile(np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+
+    data = data_pad
+    rot_center = rot_center+N//4
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
     else:
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
-        
+    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
     print("Algorithm: ", algorithm)
 
     # Mask each reconstructed slice with a circle.
@@ -195,10 +204,10 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     data_shape = get_dx_dims(h5fname, 'data')
 
     # Select sinogram range to reconstruct.
-    sino_start = 0
-    sino_end = data_shape[1]
+    sino_start = 664
+    sino_end = 665#data_shape[1]
 
-    chunks = 6          # number of sinogram chunks to reconstruct
+    chunks = 1          # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
@@ -220,7 +229,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
                 
         # Write data as stack of TIFs.
-        fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon_new_'
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
