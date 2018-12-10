@@ -75,7 +75,7 @@ def main(arg):
             proj, flat, dark, dummy = dxchange.read_aps_32id(fname, proj=nproj)
 
             # Flat-field correction of raw data.
-            data = tomopy.normalize(proj, flat, dark)                    
+            data = tomopy.normalize(proj, flat, dark, cutoff=0.9)                    
 
             # Write data as stack of TIFs.
             tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
