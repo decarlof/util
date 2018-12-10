@@ -5,7 +5,7 @@ import argparse
 import tomopy
 import dxchange
 import dxchange.reader as dxreader
-
+import numpy as np
 
 def get_dx_dims(fname, dataset):
     """
