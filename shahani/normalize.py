@@ -49,30 +49,30 @@ def main(arg):
     if os.path.isfile(fname):
         data_shape = get_dx_dims(fname, 'data')
 
-        # Select sinogram range to reconstruct.
-        sino_start = 0
-        sino_end = data_shape[1]
+        # Select projgram range to reconstruct.
+        proj_start = 0
+        proj_end = data_shape[0]
 
-        chunks = 6          # number of sinogram chunks to reconstruct
+        chunks = 6          # number of projgram chunks to reconstruct
                             # only one chunk at the time is converted
                             # allowing for limited RAM machines to complete a full reconstruction
 
-        nSino_per_chunk = (sino_end - sino_start)/chunks
-        print("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((sino_end - sino_start), sino_start, sino_end, chunks, nSino_per_chunk))            
+        nProj_per_chunk = (proj_end - proj_start)/chunks
+        print("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((proj_end - proj_start), proj_start, proj_end, chunks, nProj_per_chunk))            
 
         strt = 0
         for iChunk in range(0,chunks):
             print('\n  -- chunk # %i' % (iChunk+1))
-            sino_chunk_start = np.int(sino_start + nSino_per_chunk*iChunk)
-            sino_chunk_end = np.int(sino_start + nSino_per_chunk*(iChunk+1))
-            print('\n  --------> [%i, %i]' % (sino_chunk_start, sino_chunk_end))
+            proj_chunk_start = np.int(proj_start + nProj_per_chunk*iChunk)
+            proj_chunk_end = np.int(proj_start + nProj_per_chunk*(iChunk+1))
+            print('\n  --------> [%i, %i]' % (proj_chunk_start, proj_chunk_end))
                     
-            if sino_chunk_end > sino_end: 
+            if proj_chunk_end > proj_end: 
                 break
 
-            sino = (int(sino_chunk_start), int(sino_chunk_end))
+            nproj = (int(proj_chunk_start), int(proj_chunk_end))
             # Reconstruct.
-            proj, flat, dark, dummy = dxchange.read_aps_32id(fname, sino=sino)
+            proj, flat, dark, dummy = dxchange.read_aps_32id(fname, proj=nproj)
 
             # Flat-field correction of raw data.
             data = tomopy.normalize(proj, flat, dark)                    
@@ -81,7 +81,7 @@ def main(arg):
             tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
             print("Converted files: ", tifffname)
             dxchange.write_tiff_stack(data, fname=tifffname, start=strt)
-            strt += sino[1] - sino[0]
+            strt += nproj[1] - nproj[0]
     else:
         print("File Name does not exist: ", fname)
 
