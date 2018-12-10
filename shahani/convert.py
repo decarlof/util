@@ -47,6 +47,19 @@ def main(arg):
     fname = args.fname
 
     if os.path.isfile(fname):
+
+
+        proj, flat, dark, dummy = dxchange.read_aps_32id(fname, proj=(0,1))
+        # Write flat as stack of TIFs.
+        tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0] + '_tiff' +  os.sep + 'flat_' + os.path.splitext(os.path.basename(fname))[0]
+        print("Converted files: ", tifffname)
+        dxchange.write_tiff_stack(flat, fname=tifffname)
+        # Write dark as stack of TIFs.
+        tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0] + '_tiff' +  os.sep + 'dark_' + os.path.splitext(os.path.basename(fname))[0]
+        print("Converted files: ", tifffname)
+        dxchange.write_tiff_stack(dark, fname=tifffname)
+
+
         data_shape = get_dx_dims(fname, 'data')
 
         # Select projgram range to reconstruct.
@@ -58,7 +71,7 @@ def main(arg):
                             # allowing for limited RAM machines to complete a full reconstruction
 
         nProj_per_chunk = (proj_end - proj_start)/chunks
-        print("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((proj_end - proj_start), proj_start, proj_end, chunks, nProj_per_chunk))            
+        print("Converting [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((proj_end - proj_start), proj_start, proj_end, chunks, nProj_per_chunk))            
 
         strt = 0
         for iChunk in range(0,chunks):
@@ -78,11 +91,11 @@ def main(arg):
             #data = tomopy.normalize(proj, flat, dark, cutoff=0.85)                    
             data = proj
             # Write data as stack of TIFs.
-            tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
+            tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0] + '_tiff' +  os.sep + os.path.splitext(os.path.basename(fname))[0]
             print("Converted files: ", tifffname)
             dxchange.write_tiff_stack(data, fname=tifffname, start=strt)
             strt += nproj[1] - nproj[0]
-        proj, flat, dark, dummy = dxchange.read_aps_32id(fname, proj=(0,1))
+
         
     else:
         print("File Name does not exist: ", fname)
