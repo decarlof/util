@@ -78,9 +78,9 @@ def main(arg):
             data = tomopy.normalize(proj, flat, dark)                    
 
             # Write data as stack of TIFs.
-            fname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
-            print("Reconstructions: ", fname)
-            dxchange.write_tiff_stack(data, fname=fname, start=strt)
+            tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
+            print("Converted files: ", tifffname)
+            dxchange.write_tiff_stack(data, fname=tifffname, start=strt)
             strt += sino[1] - sino[0]
     else:
         print("File Name does not exist: ", fname)
