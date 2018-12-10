@@ -5,7 +5,36 @@ import tomopy
 import dxchange
 import dxchange.reader as dxreader
 
-fname = '/Downloads/161006_TLS629_Curvothynnus_female_2.94um_head.txm'
+
+def get_dx_dims(fname, dataset):
+    """
+    Read array size of a specific group of Data Exchange file.
+
+    Parameters
+    ----------
+    fname : str
+        String defining the path of file or file name.
+    dataset : str
+        Path to the dataset inside hdf5 file where data is located.
+
+    Returns
+    -------
+    ndarray
+        Data set size.
+    """
+
+    grp = '/'.join(['exchange', dataset])
+
+    with h5py.File(fname, "r") as f:
+        try:
+            data = f[grp]
+        except KeyError:
+            return None
+
+        shape = data.shape
+
+    return shape
+
 
 def main(arg):
 
@@ -48,7 +77,7 @@ def main(arg):
             data = tomopy.normalize(proj, flat, dark)                    
 
             # Write data as stack of TIFs.
-            fname = os.path.dirname(fname) + '/' + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
+            fname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
             print("Reconstructions: ", fname)
             dxchange.write_tiff_stack(data, fname=fname, start=strt)
             strt += sino[1] - sino[0]
