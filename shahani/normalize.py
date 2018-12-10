@@ -58,7 +58,7 @@ def main(arg):
                             # allowing for limited RAM machines to complete a full reconstruction
 
         nProj_per_chunk = (proj_end - proj_start)/chunks
-        print("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((proj_end - proj_start), proj_start, proj_end, chunks, nProj_per_chunk))            
+        print("Normalizing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((proj_end - proj_start), proj_start, proj_end, chunks, nProj_per_chunk))            
 
         strt = 0
         for iChunk in range(0,chunks):
@@ -78,7 +78,7 @@ def main(arg):
             data = tomopy.normalize(proj, flat, dark, cutoff=0.9)                    
 
             # Write data as stack of TIFs.
-            tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff/' + os.path.splitext(os.path.basename(fname))[0]
+            tifffname = os.path.dirname(fname) + os.sep + os.path.splitext(os.path.basename(fname))[0]+ '_tiff' + os.sep + os.path.splitext(os.path.basename(fname))[0]
             print("Converted files: ", tifffname)
             dxchange.write_tiff_stack(data, fname=tifffname, start=strt)
             strt += nproj[1] - nproj[0]
