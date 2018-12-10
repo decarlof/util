@@ -72,7 +72,7 @@ def main(arg):
 
             sino = (int(sino_chunk_start), int(sino_chunk_end))
             # Reconstruct.
-            proj, flat, dark, dummy = dxchange.read_aps_32id(h5fname, sino=sino)
+            proj, flat, dark, dummy = dxchange.read_aps_32id(fname, sino=sino)
 
             # Flat-field correction of raw data.
             data = tomopy.normalize(proj, flat, dark)                    
