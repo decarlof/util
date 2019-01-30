@@ -105,18 +105,18 @@ def set_acquisition(blur_pixel, exposure_time, readout_time, camera_size_x, angu
 
 if __name__ == '__main__':
 
-    exposure_time          = 0.2             # s
-    readout_time           = 0.0             # s
-    camera_size_x          = 2048            # pixel
+    exposure_time          = 0.1             # s
+    readout_time           = 0.05            # s
+    camera_size_x          = 4096            # pixel
     angular_range          = 180.0           # deg
-    number_of_proj         = 1500
+    number_of_proj         = 6000
 
     x = []    
     y1 = []
     y2 = []  
     y3 = []  
 
-    for number_of_proj in range(90, 2000, 20):
+    for number_of_proj in range(100, number_of_proj, 100):
         b_err, rot_speed, scan_time = calc_blur_error(exposure_time, readout_time, camera_size_x, angular_range, number_of_proj)
         x.append(number_of_proj)
         y1.append(b_err)
@@ -135,7 +135,10 @@ if __name__ == '__main__':
     ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=2, mode="expand", borderaxespad=0.)
     plt.legend()
 
-    label = 'exposure time = ' + str(exposure_time) + ' s' + '\nreadout time = ' + str(readout_time) + ' s' + '\ncamera h size = ' + str(camera_size_x) + ' pixels' + '\nangular range = ' + str(angular_range) + ' deg'
+    label = 'exposure time = ' + str(exposure_time) + ' s' + '\nreadout time = ' + str(readout_time) + \
+            ' s' + '\ncamera h size = ' + str(camera_size_x) + ' pixels' + '\nangular range = ' + \
+            str(angular_range) + ' deg' + '\nscan time = ' + str(scan_time/60) + ' min for ' + \
+            str(number_of_proj) + ' projections'
 
     ax.text(0.8, 0.5, label,
             verticalalignment='bottom', horizontalalignment='right',
