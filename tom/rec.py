@@ -104,63 +104,32 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
 
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
-    sample_detector_distance = 31      # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 1.17e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 65    # Energy of incident wave in keV
-    # used pink beam
+    sample_detector_distance = 8        # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 2.247e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
+    monochromator_energy = 24.9         # Energy of incident wave in keV
+    alpha = 1e-02                       # Phase retrieval coeff.
+    zinger_level = 800                  # Zinger level for projections
+    zinger_level_w = 1000               # Zinger level for white
 
-    alpha = 1*1e-4                       # Phase retrieval coeff.
-    zinger_level = 400                  # Zinger level for projections
-    zinger_level_w = 500               # Zinger level for white
-
-    # Read APS 2-BM raw data.
-    # DIMAX saves 3 files: proj, flat, dark
-    # when loading the data set select the proj file (larger size)
-
-    fname = os.path.splitext(h5fname)[0]    
- 
-    fbase = fname.rsplit('_', 1)[0]
-    fnum = fname.rsplit('_', 1)[1]
-    fext = os.path.splitext(h5fname)[1]  
-
-    fnum_flat = str("%4.4d" % (int(fnum)+1))
-    fnum_dark = str("%4.4d" % (int(fnum)+2))
-
-    fnproj = fbase + '_' + fnum + fext
-    fnflat = fbase + '_' + fnum_flat + fext
-    fndark = fbase + '_' + fnum_dark + fext
-    
-    print('proj', fnproj)
-    print('flat', fnflat)
-    print('dark', fndark)
-    # Read APS 2-BM DIMAX raw data.
-    proj, dum, dum2, theta = dxchange.read_aps_32id(fnproj, sino=sino)
-    dum3, flat, dum4, dum5 = dxchange.read_aps_32id(fnflat, sino=sino)
-    #flat, dum3, dum4, dum5 = dxchange.read_aps_32id(fnflat, sino=sino)          
-    dum6, dum7, dark, dum8 = dxchange.read_aps_32id(fndark, sino=sino)
-
-    # Flat-field correction of raw data.
-    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
-
-    # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)        
-    
+    # Read APS 32-BM raw data.
+    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+        
     # zinger_removal
-    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-    flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+    # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
     # Flat-field correction of raw data.
     ##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    data = tomopy.remove_stripe_sf(data, size=150)
+    #data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
-#    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
@@ -175,26 +144,16 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.downsample(data, level=binning) 
     data = tomopy.downsample(data, level=binning, axis=1)
 
-    # padding 
-    N = data.shape[2]
-    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
-    data_pad[:,:,N//4:5*N//4] = data
-    data_pad[:,:,0:N//4] = np.tile(np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1]),(1,1,N//4))
-    data_pad[:,:,5*N//4:] = np.tile(np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1]),(1,1,N//4))
-
-    data = data_pad
-    rot_center = rot_center+N//4
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
     else:
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
-    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
+        
     print("Algorithm: ", algorithm)
 
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
-    #rec = np.swapaxes(rec,0,2)
     
     return rec
       
@@ -204,10 +163,10 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     data_shape = get_dx_dims(h5fname, 'data')
 
     # Select sinogram range to reconstruct.
-    sino_start = 664
-    sino_end = 665#data_shape[1]
+    sino_start = 0
+    sino_end = data_shape[1]
 
-    chunks = 1          # number of sinogram chunks to reconstruct
+    chunks = 6          # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
@@ -229,7 +188,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
                 
         # Write data as stack of TIFs.
-        fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon_new_'
+        fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
@@ -254,15 +213,71 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
     print("Rec: ", fname)
     print("Slice: ", start)
     
+
+def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning):
+    
+    data_shape = get_dx_dims(h5fname, 'data')
+    print(data_shape)
+    ssino = int(data_shape[1] * nsino)
+
+    center_range = (rot_center-center_search_width, rot_center+center_search_width, 0.5)
+    #print(sino,ssino, center_range)
+    #print(center_range[0], center_range[1], center_range[2])
+
+    # Select sinogram range to reconstruct
+    sino = None
+        
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    # Read APS 32-BM raw data.
+    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+        
+    # Flat-field correction of raw data.
+    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+
+    # remove stripes
+    # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+
+
+    print("Raw data: ", h5fname)
+    print("Center: ", rot_center)
+
+    data = tomopy.minus_log(data)
+
+    stack = np.empty((len(np.arange(*center_range)), data_shape[0], data_shape[2]))
+
+    index = 0
+    for axis in np.arange(*center_range):
+        stack[index] = data[:, 0, :]
+        index = index + 1
+
+    # Reconstruct the same slice with a range of centers.
+    rec = tomopy.recon(stack, theta, center=np.arange(*center_range), sinogram_order=True, algorithm='gridrec', filter_name='parzen', nchunk=1)
+
+    # Mask each reconstructed slice with a circle.
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+
+    index = 0
+    # Save images to a temporary folder.
+    fname = os.path.dirname(h5fname) + '/' + 'try_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
+    for axis in np.arange(*center_range):
+        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
+        dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
+        index = index + 1
+
+    print("Reconstructions: ", fname)
        
 def main(arg):
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("fname", help="File name of the dimax projection file (larger file with lower index number in a group of 3): /data/sample_0001.h5")
+    parser.add_argument("fname", help="Directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
     parser.add_argument("--axis", nargs='?', type=str, default="0", help="Rotation axis location (pixel): 1024.0 (default 1/2 image horizontal size)")
     parser.add_argument("--bin", nargs='?', type=int, default=0, help="Reconstruction binning factor as power(2, choice) (default 0, no binning)")
     parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: sirtfbp (default gridrec)")
-    parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice (default slice)")
+    parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try (default slice)")
+    parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
 
     args = parser.parse_args()
@@ -276,6 +291,7 @@ def main(arg):
     nsino = float(args.nsino)
 
     rec_type = args.type
+    center_search_width = args.srs
 
     if os.path.isfile(fname):    
 
@@ -284,11 +300,39 @@ def main(arg):
         if rot_center == 0:
             data_shape = get_dx_dims(fname, 'data')
             rot_center =  data_shape[2]/2
-        if rec_type == "full":
+        if rec_type == "try":            
+            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
+        elif rec_type == "full":
             rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
         else:
             rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
 
+    elif os.path.isdir(fname):
+        print("Reconstructing a folder containing multiple files")   
+        # Add a trailing slash if missing
+        top = os.path.join(fname, '')
+        
+        # Load the the rotation axis positions.
+        jfname = top + "rotation_axis.json"
+        
+        dictionary = read_rot_centers(jfname)
+            
+        for key in dictionary:
+            dict2 = dictionary[key]
+            for h5fname in dict2:
+                rot_center = dict2[h5fname]
+                fname = top + h5fname
+                print("Reconstructing ", h5fname)
+                # Set default rotation axis location
+                if rot_center == 0:
+                    data_shape = get_dx_dims(fname, 'data')
+                    rot_center =  data_shape[2]/2
+                if rec_type == "try":            
+                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
+                elif rec_type == "full":
+                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
+                else:
+                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
     else:
         print("Directory or File Name does not exist: ", fname)
 
