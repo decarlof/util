@@ -119,11 +119,11 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
     # Flat-field correction of raw data.
-    ##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
-    data = tomopy.normalize(proj, flat, dark)
+    data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
+    #data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=16,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
     #data = tomopy.remove_stripe_sf(data, size=150)
