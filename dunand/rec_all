@@ -1,0 +1,12 @@
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0002.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0003.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0004.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0005.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0006.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0007.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0008.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0009.h5
+python rec_furnace.py --axis 1286.7 --type full /local/data/2019-02/Dunand/In-situ_75_1_0010.h5
+
+
+
