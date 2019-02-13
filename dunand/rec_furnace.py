@@ -112,7 +112,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level_w = 1000               # Zinger level for white
 
     # Read APS 32-BM raw data.
-    h5fname_norm = '/local/data/2018-12/Dunand/test_furnace_0089.h5'
+    h5fname_norm = '/local/data/2019-02/Dunand/In-situ_75_1_0001.h5'
     proj1, flat, dark, theta1 = dxchange.read_aps_32id(h5fname_norm, sino=sino)
     proj, dummy, dummy1, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
