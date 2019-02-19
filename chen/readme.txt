@@ -1,6 +1,6 @@
 To try different position of the rotation axis starting at 1290 +/- 5 pixels:
 
-    python rec.py proj_0070.hdf --axis 1290 --csw 5 --type try 
+    python rec.py proj_0070.hdf --axis 1290 --srs 5 --type try 
 
 To perform a full reconstruction
 
