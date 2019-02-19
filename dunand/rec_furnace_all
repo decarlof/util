@@ -1,0 +1,10 @@
+python rec_furnace_In-situ_100_1.py --type slice /local/data/2019-02/Dunand/In-situ_100_1/
+python rec_furnace_In-situ_100_2.py --type slice /local/data/2019-02/Dunand/In-situ_100_2/
+python rec_furnace_In-situ_100_2.py --type slice /local/data/2019-02/Dunand/In-situ_100_3/
+python rec_furnace_In-situ_100_4.py --type slice /local/data/2019-02/Dunand/In-situ_100_4/
+python rec_furnace_In-situ_75_1.py --type slice /local/data/2019-02/Dunand/In-situ_75_1/
+python rec_furnace_In-situ_75_2.py --type slice /local/data/2019-02/Dunand/In-situ_75_2/
+python rec_furnace_In-situ_75_3.py --type slice /local/data/2019-02/Dunand/In-situ_75_3/
+python rec_furnace_In-situ_75_4.py --type slice /local/data/2019-02/Dunand/In-situ_75_4/
+python rec_furnace_In-situ_75_NC_1.py --type slice /local/data/2019-02/Dunand/In-situ_75_NC_1/
+python rec_furnace_In-situ_75_NC_2.py --type slice /local/data/2019-02/Dunand/In-situ_75_NC_2/
