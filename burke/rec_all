@@ -1,7 +1,7 @@
 ##python rec.py --axis 915.50 --type full /local/data/2019-02/Burke/kc78_Menardii_0003.h5
 # unfixable white field from _0004 to _0013 included
 # fixable white
-python rec_fixflat.py --axis 877.50 --type full /local/data/2019-02/Burke/Men_1-10-1_0014.h5
+##python rec_fixflat.py --axis 877.50 --type full /local/data/2019-02/Burke/Men_1-10-1_0014.h5
 # OK white field
 ##python rec.py --axis 882.5 --type full /local/data/2019-02/Burke/C47M_0015.h5
 ##python rec.py --axis 885.50 --type full /local/data/2019-02/Burke/RM4_0016.h5
