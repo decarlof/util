@@ -1,38 +1,38 @@
-python rec.py --axis 915.50 --type full /local/data/2019-02/Burke/kc78_Menardii_0003.h5
+##python rec.py --axis 915.50 --type full /local/data/2019-02/Burke/kc78_Menardii_0003.h5
 # unfixable white field from _0004 to _0013 included
 # fixable white
 python rec_fixflat.py --axis 877.50 --type full /local/data/2019-02/Burke/Men_1-10-1_0014.h5
 # OK white field
-python rec.py --axis 882.5 --type full /local/data/2019-02/Burke/C47M_0015.h5
-python rec.py --axis 885.50 --type full /local/data/2019-02/Burke/RM4_0016.h5
-python rec.py --axis 885.50 --type full /local/data/2019-02/Burke/C410b_0017.h5
-python rec.py --axis 876.5 --type full /local/data/2019-02/Burke/RM5_0018.h5
-python rec.py --axis 883.0 --type full /local/data/2019-02/Burke/A26_0019.h5
-python rec.py --axis 885.0 --type full /local/data/2019-02/Burke/D28_0020.h5
+##python rec.py --axis 882.5 --type full /local/data/2019-02/Burke/C47M_0015.h5
+##python rec.py --axis 885.50 --type full /local/data/2019-02/Burke/RM4_0016.h5
+##python rec.py --axis 885.50 --type full /local/data/2019-02/Burke/C410b_0017.h5
+##python rec.py --axis 876.5 --type full /local/data/2019-02/Burke/RM5_0018.h5
+##python rec.py --axis 883.0 --type full /local/data/2019-02/Burke/A26_0019.h5
+##python rec.py --axis 885.0 --type full /local/data/2019-02/Burke/D28_0020.h5
 # _0021.h5 is missing
-python rec.py --axis 885.5 --type full /local/data/2019-02/Burke/RH4_0022.h5
-python rec.py --axis 887.5 --type full /local/data/2019-02/Burke/HT14_0023.h5
-python rec.py --axis 890.0 --type full /local/data/2019-02/Burke/D29_0024.h5
-python rec.py --axis 881.5 --type full /local/data/2019-02/Burke/RM2_0025.h5
-python rec.py --axis 886.5 --type full /local/data/2019-02/Burke/B17_0026.h5
+##python rec.py --axis 885.5 --type full /local/data/2019-02/Burke/RH4_0022.h5
+##python rec.py --axis 887.5 --type full /local/data/2019-02/Burke/HT14_0023.h5
+##python rec.py --axis 890.0 --type full /local/data/2019-02/Burke/D29_0024.h5
+##python rec.py --axis 881.5 --type full /local/data/2019-02/Burke/RM2_0025.h5
+##python rec.py --axis 886.5 --type full /local/data/2019-02/Burke/B17_0026.h5
 # M210_0027.h5 sample motion
-python rec.py --axis 891.5 --type full /local/data/2019-02/Burke/M210_0027.h5
-python rec.py --axis 893.5 --type full /local/data/2019-02/Burke/MT04_0028.h5
-python rec.py --axis 881.0 --type full /local/data/2019-02/Burke/LT13_0029.h5
-python rec.py --axis 892.0 --type full /local/data/2019-02/Burke/RM329_0030.h5
-python rec.py --axis 882.5 --type full /local/data/2019-02/Burke/HT15_0031.h5
-python rec.py --axis 887.0 --type full /local/data/2019-02/Burke/MT13_0032.h5
-python rec.py --axis 882.0 --type full /local/data/2019-02/Burke/RH2_0033.h5
-python rec.py --axis 892.5 --type full /local/data/2019-02/Burke/RH3orb_0034.h5
+##python rec.py --axis 891.5 --type full /local/data/2019-02/Burke/M210_0027.h5
+##python rec.py --axis 893.5 --type full /local/data/2019-02/Burke/MT04_0028.h5
+##python rec.py --axis 881.0 --type full /local/data/2019-02/Burke/LT13_0029.h5
+##python rec.py --axis 892.0 --type full /local/data/2019-02/Burke/RM329_0030.h5
+##python rec.py --axis 882.5 --type full /local/data/2019-02/Burke/HT15_0031.h5
+##python rec.py --axis 887.0 --type full /local/data/2019-02/Burke/MT13_0032.h5
+##python rec.py --axis 882.0 --type full /local/data/2019-02/Burke/RH2_0033.h5
+##python rec.py --axis 892.5 --type full /local/data/2019-02/Burke/RH3orb_0034.h5
 
-python rec.py --axis 857 --type full /local/data/2019-02/Burke/RH329_0035.h5
-python rec.py --axis 869 --type full /local/data/2019-02/Burke/B19b_0036.h5
-python rec.py --axis 883 --type full /local/data/2019-02/Burke/D29b_0037.h5
-python rec.py --axis 1280 --type full /local/data/2019-02/Burke/HST05_0038.h5
-python rec.py --axis 1277.50 --type full /local/data/2019-02/Burke/D27b_0039.h5
-python rec.py --axis 1276.50 --type full /local/data/2019-02/Burke/LUSH3_0040.h5
-python rec.py --axis 1276.50 --type full /local/data/2019-02/Burke/M210B_0041.h5
-python rec.py --axis 1283.50 --type full /local/data/2019-02/Burke/HAST2_0042.h5
+##python rec.py --axis 857 --type full /local/data/2019-02/Burke/RH329_0035.h5
+##python rec.py --axis 869 --type full /local/data/2019-02/Burke/B19b_0036.h5
+##python rec.py --axis 883 --type full /local/data/2019-02/Burke/D29b_0037.h5
+##python rec.py --axis 1280 --type full /local/data/2019-02/Burke/HST05_0038.h5
+##python rec.py --axis 1277.50 --type full /local/data/2019-02/Burke/D27b_0039.h5
+##python rec.py --axis 1276.50 --type full /local/data/2019-02/Burke/LUSH3_0040.h5
+##python rec.py --axis 1276.50 --type full /local/data/2019-02/Burke/M210B_0041.h5
+##python rec.py --axis 1283.50 --type full /local/data/2019-02/Burke/HAST2_0042.h5
 
 python rec.py --axis 1284.50 --type full /local/data/2019-02/Burke/MountB1_0043.h5
 python rec.py --axis 1282.50 --type full /local/data/2019-02/Burke/MountB23_0044.h5
