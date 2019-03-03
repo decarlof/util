@@ -37,7 +37,6 @@ python rec.py --axis 1283.50 --type full /local/data/2019-02/Burke/HAST2_0042.h5
 python rec.py --axis 1284.50 --type full /local/data/2019-02/Burke/MountB1_0043.h5
 python rec.py --axis 1282.50 --type full /local/data/2019-02/Burke/MountB23_0044.h5
 python rec.py --axis 1283.50 --type full /local/data/2019-02/Burke/HTO7_0045.h5
-
 python rec.py --axis 1288.50 --type full /local/data/2019-02/Bruke/LST03_0046.h5
 python rec.py --axis 1282.50 --type full /local/data/2019-02/Bruke/MT06_0047.h5
 python rec.py --axis 1275.50 --type full /local/data/2019-02/Bruke/HT03_0048.h5
