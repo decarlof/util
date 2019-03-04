@@ -77,7 +77,7 @@ def read_rot_centers(fname):
         exit()
 
 
-def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
+def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
 
     # Use test_sirtfbp_iter = True to test which number of iterations is suitable for your dataset
     # Filters are saved in .mat files in "./¨

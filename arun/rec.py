@@ -104,9 +104,9 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
 
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
-    sample_detector_distance = 8        # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 2.247e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 24.9         # Energy of incident wave in keV
+    sample_detector_distance = 17.5     # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 1.17e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
+    monochromator_energy = 40.0         # Energy of incident wave in keV
     alpha = 1e-02                       # Phase retrieval coeff.
     zinger_level = 800                  # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
@@ -123,13 +123,13 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
     #data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
-    #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)

@@ -112,7 +112,8 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level_w = 1000               # Zinger level for white
 
     # Read APS 32-BM raw data.
-    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+    proj1, flat, dark, theta1 = dxchange.read_aps_32id("/local/data/2019-02/Zenyuk/white_0025.h5", sino=sino)
+    proj, flat1, dark1, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
     # zinger_removal
     # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
@@ -123,7 +124,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
     #data = tomopy.remove_stripe_sf(data, size=150)

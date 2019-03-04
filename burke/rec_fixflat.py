@@ -77,7 +77,7 @@ def read_rot_centers(fname):
         exit()
 
 
-def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
+def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = True):
 
     # Use test_sirtfbp_iter = True to test which number of iterations is suitable for your dataset
     # Filters are saved in .mat files in "./¨
@@ -111,12 +111,14 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level = 800                  # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
 
-    # Read APS 32-BM raw data.
-    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+    # h5fname_norm = '/local/data/2019-02/Burke/C47M_0015.h5'
+    h5fname_norm = '/local/data/2019-02/Burke/kc78_Menardii_0003.h5'
+    proj1, flat, dark, theta1 = dxchange.read_aps_32id(h5fname_norm, sino=sino)
+    proj, dummy, dummy1, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
     # zinger_removal
-    # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
-    # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
+    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
     # Flat-field correction of raw data.
     ##data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
@@ -126,7 +128,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    #data = tomopy.remove_stripe_sf(data, size=150)
+    data = tomopy.remove_stripe_sf(data, size=20)
 
     # phase retrieval
     #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
@@ -231,8 +233,12 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     end = start + 1
     sino = (start, end)
 
-    # Read APS 32-BM raw data.
-    proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+     # Read APS 32-BM raw data.
+    # h5fname_norm = '/local/data/2019-02/Burke/C47M_0015.h5'
+    h5fname_norm = '/local/data/2019-02/Burke/kc78_Menardii_0003.h5'
+    
+    proj1, flat, dark, theta1 = dxchange.read_aps_32id(h5fname_norm, sino=sino)
+    proj, dummy, dummy1, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
     # Flat-field correction of raw data.
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
@@ -268,6 +274,7 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
         index = index + 1
 
     print("Reconstructions: ", fname)
+
        
 def main(arg):
 
@@ -327,8 +334,6 @@ def main(arg):
                 if rot_center == 0:
                     data_shape = get_dx_dims(fname, 'data')
                     rot_center =  data_shape[2]/2
-                if rec_type == "try":            
-                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
                 elif rec_type == "full":
                     rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
                 else:
