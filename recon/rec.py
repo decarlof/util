@@ -21,7 +21,10 @@ import numpy as np
 
 # sirtfilter:
 # conda install -c astra-toolbox astra-toolbox
-# conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter
+# git clone https://gitlab.com/dmpelt/sirtfilter.git
+# cd sirtfilter/
+# python setup.py install
+
 import sirtfilter
    
 def get_dx_dims(fname, dataset):
