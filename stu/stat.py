@@ -80,7 +80,7 @@ def main(arg):
     nsino = float(args.nsino)
 
     if os.path.isfile(fname):       
-        mean, average, std = tomo_stat(fname)
+        mean, amax, amin, std, var = tomo_stat(fname)
         print(fname, mean, average, std)
         
     elif os.path.isdir(fname):
