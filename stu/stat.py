@@ -61,8 +61,8 @@ def tomo_stat(h5fname):
     # mean = flat[10,:,:].mean()
     # std = flat[10,:,:].std()
 
-    mean = flat[10,:,:].amin()
-    average = flat[10,:,:].amax()
+    mean = flat[10,:,:].min()
+    average = flat[10,:,:].max()
     std = flat[10,:,:].std()
 
     return mean, average, std
