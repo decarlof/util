@@ -64,7 +64,7 @@ def tomo_stat(h5fname):
     std = flat[10,:,:].std()
     var = flat[10,:,:].var()
 
-    return mean, amax, amin, std, var
+    return amin, amax, mean, std, var
 
 
 def main(arg):
@@ -80,8 +80,8 @@ def main(arg):
     nsino = float(args.nsino)
 
     if os.path.isfile(fname):       
-        mean, amax, amin, std, var = tomo_stat(fname)
-        print(fname, mean, amax, amin, std, var)
+        amin, amax, mean, std, var = tomo_stat(fname)
+        print(fname, amin, amax, mean, std, var)
         
     elif os.path.isdir(fname):
         # Add a trailing slash if missing
@@ -101,10 +101,10 @@ def main(arg):
         i=0
         for fname in h5_file_list:
             h5fname = top + fname
-            mean, amax, amin, std, var = tomo_stat(h5fname)
-            case[0] =  {fname : mean }
+            amin, amax, mean, std, var = tomo_stat(h5fname)
+            case[0] =  {fname : amin }
             case[1] =  {fname : amax }
-            case[3] =  {fname : amin }
+            case[3] =  {fname : mean }
             case[4] =  {fname : std }
             case[5] =  {fname : var }
             print(case)
