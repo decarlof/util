@@ -58,13 +58,14 @@ def tomo_stat(h5fname):
     # Read APS 32-BM raw data
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname)
     
-    # th_average = theta.mean()
-    # th_average = theta.mean()
-    mean = flat[10,:,:].mean()
-    # average = flat[10,:,:].average()
+    # mean = flat[10,:,:].mean()
+    # std = flat[10,:,:].std()
+
+    mean = flat[10,:,:].amin()
+    average = flat[10,:,:].amax()
     std = flat[10,:,:].std()
 
-    return mean, std, std
+    return mean, average, std
 
 
 def main(arg):
