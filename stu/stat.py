@@ -97,11 +97,14 @@ def main(arg):
         print("Determining stats ...")
         
         dic_centers = {}
+        case = {}
         i=0
         for fname in h5_file_list:
             h5fname = top + fname
             mean, average, std = tomo_stat(h5fname)
-            case =  {fname : mean, average, std}
+            case[0] =  {fname : mean }
+            case[1] =  {fname : average }
+            case[3] =  {fname : std }
             print(case)
             dic_centers[i] = case
             i += 1
