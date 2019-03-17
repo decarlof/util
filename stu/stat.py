@@ -60,9 +60,11 @@ def tomo_stat(h5fname):
     
     # th_average = theta.mean()
     # th_average = theta.mean()
-    flat_average = flat[10,:,:].mean()
+    mean = flat[10,:,:].mean()
+    average = flat[10,:,:].average()
+    std = flat[10,:,:].std()
 
-    return flat_average
+    return mean, average, std
 
 
 def main(arg):
@@ -78,8 +80,8 @@ def main(arg):
     nsino = float(args.nsino)
 
     if os.path.isfile(fname):       
-        rot_center = tomo_stat(fname)
-        print(fname, rot_center)
+        mean, average, std = tomo_stat(fname)
+        print(fname, mean, average, std)
         
     elif os.path.isdir(fname):
         # Add a trailing slash if missing
@@ -98,8 +100,8 @@ def main(arg):
         i=0
         for fname in h5_file_list:
             h5fname = top + fname
-            rot_center = tomo_stat(h5fname)
-            case =  {fname : rot_center}
+            mean, average, std = tomo_stat(h5fname)
+            case =  {fname : mean, average, std}
             print(case)
             dic_centers[i] = case
             i += 1
