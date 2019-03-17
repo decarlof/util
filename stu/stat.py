@@ -81,7 +81,7 @@ def main(arg):
 
     if os.path.isfile(fname):       
         mean, amax, amin, std, var = tomo_stat(fname)
-        print(fname, mean, average, std)
+        print(fname, mean, amax, amin, std, var)
         
     elif os.path.isdir(fname):
         # Add a trailing slash if missing
