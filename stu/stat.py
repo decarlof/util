@@ -102,21 +102,22 @@ def main(arg):
         for fname in h5_file_list:
             h5fname = top + fname
             amin, amax, mean, std, var = tomo_stat(h5fname)
-            case[0] =  {fname : amin }
-            case[1] =  {fname : amax }
-            case[2] =  {fname : mean }
-            case[3] =  {fname : std }
-            case[4] =  {fname : var }
+            case[0] =  {'file name' : fname }
+            case[1] =  {'min' : amin }
+            case[2] =  {'max' : amax }
+            case[3] =  {'mean' : mean }
+            case[4] =  {'std' : std }
+            case[5] =  {'var' : var }
             print(case)
             dic_centers[i] = case
             i += 1
 
-        # Save json file containing the rotation axis
-        json_dump = json.dumps(dic_centers)
-        f = open(jfname,"w")
-        f.write(json_dump)
-        f.close()
-        print("Rotation axis locations save in: ", jfname)
+        # # Save json file containing the rotation axis
+        # json_dump = json.dumps(dic_centers)
+        # f = open(jfname,"w")
+        # f.write(json_dump)
+        # f.close()
+        # print("Rotation axis locations save in: ", jfname)
     
     else:
         print("Directory or File Name does not exist: ", fname)
