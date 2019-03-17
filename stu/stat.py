@@ -58,17 +58,13 @@ def tomo_stat(h5fname):
     # Read APS 32-BM raw data
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname)
     
-    # mean = flat[10,:,:].mean()
-    # std = flat[10,:,:].std()
-    # amin = flat[10,:,:].min()
-    # amax = flat[10,:,:].max()
-    # std = flat[10,:,:].std()
-
-    mean = flat[10,:,:].var()
-    average = flat[10,:,:].max()
+    mean = flat[10,:,:].mean()
+    amin = flat[10,:,:].min()
+    amax = flat[10,:,:].max()
     std = flat[10,:,:].std()
+    var = flat[10,:,:].var()
 
-    return mean, average, std
+    return mean, amax, amin, std, var
 
 
 def main(arg):
@@ -105,10 +101,12 @@ def main(arg):
         i=0
         for fname in h5_file_list:
             h5fname = top + fname
-            mean, average, std = tomo_stat(h5fname)
+            mean, amax, amin, std, var = tomo_stat(h5fname)
             case[0] =  {fname : mean }
-            case[1] =  {fname : average }
-            case[3] =  {fname : std }
+            case[1] =  {fname : amax }
+            case[3] =  {fname : amin }
+            case[4] =  {fname : std }
+            case[5] =  {fname : var }
             print(case)
             dic_centers[i] = case
             i += 1
