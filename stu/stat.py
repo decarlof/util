@@ -62,7 +62,7 @@ def tomo_stat(h5fname):
     # th_average = theta.mean()
     flat_average = flat[10,:,:].mean()
 
-    return th_average
+    return flat_average
 
 
 def main(arg):
