@@ -58,7 +58,7 @@ def get_dx_dims(fname, dataset):
         Data set size.
     """
 
-    grp = os.sep.join(['exchange', dataset])
+    grp = '/'.join(['exchange', dataset])
 
     with h5py.File(fname, "r") as f:
         try:
