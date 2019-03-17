@@ -104,9 +104,9 @@ def main(arg):
             amin, amax, mean, std, var = tomo_stat(h5fname)
             case[0] =  {fname : amin }
             case[1] =  {fname : amax }
-            case[3] =  {fname : mean }
-            case[4] =  {fname : std }
-            case[5] =  {fname : var }
+            case[2] =  {fname : mean }
+            case[3] =  {fname : std }
+            case[4] =  {fname : var }
             print(case)
             dic_centers[i] = case
             i += 1
