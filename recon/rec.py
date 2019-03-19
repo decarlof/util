@@ -26,7 +26,21 @@ import numpy as np
 # python setup.py install
 
 import sirtfilter
-   
+
+
+def file_base_name(file_name):
+    if '.' in file_name:
+        separator_index = file_name.index('.')
+        base_name = file_name[:separator_index]
+        return base_name
+    else:
+        return file_name
+
+def path_base_name(path):
+    file_name = os.path.basename(path)
+    return file_base_name(file_name)
+
+
 def get_dx_dims(fname, dataset):
     """
     Read array size of a specific group of Data Exchange file.
@@ -191,7 +205,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
                 
         # Write data as stack of TIFs.
-        fname = os.path.dirname(h5fname) + '/' + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
@@ -211,7 +225,7 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
 
     rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
 
-    fname = os.path.dirname(h5fname) + '/' + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
+    fname = os.path.dirname(h5fname) + os.sep + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
     dxchange.write_tiff_stack(rec, fname=fname)
     print("Rec: ", fname)
     print("Slice: ", start)
@@ -264,7 +278,7 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     index = 0
     # Save images to a temporary folder.
-    fname = os.path.dirname(h5fname) + '/' + 'try_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
+    fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
     for axis in np.arange(*center_range):
         rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
         dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
