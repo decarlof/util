@@ -126,10 +126,13 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=4,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=2,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    data = tomopy.remove_stripe_sf(data, size=300)
+    data = tomopy.remove_stripe_sf(data, size=150)
+
+
+
 
     # phase retrieval
     #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
@@ -147,12 +150,25 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.downsample(data, level=binning) 
     data = tomopy.downsample(data, level=binning, axis=1)
 
+
+
+# padding 
+    N = data.shape[2]
+    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
+    data_pad[:,:,N//4:5*N//4] = data
+    data_pad[:,:,0:N//4] = np.tile(np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+    data_pad[:,:,5*N//4:] = np.tile(np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+
+    data = data_pad
+    rot_center = rot_center+N//4
+
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
     else:
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
-        
+    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
+      
     print("Algorithm: ", algorithm)
 
     # Mask each reconstructed slice with a circle.
@@ -222,7 +238,7 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     data_shape = get_dx_dims(h5fname, 'data')
     print(data_shape)
     ssino = int(data_shape[1] * nsino)
-
+    rot_center+=data_shape[2]//4
     center_range = (rot_center-center_search_width, rot_center+center_search_width, 0.5)
     #print(sino,ssino, center_range)
     #print(center_range[0], center_range[1], center_range[2])
@@ -240,6 +256,11 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     # Flat-field correction of raw data.
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
 
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=2,pad=True)
+
+    #data = tomopy.remove_stripe_ti(data, alpha=1.5)
+    data = tomopy.remove_stripe_sf(data, size=150)
+
     # remove stripes
     # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
@@ -249,15 +270,35 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     data = tomopy.minus_log(data)
 
-    stack = np.empty((len(np.arange(*center_range)), data_shape[0], data_shape[2]))
+    # padding 
+    N = data.shape[2]
+    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
+    data_pad[:,:,N//4:5*N//4] = data
+    data_pad[:,:,0:N//4] = np.tile(np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+    data_pad[:,:,5*N//4:] = np.tile(np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+
+    data = data_pad
+  
+ 
+
+
+    stack = np.empty((len(np.arange(*center_range)), data.shape[0], data.shape[2]))
+  
+    print(stack.shape)
+    print(data.shape)
+
+
+
 
     index = 0
     for axis in np.arange(*center_range):
         stack[index] = data[:, 0, :]
         index = index + 1
 
-    # Reconstruct the same slice with a range of centers.
+     # Reconstruct the same slice with a range of centers.
     rec = tomopy.recon(stack, theta, center=np.arange(*center_range), sinogram_order=True, algorithm='gridrec', filter_name='parzen', nchunk=1)
+
+    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
 
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
@@ -266,7 +307,7 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     # Save images to a temporary folder.
     fname = os.path.dirname(h5fname) + '/' + 'try_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
     for axis in np.arange(*center_range):
-        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
+        rfname = fname + '_' + str('{0:.2f}'.format(axis-N//4) + '.tiff')
         dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
         index = index + 1
 
