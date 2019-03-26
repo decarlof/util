@@ -1,0 +1,9 @@
+#python rec.py --axis 1230.50 --type full /local/data/2019-03/LingLi/001_test.h5
+python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/002_test.h5
+python rec.py --axis 1234.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
+python rec.py --axis 1224.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
+python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/007_Tube4_BL112_2.h5 
+python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/004_Eggshell.h5 
+python rec.py --axis 1224.25 --type full /local/data/2019-03/LingLi/010_Tube3_Ring223_1.h5 
+python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/013_Tube3_pillar51_4.h5 
+python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5 
