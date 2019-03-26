@@ -1,3 +1,15 @@
+python rec.py --type full --axis 1310 /local/data/2019-03/Takahashi/K1_0001.h5 
+python rec.py --type full --axis 1278 /local/data/2019-03/Takahashi/K4_0003.h5 
+python rec.py --type full --axis 1277 /local/data/2019-03/Takahashi/AB1_0004.h5 
+python rec.py --type full --axis 1274 /local/data/2019-03/Takahashi/AB2_0005.h5 
+python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/K6_0006.h5 
+python rec.py --type full --axis 1282 /local/data/2019-03/Takahashi/K8_0007.h5 
+python rec.py --type full --axis 1283 /local/data/2019-03/Takahashi/K3_0008.h5 
+python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/K7_0009.h5 
+python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/K5_0010.h5 
+python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/C1_0011.h5
+python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/C2_0012.h5
+python rec.py --type full --axis 1278 /local/data/2019-03/Takahashi/C3_0013.h5
 #python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/C3_0014.h5
 python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/Lycopod1_0015.h5
 python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/Flower1_0017.h5
@@ -10,6 +22,7 @@ python rec.py --type full --axis 1294 /local/data/2019-03/Takahashi/C4_0023.h5
 python rec.py --type full --axis 1293 /local/data/2019-03/Takahashi/C5_0024.h5
 python rec.py --type full --axis 1300 /local/data/2019-03/Takahashi/C6_0025.h5
 python rec.py --type full --axis 1298 /local/data/2019-03/Takahashi/C16_0026.h5
+python rec.py --type full --axis 1294 /local/data/2019-03/Takahashi/Lycopod1_0027.h5
 python rec.py --type full --axis 1298 /local/data/2019-03/Takahashi/C7_0028.h5
 python rec.py --type full --axis 1298 /local/data/2019-03/Takahashi/C8_0029.h5
 python rec.py --type full --axis 1297 /local/data/2019-03/Takahashi/C9_0030.h5
@@ -17,7 +30,3 @@ python rec.py --type full --axis 1300 /local/data/2019-03/Takahashi/C10_0031.h5
 python rec.py --type full --axis 1292 /local/data/2019-03/Takahashi/C11_0032.h5
 python rec.py --type full --axis 1300 /local/data/2019-03/Takahashi/C14_0033.h5
 python rec.py --type full --axis 1300 /local/data/2019-03/Takahashi/C18_0034.h5
-python rec.py --type full --axis 1294 /local/data/2019-03/Takahashi/Lycopod1_0027.h5
-python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/C1_0011.h5
-python rec.py --type full --axis 1280 /local/data/2019-03/Takahashi/C2_0012.h5
-python rec.py --type full --axis 1278 /local/data/2019-03/Takahashi/C3_0013.h5
