@@ -1,9 +1,30 @@
 #python rec.py --axis 1230.50 --type full /local/data/2019-03/LingLi/001_test.h5
-python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/002_test.h5
-python rec.py --axis 1234.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
-python rec.py --axis 1224.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
-python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/007_Tube4_BL112_2.h5 
-python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/004_Eggshell.h5 
-python rec.py --axis 1224.25 --type full /local/data/2019-03/LingLi/010_Tube3_Ring223_1.h5 
-python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/013_Tube3_pillar51_4.h5 
-python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5 
+#python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/002_test.h5
+#python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/004_Eggshell.h5 
+#python rec.py --axis 1234.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
+#python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/007_Tube4_BL112_2.h5 
+#python rec.py --axis 1224.25 --type full /local/data/2019-03/LingLi/010_Tube3_Ring223_1.h5 
+#python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/013_Tube3_pillar51_4.h5 
+#python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5 
+
+
+python rec.py --axis 1225.25 --type full /local/data/2019-03/LingLi/003_Eggshell.h5
+python rec.py --axis 1224.75 --type full /local/data/2019-03/LingLi/005_Eggshell.h5
+python rec.py --axis 1225.75 --type full /local/data/2019-03/LingLi/008_Tube4_BL112_RF12_3.h5
+python rec.py --axis 1225.75 --type full /local/data/2019-03/LingLi/009_Tube4_RF12_4.h5
+python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/011_Tube3_Ring224_2.h5
+## 012 has BAD white, tried to use white from 011 and 013 with rec_fix_white.py but does not work
+## python rec.py --axis  --type full /local/data/2019-03/LingLi/012_Tube3_Ring14_3.h5
+python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/014_Tube3_pillar52_4.h5
+python rec.py --axis 1230.25 --type full /local/data/2019-03/LingLi/015_Tube3_pillar41_6.h5
+python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/016_Tube3_pillar11_7.h5
+python rec.py --axis 1226.25 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5
+python rec.py --axis 1227.25 --type full /local/data/2019-03/LingLi/018_Tube2_L16_1.h5
+python rec.py --axis 1230.25 --type full /local/data/2019-03/LingLi/019_Tube2_L110_2.h5
+python rec.py --axis 1231.25 --type full /local/data/2019-03/LingLi/020_Tube2_L110_3.h5
+python rec.py --axis 1228.75 --type full /local/data/2019-03/LingLi/021_Tube2_BL2_4.h5
+python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/022_Tube2_Completepillar_5.h5
+python rec.py --axis 1222.75 --type full /local/data/2019-03/LingLi/023_CLL1_scan1.h5
+
+
+
