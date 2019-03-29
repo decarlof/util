@@ -263,6 +263,10 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     data = tomopy.minus_log(data)
 
+    data = tomopy.remove_nan(data, val=0.0)
+    data = tomopy.remove_neg(data, val=0.00)
+    data[np.where(data == np.inf)] = 0.00
+
     stack = np.empty((len(np.arange(*center_range)), data_shape[0], data_shape[2]))
 
     index = 0
