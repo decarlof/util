@@ -196,6 +196,41 @@ python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/302
 python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/303_cb_long_1.h5
 
 
+## LAST BATCH TO MERLOT
+python rec.py --axis 1224.00 --type full/local/dataraid/tomo/2019-03/LingLi/304_cb_long_2.h5 
+python rec.py --axis 1222.00 --type full/local/dataraid/tomo/2019-03/LingLi/305_cb_long_3.h5
+python rec.py --axis 1226.00 --type full/local/dataraid/tomo/2019-03/LingLi/306_cb_long_3.h5
+python rec.py --axis 1224.50 --type full/local/dataraid/tomo/2019-03/LingLi/307_cb_long_5.h5
+python rec.py --axis 1222.00 --type full/local/dataraid/tomo/2019-03/LingLi/308_cb_long_6.h5
+python rec.py --axis 1227.00 --type full/local/dataraid/tomo/2019-03/LingLi/309_cb_long_7.h5
+python rec.py --axis 1224.50 --type full/local/dataraid/tomo/2019-03/LingLi/310_cb_long_8.h5
+python rec.py --axis 1222.50 --type full/local/dataraid/tomo/2019-03/LingLi/311_cb_long_9.h5
+python rec.py --axis 1228.00 --type full/local/dataraid/tomo/2019-03/LingLi/312_cb_long_10.h5
+python rec.py --axis 1225.00 --type full/local/dataraid/tomo/2019-03/LingLi/313_cb_long_11.h5
+python rec.py --axis 1224.00 --type full/local/dataraid/tomo/2019-03/LingLi/314_R1.h5
+python rec.py --axis 1223.50 --type full/local/dataraid/tomo/2019-03/LingLi/315_R2.h5
+python rec.py --axis 1220.00 --type full/local/dataraid/tomo/2019-03/LingLi/316_Sample1_bottom_1.h5
+python rec.py --axis 1224.50 --type full/local/dataraid/tomo/2019-03/LingLi/317_Sample1_bottom_2.h5
+python rec.py --axis 1221.00 --type full/local/dataraid/tomo/2019-03/LingLi/318_Sample7_tip_1.h5
+python rec.py --axis 1226.00 --type full/local/dataraid/tomo/2019-03/LingLi/319_Sample7_tip_2.h5
+python rec.py --axis 1223.00 --type full/local/dataraid/tomo/2019-03/LingLi/320_Sample7_tip_3.h5
+python rec.py --axis 1220.50 --type full/local/dataraid/tomo/2019-03/LingLi/321_Sample7_tip_4.h5
+python rec.py --axis 1220.00 --type full/local/dataraid/tomo/2019-03/LingLi/322_Sample7_cluatser_1.h5
+python rec.py --axis 1225.50 --type full/local/dataraid/tomo/2019-03/LingLi/323_Sample7_cluatser_2.h5
+python rec.py --axis 1223.00 --type full/local/dataraid/tomo/2019-03/LingLi/324_Sample7_cluatser_3.h5
+python rec.py --axis 1222.50 --type full/local/dataraid/tomo/2019-03/LingLi/325_Sample7_cluatser_4.h5
+python rec.py --axis 1224.50 --type full/local/dataraid/tomo/2019-03/LingLi/326_HSlast_1.h5
+python rec.py --axis 1223.00 --type full/local/dataraid/tomo/2019-03/LingLi/327_HSlast_2.h5
+python rec.py --axis 1227.00 --type full/local/dataraid/tomo/2019-03/LingLi/328_HSlast_3.h5
+python rec.py --axis 1225.00 --type full/local/dataraid/tomo/2019-03/LingLi/329_HSlast_4.h5
+python rec.py --axis 1222.50 --type full/local/dataraid/tomo/2019-03/LingLi/330_HSlast_5.h5
+python rec.py --axis 1226.50 --type full/local/dataraid/tomo/2019-03/LingLi/331_HSlast_6.h5
+python rec.py --axis 1224.50 --type full/local/dataraid/tomo/2019-03/LingLi/332_HSlast_7.h5
+python rec.py --axis 1222.50 --type full/local/dataraid/tomo/2019-03/LingLi/333_HSlast_8.h5
+python rec.py --axis 1225.50 --type full/local/dataraid/tomo/2019-03/LingLi/334_HSlast_9.h5
+python rec.py --axis 1225.50 --type full/local/dataraid/tomo/2019-03/LingLi/335_HSlast_10.h5
+python rec.py --axis 1227.50 --type full/local/dataraid/tomo/2019-03/LingLi/336_Atrina.h5
+
 # tocai
 python rec.py --axis 1223.50 --type full /local/data/2019-03/LingLi/337_ToothStick_1.h5
 python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/338_ToothStick_2.h5
