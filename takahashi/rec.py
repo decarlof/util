@@ -126,10 +126,10 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=12,wname='sym16',sigma=1,pad=True)
+    # data = tomopy.remove_stripe_fw(data,level=1,wname='sym16',sigma=5,pad=True)
 
     # data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    # data = tomopy.remove_stripe_sf(data, size=150)
+    data = tomopy.remove_stripe_sf(data, size=300)
 
     # phase retrieval
     #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
@@ -169,7 +169,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     sino_start = 0
     sino_end = data_shape[1]
 
-    chunks = 6          # number of sinogram chunks to reconstruct
+    chunks = 12         # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 

@@ -140,10 +140,10 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    #data = tomopy.remove_stripe_sf(data, size=150)
+    # data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
     #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
@@ -262,10 +262,6 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     print("Center: ", rot_center)
 
     data = tomopy.minus_log(data)
-
-    data = tomopy.remove_nan(data, val=0.0)
-    data = tomopy.remove_neg(data, val=0.00)
-    data[np.where(data == np.inf)] = 0.00
 
     stack = np.empty((len(np.arange(*center_range)), data_shape[0], data_shape[2]))
 
