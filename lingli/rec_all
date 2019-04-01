@@ -1,51 +1,51 @@
-##python rec.py --axis 1230.50 --type full /local/data/2019-03/LingLi/001_test.h5
-##python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/002_test.h5
-##python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/004_Eggshell.h5 
-##python rec.py --axis 1234.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
-##python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/007_Tube4_BL112_2.h5 
-##python rec.py --axis 1224.25 --type full /local/data/2019-03/LingLi/010_Tube3_Ring223_1.h5 
-##python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/013_Tube3_pillar51_4.h5 
-##python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5 
+python rec.py --axis 1230.50 --type full /local/data/2019-03/LingLi/001_test.h5
+python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/002_test.h5
+python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/004_Eggshell.h5 
+python rec.py --axis 1234.75 --type full /local/data/2019-03/LingLi/006_Tube4_BL19_1.h5 
+python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/007_Tube4_BL112_2.h5 
+python rec.py --axis 1224.25 --type full /local/data/2019-03/LingLi/010_Tube3_Ring223_1.h5 
+python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/013_Tube3_pillar51_4.h5 
+python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5 
 
 
-##python rec.py --axis 1225.25 --type full /local/data/2019-03/LingLi/003_Eggshell.h5
-##python rec.py --axis 1224.75 --type full /local/data/2019-03/LingLi/005_Eggshell.h5
-##python rec.py --axis 1225.75 --type full /local/data/2019-03/LingLi/008_Tube4_BL112_RF12_3.h5
-##python rec.py --axis 1225.75 --type full /local/data/2019-03/LingLi/009_Tube4_RF12_4.h5
-##python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/011_Tube3_Ring224_2.h5
+python rec.py --axis 1225.25 --type full /local/data/2019-03/LingLi/003_Eggshell.h5
+python rec.py --axis 1224.75 --type full /local/data/2019-03/LingLi/005_Eggshell.h5
+python rec.py --axis 1225.75 --type full /local/data/2019-03/LingLi/008_Tube4_BL112_RF12_3.h5
+python rec.py --axis 1225.75 --type full /local/data/2019-03/LingLi/009_Tube4_RF12_4.h5
+python rec.py --axis 1227.75 --type full /local/data/2019-03/LingLi/011_Tube3_Ring224_2.h5
 ## 012 has BAD white, tried to use white from 011 and 013 with rec_fix_white.py but does not work
-## ###python rec.py --axis 1230 --type full /local/data/2019-03/LingLi/012_Tube3_Ring14_3.h5
-##python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/014_Tube3_pillar52_4.h5
-##python rec.py --axis 1230.25 --type full /local/data/2019-03/LingLi/015_Tube3_pillar41_6.h5
-##python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/016_Tube3_pillar11_7.h5
-##python rec.py --axis 1226.25 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5
-##python rec.py --axis 1227.25 --type full /local/data/2019-03/LingLi/018_Tube2_L16_1.h5
-##python rec.py --axis 1230.25 --type full /local/data/2019-03/LingLi/019_Tube2_L110_2.h5
-##python rec.py --axis 1231.25 --type full /local/data/2019-03/LingLi/020_Tube2_L110_3.h5
-##python rec.py --axis 1228.75 --type full /local/data/2019-03/LingLi/021_Tube2_BL2_4.h5
-##python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/022_Tube2_Completepillar_5.h5
-##python rec.py --axis 1222.75 --type full /local/data/2019-03/LingLi/023_CLL1_scan1.h5
+python rec.py --axis 1230 --type full /local/data/2019-03/LingLi/012_Tube3_Ring14_3.h5
+python rec.py --axis 1226.75 --type full /local/data/2019-03/LingLi/014_Tube3_pillar52_4.h5
+python rec.py --axis 1230.25 --type full /local/data/2019-03/LingLi/015_Tube3_pillar41_6.h5
+python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/016_Tube3_pillar11_7.h5
+python rec.py --axis 1226.25 --type full /local/data/2019-03/LingLi/017_Tube3_pillar11_8.h5
+python rec.py --axis 1227.25 --type full /local/data/2019-03/LingLi/018_Tube2_L16_1.h5
+python rec.py --axis 1230.25 --type full /local/data/2019-03/LingLi/019_Tube2_L110_2.h5
+python rec.py --axis 1231.25 --type full /local/data/2019-03/LingLi/020_Tube2_L110_3.h5
+python rec.py --axis 1228.75 --type full /local/data/2019-03/LingLi/021_Tube2_BL2_4.h5
+python rec.py --axis 1229.25 --type full /local/data/2019-03/LingLi/022_Tube2_Completepillar_5.h5
+python rec.py --axis 1222.75 --type full /local/data/2019-03/LingLi/023_CLL1_scan1.h5
 
 ## BAD python rec.py --axis 1222.75 --type full /local/data/2019-03/LingLi/small/024_CLL1_scan2.h5
 
 #### USED find_center.py for all after 023 with this rotation_axis.json
+#### to reconstruct run: python rec.py --type full /local/data/2019-03/LingLi/
 #{"0": {"140_Abalone2_scan3.h5": 1226.25}, "1": {"075_CLT3_scan6.h5": 1228.25}, "2": {"137_Clam4oppo_scan3.h5": 1231.75}, "3": {"047_CLL3_Scan5.h5": 1230.25}, "4": {"067_CLT2_Scan7.h5": 1229.75}, "5": {"050_CLL3_Scan8.h5": 1230.75}, "6": {"148_Sponge1.3_scan2.h5": 1227.75}, "7": {"044_CLL3_Scan2.h5": 1228.75}, "8": {"041_CLL2_Scan5.h5": 1228.25}, "9": {"117_CLT4_scan5.h5": 1229.25}, "10": {"149_Sponge1.3_scan3.h5": 1230.75}, "11": {"062_CLT2_Scan2.h5": 1228.25}, "12": {"115_CLT4_scan4.h5": 1229.25}, "13": {"087_Abalone1_scan4.h5": 1231.25}, "14": {"121_CLT5_scan4.h5": 1231.75}, "15": {"037_CLL2_Scan1.h5": 1231.25}, "16": {"145_Abalone3_scan4.h5": 1231.75}, "17": {"100_Cll5_scan2.h5": 1227.75}, "18": {"114_CLT4_scan3.h5": 1229.25}, "19": {"106_Cll5_scan8.h5": 1228.75}, "20": {"038_CLL2_Scan1.h5": 1231.25}, "21": {"135_Clam4oppo_scan1.h5": 1227.25}, "22": {"072_CLT3_scan3.h5": 1228.25}, "23": {"035_CLL1_scan13.h5": 1230.75}, "24": {"052_CLL3_Scan10.h5": 1232.25}, "25": {"078_CLT3_scan9.h5": 1227.75}, "26": {"129_CLT5_scan12.h5": 1227.25}, "27": {"013_Tube3_pillar51_4.h5": 1227.75}, "28": {"029_CLL1_scan7.h5": 1230.25}, "29": {"109_Cll5_scan11.h5": 1229.25}, "30": {"147_Sponge1.3_scan1.h5": 1229.75}, "31": {"036_CLL1_scan14.h5": 1230.25}, "32": {"118_CLT5_scan1.h5": 1231.25}, "33": {"026_CLL1_scan4.h5": 1225.75}, "34": {"079_Clam1_scan1.h5": 1234.25}, "35": {"057_CLT1_scan3.h5": 1227.75}, "36": {"085_Abalone1_scan1.h5": 1231.75}, "37": {"143_Abalone3_scan1.h5": 1231.75}, "38": {"039_CLL2_Scan3.h5": 1232.25}, "39": {"065_CLT2_Scan5.h5": 1229.25}, "40": {"134_Clam3_scan4.h5": 1230.25}, "41": {"077_CLT3_scan8.h5": 1228.25}, "42": {"080_Clam1_scan2.h5": 1231.75}, "43": {"091_CLL4_scan3.h5": 1231.25}, "44": {"090_CLL4_scan2.h5": 1228.75}, "45": {"059_CLT1_scan6.h5": 1228.25}, "46": {"012_Tube3_Ring14_3.h5": 1246.25}, "47": {"146_Abalone3_scan5.h5": 1232.25}, "48": {"069_CLT2_Scan9.h5": 1229.25}, "49": {"061_CLT2_Scan1.h5": 1231.25}, "50": {"027_CLL1_scan5.h5": 1226.25}, "51": {"064_CLT2_Scan3.h5": 1229.25}, "52": {"043_CLL3_Scan1.h5": 1228.25}, "53": {"126_CLT5_scan9.h5": 1227.25}, "54": {"045_CLL3_Scan3.h5": 1227.75}, "55": {"032_CLL1_scan10.h5": 1230.75}, "56": {"092_CLL4_scan4.h5": 1227.25}, "57": {"150_Sponge1.3_scan3.h5": 1230.75}, "58": {"030_CLL1_scan8.h5": 1229.25}, "59": {"063_CLT2_Scan3.h5": 1229.25}, "60": {"040_CLL2_Scan4.h5": 1232.25}, "61": {"138_Abalone2_scan1.h5": 1226.25}, "62": {"112_CLT4_scan1.h5": 1228.75}, "63": {"054_CLT1_scan1.h5": 1227.75}, "64": {"120_CLT5_scan3.h5": 1227.25}, "65": {"096_CLL4_scan8.h5": 1229.25}, "66": {"053_CLL3_Scan11.h5": 1230.75}, "67": {"139_Abalone2_scan2.h5": 1226.25}, "68": {"089_SheetNacre1_scan1.h5": 1228.75}, "69": {"099_Cll5_scan1.h5": 1229.25}, "70": {"128_CLT5_scan11.h5": 1226.75}, "71": {"127_CLT5_scan10.h5": 1232.25}, "72": {"097_CLL4_scan9.h5": 1231.25}, "73": {"093_CLL4_scan5.h5": 1228.75}, "74": {"111_Cll5_scan13.h5": 1227.75}, "75": {"070_CLT3_scan1.h5": 1228.25}, "76": {"105_Cll5_scan7.h5": 1227.25}, "77": {"124_CLT5_scan7.h5": 1227.25}, "78": {"102_Cll5_scan4.h5": 1226.75}, "79": {"122_CLT5_scan5.h5": 1227.25}, "80": {"084_Abalone1_scan1.h5": 1228.75}, "81": {"058_CLT1_scan5.h5": 1233.25}, "82": {"073_CLT3_scan4.h5": 1228.25}, "83": {"116_CLT4_scan5.h5": 1229.25}, "84": {"142_Abalone3_scan1.h5": 1231.25}, "85": {"046_CLL3_Scan4.h5": 1231.75}, "86": {"042_CLL2_Scan6.h5": 1228.25}, "87": {"141_Abalone2_scan4.h5": 1226.25}, "88": {"098_CLL4_scan10.h5": 1227.75}, "89": {"034_CLL1_scan12.h5": 1226.25}, "90": {"151_Sponge1.3_scan5.h5": 1226.75}, "91": {"136_Clam4oppo_scan2.h5": 1226.75}, "92": {"083_Clam1_scan5.h5": 1230.75}, "93": {"071_CLT3_scan2.h5": 1227.75}, "94": {"024_CLL1_scan2.h5": 1221.75}, "95": {"113_CLT4_scan2.h5": 1229.25}, "96": {"144_Abalone3_scan3.h5": 1231.25}, "97": {"108_Cll5_scan10.h5": 1227.25}, "98": {"132_Clam3_scan2.h5": 1229.75}, "99": {"060_CLT1_scan7.h5": 1233.25}, "100": {"095_CLL4_scan7.h5": 1227.25}, "101": {"068_CLT2_Scan8.h5": 1229.25}, "102": {"025_CLL1_scan2.h5": 1225.25}, "103": {"125_CLT5_scan8.h5": 1232.25}, "104": {"123_CLT5_scan6.h5": 1231.25}, "105": {"028_CLL1_scan6.h5": 1225.75}, "106": {"131_Clam3_scan1.h5": 1229.25}, "107": {"094_CLL4_scan6.h5": 1231.75}, "108": {"074_CLT3_scan5.h5": 1228.25}, "109": {"110_Cll5_scan12.h5": 1232.25}, "110": {"081_Clam1_scan3.h5": 1231.75}, "111": {"076_CLT3_scan7.h5": 1228.75}, "112": {"033_CLL1_scan11.h5": 1230.25}, "113": {"049_CLL3_Scan7.h5": 1231.75}, "114": {"130_Clam2_scan1.h5": 1230.25}, "115": {"088_SheetNacre1_scan1.h5": 1233.75}, "116": {"103_Cll5_scan5.h5": 1229.75}, "117": {"101_Cll5_scan3.h5": 1231.25}, "118": {"119_CLT5_scan2.h5": 1231.25}, "119": {"055_CLT1_scan2.h5": 1227.75}, "120": {"056_CLT1_scan3.h5": 1232.75}, "121": {"133_Clam3_scan3.h5": 1229.75}, "122": {"051_CLL3_Scan9.h5": 1226.75}, "123": {"107_Cll5_scan9.h5": 1231.75}, "124": {"104_Cll5_scan6.h5": 1231.75}, "125": {"048_CLL3_Scan6.h5": 1226.75}, "126": {"031_CLL1_scan9.h5": 1225.25}}
-python rec.py --type full /local/data/2019-03/LingLi/small/
 
-##python rec.py --axis 1228.50 --type full /local/data/2019-03/LingLi/153_otherspine12.h5  
-##python rec.py --axis 1229.50 --type full /local/data/2019-03/LingLi/161_Sample7_tube1_L47.h5	
-##python rec.py --axis 1228.00 --type full /local/data/2019-03/LingLi/169_Sample7_tube1_BR49.h5	  
-##python rec.py --axis 1229.50 --type full /local/data/2019-03/LingLi/177_Sample7_tube2_BL2_completepillarbottom.h5  
-##python rec.py --axis 1233.00 --type full /local/data/2019-03/LingLi/185_Sample7_tube22_L16.h5
-##python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/154_otherspine21.h5  
-##python rec.py --axis 1229.00 --type full /local/data/2019-03/LingLi/162_Sample7_tube1_L49.h5	
-##python rec.py --axis 1230.00 --type full /local/data/2019-03/LingLi/170_Sample7_tube1_BR34.h5	  
-##python rec.py --axis 1231.00 --type full /local/data/2019-03/LingLi/178_Sample7_tube2_BL2_completepillarbottom.h5  
-##python rec.py --axis 1230.00 --type full /local/data/2019-03/LingLi/186_Sample7_tube22_Ring224.h5
-##python rec.py --axis 1225.00 --type full /local/data/2019-03/LingLi/155_otherspine22.h5  
-##python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/163_Sample7_tube1_L311.h5	
-##python rec.py --axis 1231.00 --type full /local/data/2019-03/LingLi/171_Sample7_tube1_center0.h5	  
-##python rec.py --axis 1233.00 --type full /local/data/2019-03/LingLi/179_Sample7_tube2_BL2_completepillar2.h5	 
+python rec.py --axis 1228.50 --type full /local/data/2019-03/LingLi/153_otherspine12.h5  
+python rec.py --axis 1229.50 --type full /local/data/2019-03/LingLi/161_Sample7_tube1_L47.h5	
+python rec.py --axis 1228.00 --type full /local/data/2019-03/LingLi/169_Sample7_tube1_BR49.h5	  
+python rec.py --axis 1229.50 --type full /local/data/2019-03/LingLi/177_Sample7_tube2_BL2_completepillarbottom.h5  
+python rec.py --axis 1233.00 --type full /local/data/2019-03/LingLi/185_Sample7_tube22_L16.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/154_otherspine21.h5  
+python rec.py --axis 1229.00 --type full /local/data/2019-03/LingLi/162_Sample7_tube1_L49.h5	
+python rec.py --axis 1230.00 --type full /local/data/2019-03/LingLi/170_Sample7_tube1_BR34.h5	  
+python rec.py --axis 1231.00 --type full /local/data/2019-03/LingLi/178_Sample7_tube2_BL2_completepillarbottom.h5  
+python rec.py --axis 1230.00 --type full /local/data/2019-03/LingLi/186_Sample7_tube22_Ring224.h5
+python rec.py --axis 1225.00 --type full /local/data/2019-03/LingLi/155_otherspine22.h5  
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/163_Sample7_tube1_L311.h5	
+python rec.py --axis 1231.00 --type full /local/data/2019-03/LingLi/171_Sample7_tube1_center0.h5	  
+python rec.py --axis 1233.00 --type full /local/data/2019-03/LingLi/179_Sample7_tube2_BL2_completepillar2.h5	 
 
 python rec.py --axis 1233.00 --type full /local/data/2019-03/LingLi/187_Sample7_tube22_R111_1.h5
 python rec.py --axis 1229.50 --type full /local/data/2019-03/LingLi/156_Sample7BL51.h5   
@@ -63,7 +63,7 @@ python rec.py --axis 1231.00 --type full /local/data/2019-03/LingLi/174_Sample7_
 python rec.py --axis 1230.00 --type full /local/data/2019-03/LingLi/182_Sample7_tube2_completepillarBL22.h5	
 python rec.py --axis 1231.00 --type full /local/data/2019-03/LingLi/159_Sample7BL54.h5   
 python rec.py --axis 1228.00 --type full /local/data/2019-03/LingLi/167_Sample7_tube1_T1.h5	
-## BAD ##python rec.py --axis 1230 --type full /local/data/2019-03/LingLi/175_Sample7_tube2_L110_1.h5	  
+## BAD python rec.py --axis 1230 --type full /local/data/2019-03/LingLi/175_Sample7_tube2_L110_1.h5	  
 python rec.py --axis 1232.00 --type full /local/data/2019-03/LingLi/183_Sample7_tube2_completepillarBL32.h5	
 python rec.py --axis 1229.50 --type full /local/data/2019-03/LingLi/160_Sample7tip.h5    
 python rec.py --axis 1232.00 --type full /local/data/2019-03/LingLi/168_Sample7_tube1_R22.h5	
@@ -158,78 +158,78 @@ python rec.py --axis 1227.00 --type full /local/data/2019-03/LingLi/265_Sample1_
 
 
 # merlot
-#python rec.py --axis 1227.00 --type full /local/dataraid/tomo/2019-03/LingLi/267_Sample1_tube10_Ring13_1.h5
-#python rec.py --axis 1225.00 --type full /local/dataraid/tomo/2019-03/LingLi/269_Sample1_tube11_center13.h5
-#python rec.py --axis 1227.00 --type full /local/dataraid/tomo/2019-03/LingLi/270_Sample1_tube11_center24.h5
-#python rec.py --axis 1221.50 --type full /local/dataraid/tomo/2019-03/LingLi/271_Sample1_tube11_BL54_1.h5
-#python rec.py --axis 1226.50 --type full /local/dataraid/tomo/2019-03/LingLi/272_Sample1_tube11_BL54_2.h5
-#python rec.py --axis 1226.50 --type full /local/dataraid/tomo/2019-03/LingLi/273_Sample1_tube11_BL54_3.h5
-#python rec.py --axis 1222.00 --type full /local/dataraid/tomo/2019-03/LingLi/274_Sample7_tube2_L110_1.h5
-#python rec.py --axis 1223.00 --type full /local/dataraid/tomo/2019-03/LingLi/275_Sample7_tube2_L110_2.h5
-#python rec.py --axis 1222.00 --type full /local/dataraid/tomo/2019-03/LingLi/276_sheetnacre_1.h5
+python rec.py --axis 1227.00 --type full /local/data/2019-03/LingLi/267_Sample1_tube10_Ring13_1.h5
+python rec.py --axis 1225.00 --type full /local/data/2019-03/LingLi/269_Sample1_tube11_center13.h5
+python rec.py --axis 1227.00 --type full /local/data/2019-03/LingLi/270_Sample1_tube11_center24.h5
+python rec.py --axis 1221.50 --type full /local/data/2019-03/LingLi/271_Sample1_tube11_BL54_1.h5
+python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/272_Sample1_tube11_BL54_2.h5
+python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/273_Sample1_tube11_BL54_3.h5
+python rec.py --axis 1222.00 --type full /local/data/2019-03/LingLi/274_Sample7_tube2_L110_1.h5
+python rec.py --axis 1223.00 --type full /local/data/2019-03/LingLi/275_Sample7_tube2_L110_2.h5
+python rec.py --axis 1222.00 --type full /local/data/2019-03/LingLi/276_sheetnacre_1.h5
 
-python rec.py --axis 1227.50 --type full /local/dataraid/tomo/2019-03/LingLi/277_sheetnacre_2.h5
-python rec.py --axis 1224.00 --type full /local/dataraid/tomo/2019-03/LingLi/279_eggshell2_2.h5
-python rec.py --axis 1223.50 --type full /local/dataraid/tomo/2019-03/LingLi/280_eggshell2_2.h5
-python rec.py --axis 1219.5 --type full /local/dataraid/tomo/2019-03/LingLi/281_eggshell2_4.h5
-#python rec.py --axis 1220.00 --type full /local/dataraid/tomo/2019-03/LingLi/282_Sample1_tube12_BR2.h5
-python rec.py --axis 1222.00 --type full /local/dataraid/tomo/2019-03/LingLi/283_Sample1_tube12_BR3.h5
-python rec.py --axis 1226.00 --type full /local/dataraid/tomo/2019-03/LingLi/284_Sample1_tube12_BL5.h5
-python rec.py --axis 1223.00 --type full /local/dataraid/tomo/2019-03/LingLi/285_Sample1_tube12_BL414.h5
-python rec.py --axis 1220.00 --type full /local/dataraid/tomo/2019-03/LingLi/286_Sample1_tube12_BR49_BL1_1.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/287_Sample1_tube12_BR49_BL1_2.h5
-python rec.py --axis 1221.50 --type full /local/dataraid/tomo/2019-03/LingLi/288_Sample7_bottom_1.h5
-python rec.py --axis 1226.00 --type full /local/dataraid/tomo/2019-03/LingLi/289_Sample7_bottom_2.h5
-python rec.py --axis 1223.00 --type full /local/dataraid/tomo/2019-03/LingLi/290_Sample1_Spine1_1.h5
-python rec.py --axis 1223.50 --type full /local/dataraid/tomo/2019-03/LingLi/291_Sample1_Spine1_2.h5
-python rec.py --axis 1226.00 --type full /local/dataraid/tomo/2019-03/LingLi/292_Sample1_Spine2_1.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/293_Sample1_Spine2_2.h5
-python rec.py --axis 1224.00 --type full /local/dataraid/tomo/2019-03/LingLi/294_Sample1_Spine4_1.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/295_Sample1_Spine4_2.h5
-python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/296_Sample1_Spine5_1.h5
-python rec.py --axis 1224.00 --type full /local/dataraid/tomo/2019-03/LingLi/297_Sample1_Spine5_1.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/298_Sample1_Spine5_2.h5
-python rec.py --axis 1220.00 --type full /local/dataraid/tomo/2019-03/LingLi/299_Sample1_Spine5_3.h5
-python rec.py --axis 1219.50 --type full /local/dataraid/tomo/2019-03/LingLi/300_cb_dorsalshield_1.h5
-python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/301_cb_dorsalshield_2.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/302_cb_dorsalshield_3.h5
-python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/303_cb_long_1.h5
+python rec.py --axis 1227.50 --type full /local/data/2019-03/LingLi/277_sheetnacre_2.h5
+python rec.py --axis 1224.00 --type full /local/data/2019-03/LingLi/279_eggshell2_2.h5
+python rec.py --axis 1223.50 --type full /local/data/2019-03/LingLi/280_eggshell2_2.h5
+python rec.py --axis 1219.50 --type full /local/data/2019-03/LingLi/281_eggshell2_4.h5
+python rec.py --axis 1220.00 --type full /local/data/2019-03/LingLi/282_Sample1_tube12_BR2.h5
+python rec.py --axis 1222.00 --type full /local/data/2019-03/LingLi/283_Sample1_tube12_BR3.h5
+python rec.py --axis 1226.00 --type full /local/data/2019-03/LingLi/284_Sample1_tube12_BL5.h5
+python rec.py --axis 1223.00 --type full /local/data/2019-03/LingLi/285_Sample1_tube12_BL414.h5
+python rec.py --axis 1220.00 --type full /local/data/2019-03/LingLi/286_Sample1_tube12_BR49_BL1_1.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/287_Sample1_tube12_BR49_BL1_2.h5
+python rec.py --axis 1221.50 --type full /local/data/2019-03/LingLi/288_Sample7_bottom_1.h5
+python rec.py --axis 1226.00 --type full /local/data/2019-03/LingLi/289_Sample7_bottom_2.h5
+python rec.py --axis 1223.00 --type full /local/data/2019-03/LingLi/290_Sample1_Spine1_1.h5
+python rec.py --axis 1223.50 --type full /local/data/2019-03/LingLi/291_Sample1_Spine1_2.h5
+python rec.py --axis 1226.00 --type full /local/data/2019-03/LingLi/292_Sample1_Spine2_1.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/293_Sample1_Spine2_2.h5
+python rec.py --axis 1224.00 --type full /local/data/2019-03/LingLi/294_Sample1_Spine4_1.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/295_Sample1_Spine4_2.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/296_Sample1_Spine5_1.h5
+python rec.py --axis 1224.00 --type full /local/data/2019-03/LingLi/297_Sample1_Spine5_1.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/298_Sample1_Spine5_2.h5
+python rec.py --axis 1220.00 --type full /local/data/2019-03/LingLi/299_Sample1_Spine5_3.h5
+python rec.py --axis 1219.50 --type full /local/data/2019-03/LingLi/300_cb_dorsalshield_1.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/301_cb_dorsalshield_2.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/302_cb_dorsalshield_3.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/303_cb_long_1.h5
 
 
 ## LAST BATCH TO MERLOT
-python rec.py --axis 1224.00 --type full /local/dataraid/tomo/2019-03/LingLi/304_cb_long_2.h5 
-python rec.py --axis 1222.00 --type full /local/dataraid/tomo/2019-03/LingLi/305_cb_long_3.h5
-python rec.py --axis 1226.00 --type full /local/dataraid/tomo/2019-03/LingLi/306_cb_long_3.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/307_cb_long_5.h5
-python rec.py --axis 1222.00 --type full /local/dataraid/tomo/2019-03/LingLi/308_cb_long_6.h5
-python rec.py --axis 1227.00 --type full /local/dataraid/tomo/2019-03/LingLi/309_cb_long_7.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/310_cb_long_8.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/311_cb_long_9.h5
-python rec.py --axis 1228.00 --type full /local/dataraid/tomo/2019-03/LingLi/312_cb_long_10.h5
-python rec.py --axis 1225.00 --type full /local/dataraid/tomo/2019-03/LingLi/313_cb_long_11.h5
-python rec.py --axis 1224.00 --type full /local/dataraid/tomo/2019-03/LingLi/314_R1.h5
-python rec.py --axis 1223.50 --type full /local/dataraid/tomo/2019-03/LingLi/315_R2.h5
-python rec.py --axis 1220.00 --type full /local/dataraid/tomo/2019-03/LingLi/316_Sample1_bottom_1.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/317_Sample1_bottom_2.h5
-python rec.py --axis 1221.00 --type full /local/dataraid/tomo/2019-03/LingLi/318_Sample7_tip_1.h5
-python rec.py --axis 1226.00 --type full /local/dataraid/tomo/2019-03/LingLi/319_Sample7_tip_2.h5
-python rec.py --axis 1223.00 --type full /local/dataraid/tomo/2019-03/LingLi/320_Sample7_tip_3.h5
-python rec.py --axis 1220.50 --type full /local/dataraid/tomo/2019-03/LingLi/321_Sample7_tip_4.h5
-python rec.py --axis 1220.00 --type full /local/dataraid/tomo/2019-03/LingLi/322_Sample7_cluatser_1.h5
-python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/323_Sample7_cluatser_2.h5
-python rec.py --axis 1223.00 --type full /local/dataraid/tomo/2019-03/LingLi/324_Sample7_cluatser_3.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/325_Sample7_cluatser_4.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/326_HSlast_1.h5
-python rec.py --axis 1223.00 --type full /local/dataraid/tomo/2019-03/LingLi/327_HSlast_2.h5
-python rec.py --axis 1227.00 --type full /local/dataraid/tomo/2019-03/LingLi/328_HSlast_3.h5
-python rec.py --axis 1225.00 --type full /local/dataraid/tomo/2019-03/LingLi/329_HSlast_4.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/330_HSlast_5.h5
-python rec.py --axis 1226.50 --type full /local/dataraid/tomo/2019-03/LingLi/331_HSlast_6.h5
-python rec.py --axis 1224.50 --type full /local/dataraid/tomo/2019-03/LingLi/332_HSlast_7.h5
-python rec.py --axis 1222.50 --type full /local/dataraid/tomo/2019-03/LingLi/333_HSlast_8.h5
-python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/334_HSlast_9.h5
-python rec.py --axis 1225.50 --type full /local/dataraid/tomo/2019-03/LingLi/335_HSlast_10.h5
-python rec.py --axis 1227.50 --type full /local/dataraid/tomo/2019-03/LingLi/336_Atrina.h5
+python rec.py --axis 1224.00 --type full /local/data/2019-03/LingLi/304_cb_long_2.h5 
+python rec.py --axis 1222.00 --type full /local/data/2019-03/LingLi/305_cb_long_3.h5
+python rec.py --axis 1226.00 --type full /local/data/2019-03/LingLi/306_cb_long_3.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/307_cb_long_5.h5
+python rec.py --axis 1222.00 --type full /local/data/2019-03/LingLi/308_cb_long_6.h5
+python rec.py --axis 1227.00 --type full /local/data/2019-03/LingLi/309_cb_long_7.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/310_cb_long_8.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/311_cb_long_9.h5
+python rec.py --axis 1228.00 --type full /local/data/2019-03/LingLi/312_cb_long_10.h5
+python rec.py --axis 1225.00 --type full /local/data/2019-03/LingLi/313_cb_long_11.h5
+python rec.py --axis 1224.00 --type full /local/data/2019-03/LingLi/314_R1.h5
+python rec.py --axis 1223.50 --type full /local/data/2019-03/LingLi/315_R2.h5
+python rec.py --axis 1220.00 --type full /local/data/2019-03/LingLi/316_Sample1_bottom_1.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/317_Sample1_bottom_2.h5
+python rec.py --axis 1221.00 --type full /local/data/2019-03/LingLi/318_Sample7_tip_1.h5
+python rec.py --axis 1226.00 --type full /local/data/2019-03/LingLi/319_Sample7_tip_2.h5
+python rec.py --axis 1223.00 --type full /local/data/2019-03/LingLi/320_Sample7_tip_3.h5
+python rec.py --axis 1220.50 --type full /local/data/2019-03/LingLi/321_Sample7_tip_4.h5
+python rec.py --axis 1220.00 --type full /local/data/2019-03/LingLi/322_Sample7_cluatser_1.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/323_Sample7_cluatser_2.h5
+python rec.py --axis 1223.00 --type full /local/data/2019-03/LingLi/324_Sample7_cluatser_3.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/325_Sample7_cluatser_4.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/326_HSlast_1.h5
+python rec.py --axis 1223.00 --type full /local/data/2019-03/LingLi/327_HSlast_2.h5
+python rec.py --axis 1227.00 --type full /local/data/2019-03/LingLi/328_HSlast_3.h5
+python rec.py --axis 1225.00 --type full /local/data/2019-03/LingLi/329_HSlast_4.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/330_HSlast_5.h5
+python rec.py --axis 1226.50 --type full /local/data/2019-03/LingLi/331_HSlast_6.h5
+python rec.py --axis 1224.50 --type full /local/data/2019-03/LingLi/332_HSlast_7.h5
+python rec.py --axis 1222.50 --type full /local/data/2019-03/LingLi/333_HSlast_8.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/334_HSlast_9.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-03/LingLi/335_HSlast_10.h5
+python rec.py --axis 1227.50 --type full /local/data/2019-03/LingLi/336_Atrina.h5
 
 # tocai
 python rec.py --axis 1223.50 --type full /local/data/2019-03/LingLi/337_ToothStick_1.h5
