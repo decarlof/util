@@ -300,6 +300,7 @@ def main(arg):
     parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try (default slice)")
     parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
+    parser.add_argument("--options", nargs='?', type=dict, default={}, help="Options for astra-toolbox")
 
     args = parser.parse_args()
 
@@ -313,6 +314,9 @@ def main(arg):
 
     rec_type = args.type
     center_search_width = args.srs
+
+    # Options for using tomopy.astra
+    options = args.options
 
     if os.path.isfile(fname):    
 

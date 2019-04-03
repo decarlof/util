@@ -112,7 +112,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level = 1000                 # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
 
-    miss_angles = [141,226]
+    miss_angles = [500,1050]
 
     # Read APS 32-BM raw data.
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
@@ -122,9 +122,12 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     # Manage the missing angles:
     #proj_size = np.shape(proj)
     #theta = np.linspace(0,180,proj_size[0])
+    print(proj.shape, theta.shape)
+
     proj = np.concatenate((proj[0:miss_angles[0],:,:], proj[miss_angles[1]+1:-1,:,:]), axis=0)
     theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
 
+    print(proj.shape, theta.shape)
     # zinger_removal
     #proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
     #flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
@@ -133,7 +136,8 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark, cutoff=0.8)
 
     # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+#    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_ti(data, 2)
 
     # phase retrieval
     # data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
