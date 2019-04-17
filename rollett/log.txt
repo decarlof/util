@@ -1,0 +1,3 @@
+  768  python rec.py --type full --axis 1204  /local/data/2019-04/Rollett/104_thinwall_ti64b_V_1_100.h5 
+  769  python rec.py --type full --axis 1204  /local/data/2019-04/Rollett/104_thinwall_ti64b_V_1_100.h5 
+  790  python rec.py --type full --axis 411  /local/data/2019-04/Rollett/104_thinwall_ti64b_V_1_100.h5 
