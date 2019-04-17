@@ -23,3 +23,9 @@ python rec.py --axis 1226.00 --type full /local/data/2019-04/Nelson/018_Perdue_1
 python rec.py --axis 1227.00 --type full /local/data/2019-04/Nelson/020_Perdue_10uSn_CMC_CB_701911PC_NaPF6_Desodiated_cyc5_5cyle.h5 
 python rec.py --axis 1226.00 --type full /local/data/2019-04/Nelson/021_Perdue_10uSn_PVDF_CB_701911PC_NaPF6_Desodiated_cyc20_5_20_1_5cyle_each.h5 
 python rec.py --axis 1228.00 --type full /local/data/2019-04/Nelson/022_Perdue_10uSn_PVDF_CB_701911PC_FEC_NaClO4_Desodiated_cyc50.h5 
+python rec.py --axis 1224.50 --type full /local/data/2019-04/Nelson/028_UAH_Sn_PVDF_CB_801010_13NMP_Lithiated_4cycl_Ch1.h5 
+python rec.py --axis 1223.00 --type full /local/data/2019-04/Nelson/029_UAH_Sn_PVDF_CB_68139_13NMP_Lithiated_4cycl_Ch5.h5 
+python rec.py --axis 1224.50 --type full /local/data/2019-04/Nelson/030_UAH_Sn_PVDF_CB_801010_13NMP_Lithiated_4cycl_Ch1_04_09_19_1p2V.h5 
+python rec.py --axis 1226.50 --type full /local/data/2019-04/Nelson/031_UAH_Sn_PAA_CB_801010_6p5NMP_Lithiated_4cycl_Ch3_04_07_19_1p2V.h5 
+python rec.py --axis 1226.50 --type full /local/data/2019-04/Nelson/032_UAH_Sn_PAA_CB_801010_10p5NMP_Lithiated_4cycl_Ch1_03_20_19_1p2V.h5 
+python rec.py --axis 1223.50 --type full /local/data/2019-04/Nelson/033_UAH_NP_Sn_PAA_CB_801010_9NMP_Lithiated_4cycl_Ch3_03_20_19_2V.h5 
