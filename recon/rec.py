@@ -213,6 +213,11 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
+
+    log = "python rec.py --axis " + str(rot_center) + " --type full " + h5fname + "\n"
+    print (log)
+    with open("log.txt", "a") as myfile:
+        myfile.write(log)
     
 
 def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
@@ -288,7 +293,7 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     # Save images to a temporary folder.
     fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' ##+ os.path.splitext(os.path.basename(h5fname))[0]    
     for axis in np.arange(*center_range):
-        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
+        rfname = fname + str('{0:.2f}'.format(axis) + '.tiff')
         dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
         index = index + 1
 
