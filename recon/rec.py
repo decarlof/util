@@ -286,7 +286,7 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     index = 0
     # Save images to a temporary folder.
-    fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
+    fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' ##+ os.path.splitext(os.path.basename(h5fname))[0]    
     for axis in np.arange(*center_range):
         rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
         dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
