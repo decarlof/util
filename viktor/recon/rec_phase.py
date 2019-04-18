@@ -25,7 +25,7 @@ import numpy as np
 # cd sirtfilter/
 # python setup.py install
 
-import sirtfilter
+#import sirtfilter
 
 
 def file_base_name(file_name):
@@ -121,10 +121,10 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
 
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
-    sample_detector_distance = 8        # Propagation distance of the wavefront in cm
-    detector_pixel_size_x = 2.247e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 24.9         # Energy of incident wave in keV
-    alpha = 1e-02                       # Phase retrieval coeff.
+    sample_detector_distance = 10        # Propagation distance of the wavefront in cm
+    detector_pixel_size_x = 1.725e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
+    monochromator_energy = 27.0         # Energy of incident wave in keV
+    alpha = 5e-05                       # Phase retrieval coeff.
     zinger_level = 800                  # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
 
@@ -140,13 +140,13 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
-    # data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    # data = tomopy.remove_stripe_sf(data, size=150)
+    #data = tomopy.remove_stripe_ti(data, alpha=1.5)
+    #data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
-    #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
+    data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
@@ -161,20 +161,27 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.downsample(data, level=binning) 
     data = tomopy.downsample(data, level=binning, axis=1)
 
+    # padding 
+    N = data.shape[2]
+    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
+    data_pad[:,:,N//4:5*N//4] = data
+    data_pad[:,:,0:N//4] = np.tile(np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+    data_pad[:,:,5*N//4:] = np.tile(np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1]),(1,1,N//4))
+
+    data = data_pad
+    rot_center = rot_center+N//4
+ 
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
-    elif algorithm == 'astrasirt':
-        extra_options ={'MinConstraint':0}
-        options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':200, 'extra_options':extra_options}
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)
     else:
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
+    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
         
     print("Algorithm: ", algorithm)
 
     # Mask each reconstructed slice with a circle.
-    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+#    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
     
     return rec
       
@@ -187,7 +194,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
     sino_start = 0
     sino_end = data_shape[1]
 
-    chunks = 6          # number of sinogram chunks to reconstruct
+    chunks = 8        # number of sinogram chunks to reconstruct
                         # only one chunk at the time is reconstructed
                         # allowing for limited RAM machines to complete a full reconstruction
 
@@ -209,15 +216,10 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
                 
         # Write data as stack of TIFs.
-        fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec_phase/' + 'recon'
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
-
-    log = "python rec.py --axis " + str(rot_center) + " --type full " + h5fname + "\n"
-    print (log)
-    with open("log.txt", "a") as myfile:
-        myfile.write(log)
     
 
 def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
@@ -264,17 +266,13 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
 
     # remove stripes
-    # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
 
     print("Raw data: ", h5fname)
     print("Center: ", rot_center)
 
     data = tomopy.minus_log(data)
-
-    data = tomopy.remove_nan(data, val=0.0)
-    data = tomopy.remove_neg(data, val=0.00)
-    data[np.where(data == np.inf)] = 0.00
 
     stack = np.empty((len(np.arange(*center_range)), data_shape[0], data_shape[2]))
 
@@ -291,9 +289,9 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     index = 0
     # Save images to a temporary folder.
-    fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' ##+ os.path.splitext(os.path.basename(h5fname))[0]    
+    fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
     for axis in np.arange(*center_range):
-        rfname = fname + str('{0:.2f}'.format(axis) + '.tiff')
+        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
         dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
         index = index + 1
 
@@ -305,7 +303,7 @@ def main(arg):
     parser.add_argument("fname", help="Directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
     parser.add_argument("--axis", nargs='?', type=str, default="0", help="Rotation axis location (pixel): 1024.0 (default 1/2 image horizontal size)")
     parser.add_argument("--bin", nargs='?', type=int, default=0, help="Reconstruction binning factor as power(2, choice) (default 0, no binning)")
-    parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: astrasirt, gridrec, sirtfbp (default gridrec)")
+    parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: sirtfbp (default gridrec)")
     parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try (default slice)")
     parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")

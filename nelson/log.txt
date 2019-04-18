@@ -1,0 +1,4 @@
+python rec.py --axis 1226.5 --type full /local/data/2019-04/Nelson/031_UAH_Sn_PAA_CB_801010_6p5NMP_Lithiated_4cycl_Ch3_04_07_19_1p2V.h5
+python rec.py --axis 1226.5 --type full /local/data/2019-04/Nelson/032_UAH_Sn_PAA_CB_801010_10p5NMP_Lithiated_4cycl_Ch1_03_20_19_1p2V.h5
+python rec.py --axis 1226.0 --type full /local/data/2019-04/Nelson/034_UAH_NP_Sn_PAA_CB_801010_9NMP_Lithiated_4cycl_Ch3_03_15_19_1p2V.h5
+python rec.py --axis 1224.0 --type full /local/data/2019-04/Nelson/035_UAH_10u_Sn_CMC_95_5_Pristine_wtt200u.h5

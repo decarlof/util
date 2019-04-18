@@ -119,20 +119,24 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
     return rec
 
 
-def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
+def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec', options=None, num_iter=100, dark_file=None):
 
-    sample_detector_distance = 8        # Propagation distance of the wavefront in cm
+    sample_detector_distance = 10       # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 2.247e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-    monochromator_energy = 24.9         # Energy of incident wave in keV
-    alpha = 1e-02                       # Phase retrieval coeff.
-    zinger_level = 800                  # Zinger level for projections
+    monochromator_energy = 35           # Energy of incident wave in keV
+    alpha = 1e-01                       # Phase retrieval coeff.
+    zinger_level = 500                  # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
 
     # Read APS 32-BM raw data.
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+
+    if dark_file is not None:
+        proj_, flat, dark, theta_ = dxchange.read_aps_32id(dark_file, sino=sino)
+        del proj_, theta_
         
     # zinger_removal
-    # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
+    proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
     # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
 
     # Flat-field correction of raw data.
@@ -140,10 +144,10 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
-    # data = tomopy.remove_stripe_ti(data, alpha=1.5)
-    # data = tomopy.remove_stripe_sf(data, size=150)
+    data = tomopy.remove_stripe_ti(data, alpha=1.5)
+    data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
     #data = tomopy.prep.phase.retrieve_phase(data,pixel_size=detector_pixel_size_x,dist=sample_detector_distance,energy=monochromator_energy,alpha=alpha,pad=True)
@@ -161,15 +165,27 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.downsample(data, level=binning) 
     data = tomopy.downsample(data, level=binning, axis=1)
 
+    print(algorithm)
     # Reconstruct object.
     if algorithm == 'sirtfbp':
         rec = rec_sirtfbp(data, theta, rot_center)
-    elif algorithm == 'astrasirt':
-        extra_options ={'MinConstraint':0}
-        options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':200, 'extra_options':extra_options}
+    elif algorithm == "astra_fbp":
+        if options == 'linear':
+            options = {'proj_type':'linear', 'method':'FBP'}
+        else:
+            options = {'proj_type':'cuda', 'method':'FBP_CUDA'}
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options, ncore=1)
+    elif algorithm == "astra_sirt":
+        extra_options = {'MinConstraint':0}
+        options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':num_iter, 'extra_options':extra_options}
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)
+    elif algorithm == tomopy.astra:
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)
     else:
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
+        try:
+            rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
+        except:
+            rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm)
         
     print("Algorithm: ", algorithm)
 
@@ -179,7 +195,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     return rec
       
 
-def rec_full(h5fname, rot_center, algorithm, binning):
+def rec_full(h5fname, rot_center, algorithm, binning, options, num_iter, dark_file):
     
     data_shape = get_dx_dims(h5fname, 'data')
 
@@ -206,21 +222,16 @@ def rec_full(h5fname, rot_center, algorithm, binning):
 
         sino = (int(sino_chunk_start), int(sino_chunk_end))
         # Reconstruct.
-        rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
+        rec = reconstruct(h5fname, sino, rot_center, binning, algorithm, options, num_iter, dark_file)
                 
         # Write data as stack of TIFs.
-        fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + os.sep + algorithm + os.sep + 'recon'
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
-
-    log = "python rec.py --axis " + str(rot_center) + " --type full " + h5fname + "\n"
-    print (log)
-    with open("log.txt", "a") as myfile:
-        myfile.write(log)
     
 
-def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
+def rec_slice(h5fname, nsino, rot_center, algorithm, binning, options, num_iter, dark_file):
     
     data_shape = get_dx_dims(h5fname, 'data')
     ssino = int(data_shape[1] * nsino)
@@ -232,15 +243,15 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
     end = start + 1
     sino = (start, end)
 
-    rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
+    rec = reconstruct(h5fname, sino, rot_center, binning, algorithm, options, num_iter, dark_file)
 
-    fname = os.path.dirname(h5fname) + os.sep + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
+    fname = os.path.dirname(h5fname) + os.sep + 'slice_rec/' + path_base_name(h5fname) + os.sep + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]  + '_' + algorithm
     dxchange.write_tiff_stack(rec, fname=fname)
     print("Rec: ", fname)
     print("Slice: ", start)
     
 
-def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning):
+def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning, dark_file):
     
     data_shape = get_dx_dims(h5fname, 'data')
     print(data_shape)
@@ -259,9 +270,15 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     # Read APS 32-BM raw data.
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+    if dark_file is not None:
+        print('Reading white/dark from {}'.format(dark_file))
+        proj_, flat, dark, theta_ = dxchange.read_aps_32id(dark_file, sino=sino)
+        del proj_, theta_
+
+    print(proj.shape, flat.shape, dark.shape)
         
     # Flat-field correction of raw data.
-    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)    
 
     # remove stripes
     # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
@@ -291,24 +308,30 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     index = 0
     # Save images to a temporary folder.
-    fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' ##+ os.path.splitext(os.path.basename(h5fname))[0]    
+    #fname = os.path.dirname(h5fname) + os.sep + 'try_rec/' + path_base_name(h5fname) + os.sep + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
+    fname = os.path.dirname(h5fname) + os.sep + 'centers/' + path_base_name(h5fname) + os.sep + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]    
     for axis in np.arange(*center_range):
-        rfname = fname + str('{0:.2f}'.format(axis) + '.tiff')
+        rfname = fname + '_' + str('{0:.2f}'.format(axis) + '.tiff')
         dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
         index = index + 1
 
     print("Reconstructions: ", fname)
-       
+      
+
+ 
 def main(arg):
 
     parser = argparse.ArgumentParser()
     parser.add_argument("fname", help="Directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
     parser.add_argument("--axis", nargs='?', type=str, default="0", help="Rotation axis location (pixel): 1024.0 (default 1/2 image horizontal size)")
     parser.add_argument("--bin", nargs='?', type=int, default=0, help="Reconstruction binning factor as power(2, choice) (default 0, no binning)")
-    parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: astrasirt, gridrec, sirtfbp (default gridrec)")
+    parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: sirtfbp (default gridrec)")
     parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try (default slice)")
     parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
+    parser.add_argument("--options", nargs='?', type=str, default=None, help="Options for astra-toolbox")
+    parser.add_argument("--num_iter", nargs='?', type=int, default=100, help="Number of iteratios for SIRT etc.")
+    parser.add_argument("--dark_file", nargs='?', type=str, default=None, help="H5 File to use for Dark and White Images")
 
     args = parser.parse_args()
 
@@ -323,6 +346,13 @@ def main(arg):
     rec_type = args.type
     center_search_width = args.srs
 
+    # Options for using tomopy.astra
+    options = args.options
+    num_iter = args.num_iter
+
+    # Dark/White File
+    dark_file = args.dark_file
+
     if os.path.isfile(fname):    
 
         print("Reconstructing a single file")   
@@ -331,11 +361,11 @@ def main(arg):
             data_shape = get_dx_dims(fname, 'data')
             rot_center =  data_shape[2]/2
         if rec_type == "try":            
-            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
+            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning, dark_file=dark_file)
         elif rec_type == "full":
-            rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
+            rec_full(fname, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
         else:
-            rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
+            rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
 
     elif os.path.isdir(fname):
         print("Reconstructing a folder containing multiple files")   
@@ -358,14 +388,61 @@ def main(arg):
                     data_shape = get_dx_dims(fname, 'data')
                     rot_center =  data_shape[2]/2
                 if rec_type == "try":            
-                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
+                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning, dark_file=dark_file)
                 elif rec_type == "full":
-                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
+                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
                 else:
-                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
+                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
     else:
         print("Directory or File Name does not exist: ", fname)
 
+
+def rec(fname, rot_center=0, binning=0, algorithm='gridrec', rec_type='slice', center_search_width=10, nsino=0.5, options=None, num_iter=100, dark_file=None):
+
+    rot_center = float(rot_center)
+    if os.path.isfile(fname):    
+
+        print("Reconstructing a single file")   
+        # Set default rotation axis location
+        if rot_center == 0:
+            data_shape = get_dx_dims(fname, 'data')
+            rot_center =  data_shape[2]/2
+        if rec_type == "try":            
+            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning, dark_file=dark_file)
+        elif rec_type == "full":
+            rec_full(fname, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
+        else:
+            rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
+
+    elif os.path.isdir(fname):
+        print("Reconstructing a folder containing multiple files")   
+        # Add a trailing slash if missing
+        top = os.path.join(fname, '')
+        
+        # Load the the rotation axis positions.
+        jfname = top + "rotation_axis.json"
+        
+        dictionary = read_rot_centers(jfname)
+            
+        for key in dictionary:
+            dict2 = dictionary[key]
+            for h5fname in dict2:
+                rot_center = dict2[h5fname]
+                fname = top + h5fname
+                print("Reconstructing ", h5fname)
+                # Set default rotation axis location
+                if rot_center == 0:
+                    data_shape = get_dx_dims(fname, 'data')
+                    rot_center =  data_shape[2]/2
+                if rec_type == "try":            
+                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning, dark_file=dark_file)
+                elif rec_type == "full":
+                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
+                else:
+                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning, options=options, num_iter=num_iter, dark_file=dark_file)
+    else:
+        print("Directory or File Name does not exist: ", fname)
+
+
 if __name__ == "__main__":
     main(sys.argv[1:])
-
