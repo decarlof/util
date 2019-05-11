@@ -105,12 +105,12 @@ def main(arg):
         
         h5_file_list = list(filter(lambda x: x.endswith(('.h5', '.hdf')), os.listdir(top)))
 
-        print("Found: ", h5_file_list)
+        print("Found: ", h5_file_list.sort())
         print("Determining the rotation axis location ...")
         
         dic_centers = {}
         i=0
-        for fname in h5_file_list:
+        for fname in h5_file_list.sort():
             h5fname = top + fname
             rot_center = find_rotation_axis(h5fname, nsino)
             case =  {fname : rot_center}
