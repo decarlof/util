@@ -21,7 +21,7 @@ for ep in tc.endpoint_search(filter_scope="shared-with-me"):
 # [e133a81a-6d04-11e5-ba46-22000b92c6ec] petrel tomography
 
 # picked petrel
-petrel_id = u'e133a81a-6d04-11e5-ba46-22000b92c6ec'
+globus_server_id = u'e133a81a-6d04-11e5-ba46-22000b92c6ec'
 
-shared_path = globus_lib.create_dir('2020-12', petrel_id, '/2-BM/', ac, tc)
-globus_lib.share_dir(shared_path, 'decarlof@gmail.com', petrel_id, ac, tc)
+shared_path = globus_lib.create_dir('2020-12', globus_server_id, '/2-BM/', ac, tc)
+globus_lib.share_dir(shared_path, 'decarlof@gmail.com', globus_server_id, ac, tc)
