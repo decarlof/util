@@ -1,5 +1,6 @@
 Tasks:
 
+        - Authenticate with Globus
         - Create a folder on a Globus server
         - Share the Globus server folder with a user
         - Send to the user an email with a link to the shared folder
