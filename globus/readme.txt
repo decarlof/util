@@ -10,8 +10,8 @@ Installation:
 
 Configuration:
 
-        see https://globus-sdk-python.readthedocs.io/en/stable/tutorial/#step-1-get-a-client
-        to create your project app_id
+        see Step 1 at https://globus-sdk-python.readthedocs.io/en/stable/tutorial/#step-1-get-a-client
+        to register your app with Globus and get your project app_id
 
         set your project app_id in globus.py
 
