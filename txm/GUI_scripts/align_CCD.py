@@ -1,3 +1,7 @@
+import process_variables as pv
+import numpy as np
+from scipy import ndimage
+
 def align_CCD():
     """
     align_CCD: aligned a CCD on the gravity center of the current image. Is supposed to be launched 
@@ -21,7 +25,7 @@ def align_CCD():
     else:
         Pix_size_H = 1/394.*1.25/10 # motor unit
         Pix_size_V = 1/198.*1.25/10 # motor unit
-        print '20x mag'
+        print '10x mag'
 
     nRow = pv.ccd_image_rows.get()
     nCol = pv.ccd_image_columns.get()

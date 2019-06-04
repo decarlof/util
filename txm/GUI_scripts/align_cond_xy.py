@@ -1,3 +1,7 @@
+import process_variables as pv
+import numpy as np
+from scipy import ndimage
+
 def align_cond_xy():
     """
     align_condxy: aligned the condenser on the center of the CCD. Is supposed to be launched 
@@ -22,7 +26,7 @@ def align_cond_xy():
     else:
         Pix_size_H = 1/800.*5/20 # motor unit
         Pix_size_V = 1/800.*5/20 # motor unit
-        print '20x mag'
+        print '10x mag'
 
     nRow = pv.ccd_image_rows.get()
     nCol = pv.ccd_image_columns.get()

@@ -1,3 +1,7 @@
+import process_variables as pv
+import numpy as np
+from scipy import ndimage
+
 def align_pinhole():
     """
     align_pinhole: aligned the condenser on the center of the CCD. Is supposed to be launched 
