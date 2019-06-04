@@ -1,0 +1,15 @@
+python rec.py --axis 1236.00 --type full /local/data/2019-04/Nelson/071_UAH_10u_Sn_CMC_95_5_wtt250_Pristine.h5
+python rec.py --axis 1233.50 --type full /local/data/2019-04/Nelson/072_UAH_10u_Sn_CMC_95_5_wtt250_Pristine.h5
+python rec.py --axis 1235.00 --type full /local/data/2019-04/Nelson/073_NP_UAH_10u_Sn_CMC_95_5_wtt250_Pristine.h5
+python rec.py --axis 1231.50 --type full /local/data/2019-04/Nelson/074_NP_UAH_10u_Sn_CMC_CB_water_Ethnol_80_10_10_4p9g_2p1g_wtt300u_Pristine.h5
+python rec.py --axis 1226.00 --type full /local/data/2019-04/Nelson/075_NP_UAH_10u_Sn_PAA_9mlNMP_80_10_10_Pristine.h5
+python rec.py --axis 1233.50 --type full /local/data/2019-04/Nelson/076_CFDRC_FUSED_1.h5
+python rec.py --axis 1238.00 --type full /local/data/2019-04/Nelson/077_CFDRC_FUSED_2.h5
+python rec.py --axis 1238.00 --type full /local/data/2019-04/Nelson/078_CFDRC_NONFUSED_1.h5
+python rec.py --axis 1223.50 --type full /local/data/2019-04/Nelson/079_CFDRC_NONFUSED_2.h5
+python rec.py --axis 1233.00 --type full /local/data/2019-04/Nelson/080_Zhang_C1.h5
+python rec.py --axis 1225.50 --type full /local/data/2019-04/Nelson/081_Zhang_C2.h5
+python rec.py --axis 1231.50 --type full /local/data/2019-04/Nelson/082_Zhang_C3.h5
+python rec.py --axis 1228.00 --type full /local/data/2019-04/Nelson/083_Zhang_C4.h5
+python rec.py --axis 1232.50 --type full /local/data/2019-04/Nelson/084_Zhang_C5.h5
+python rec.py --axis 1215.50 --type full /local/data/2019-04/Nelson/086_Purdue_PVDF_NaCllO4_C_50_2nd run.h5

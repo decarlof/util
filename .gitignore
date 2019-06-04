@@ -42,6 +42,7 @@ ehthumbs.db
 Thumbs.db
 .spyderworkspace
 *.*~
+core
 
 # Python pyproducts #
 #####################
@@ -52,6 +53,7 @@ docs/build
 *egg-info
 *.egg
 .settings
+.ipynb_checkpoints
 
 # LaTex generated files #
 #########################
@@ -68,6 +70,9 @@ docs/build
 test.py
 Test.py
 main.py
+test*
+data*
+*.h5
 
 # Distribution / packaging #
 ############################
@@ -106,3 +111,8 @@ coverage.xml
 *.sublime-project
 *.sublime-workspace
 docs/trunk/*
+
+# tomopy by products
+####################
+*.mat
+recon_dir

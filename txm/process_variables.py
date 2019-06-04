@@ -55,9 +55,14 @@ sample_top_x = PV('32idcTXM:mcs:c1:m2.VAL')
 sample_top_z = PV('32idcTXM:mcs:c1:m1.VAL')
 sample_rotary = PV('32idcTXM:hydra:c0:m1.VAL')
 sample_rotary_home = PV('32idcTXM:hydra:c0:m1.HOMF')
+<<<<<<< HEAD:process_variables.py
 sample_rotary_speed = PV('32idcTXM:hydra:c0:m1.VELO')
 #sample_x = PV('32idcTXM:xps:c1:m8.VAL')
 sample_y = PV('32idcTXM:mxv:c1:m1.VAL')
+=======
+sample_x = PV('32idcTXM:xps:c1:m8.VAL')
+sample_y = PV('32idcTXM:xps:c1:m7.VAL')
+>>>>>>> f4a3af696dfa20e85bb30f011f7d69a5f587b7c4:txm/process_variables.py
 
 # Zone Plate
 zone_plate_x = PV('32idcTXM:mcs:c2:m1.VAL')
