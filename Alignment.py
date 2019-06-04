@@ -54,6 +54,7 @@ def align_bpm(x_range, y_range, steps, dwell_time):
     # start the Y BPM scan
 
     pv.ccd_trigger.put(1, wait=True, timeout=500) # trigger once fisrt to avoid a reading bug
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
     # move the BPM to the Y starting point
     pv.beam_monitor_y.put(vect_pos_y[0], wait=True)
@@ -66,10 +67,10 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
         # Trigger the CCD
         pv.ccd_trigger.put(1, wait=True, timeout=500)
+        while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
         # Get the image still in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
+        img_vect = pv.ccd_image.get(count=image_size)
         img_tmp = np.reshape(img_vect,[nRow, nCol])
 
         # Store the image in Mat3D
@@ -111,12 +112,14 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
     # Make a last snapshot
     pv.ccd_trigger.put(1, wait=True, timeout=500) 
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
 
     ######################################
     # Start the X BPM scan
 
     pv.ccd_trigger.put(1, wait=True, timeout=500) # trigger once fisrt to avoid a reading bug
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
     # Move the BPM to the X starting point
     pv.beam_monitor_x.put(vect_pos_x[0], wait=True)
@@ -129,10 +132,10 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
         # Trigger the CCD
         pv.ccd_trigger.put(1, wait=True, timeout=500)
+        while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
         # gGet the image still in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
+        img_vect = pv.ccd_image.get(count=image_size)
         img_tmp = np.reshape(img_vect,[nRow, nCol])
 
         # Store the image in Mat3D
@@ -174,6 +177,7 @@ def align_bpm(x_range, y_range, steps, dwell_time):
 
     # Make a last snapshot
     pv.ccd_trigger.put(1, wait=True, timeout=500)
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
     return mat_3d_y, intensity_y_int, vect_pos_y, vect_pos_x_int, mat_3d_x, intensity_x_int, vect_pos_x, vect_pos_x_int
 
@@ -194,7 +198,6 @@ def align_CCD():
     ----------
     No input required
     """
-    
     # Check the magnification lens:
     Objective_pos = np.round(pv.ccd_camera_objective.get())
     if Objective_pos==-40:
@@ -226,8 +229,9 @@ def align_CCD():
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
-    img_vect = pv.ccd_image.get()
-    img_vect = img_vect[0:image_size]
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
+
+    img_vect = pv.ccd_image.get(count=image_size)
     img_tmp = np.reshape(img_vect,[nRow, nCol])
 
     print "Image Shape: (", img_tmp.shape[0], ", ", img_tmp.shape[1], ")"
@@ -272,9 +276,13 @@ def align_CCD():
     
     pv.ccd_acquire_mode.put(1, wait=True, timeout=500) # CCD mode switched to continuous
     pv.ccd_trigger.put(1) # Trigger the CCD
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
     return
 
+
+###########################################
+###########################################
 
 def align_cond_xy():
     """
@@ -298,8 +306,8 @@ def align_cond_xy():
         Pix_size_V = 1/800. # motor unit
         print '5x mag'
     else:
-        Pix_size_H = 1/800.*5/20 # motor unit
-        Pix_size_V = 1/800.*5/20 # motor unit
+        Pix_size_H = 1/800.*5/10 # motor unit
+        Pix_size_V = 1/800.*5/10 # motor unit
         print '20x mag'
 
     nRow = pv.ccd_image_rows.get()
@@ -317,8 +325,9 @@ def align_cond_xy():
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
-    img_vect = pv.ccd_image.get()
-    img_vect = img_vect[0:image_size]
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
+
+    img_vect = pv.ccd_image.get(count=image_size)
     img_tmp = np.reshape(img_vect,[nRow, nCol])
 
     Im_max = np.max(np.max(img_tmp))
@@ -356,6 +365,7 @@ def align_cond_xy():
     
     pv.ccd_acquire_mode.put(1, wait=True, timeout=500) # CCD mode switched to continuous
     pv.ccd_trigger.put(1) # Trigger the CCD
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
     return
 
@@ -381,8 +391,8 @@ def align_pinhole():
         Pix_size_V = 1/800. # motor unit
         print '5x mag'
     else:
-        Pix_size_H = 1/800.*5/20 # motor unit
-        Pix_size_V = 1/800.*5/20 # motor unit
+        Pix_size_H = 1/800.*5/10 # motor unit
+        Pix_size_V = 1/800.*5/10 # motor unit
         print '20x mag'
 
     nRow = pv.ccd_image_rows.get()
@@ -400,8 +410,9 @@ def align_pinhole():
     pv.ccd_trigger.put(0, wait=True, timeout=500) # stop CCD acquisitions
     pv.ccd_acquire_mode.put(0, wait=True, timeout=500) # CCD mode switched to fixed
     pv.ccd_trigger.put(1, wait=True, timeout=500) # makes 1 acquisition
-    img_vect = pv.ccd_image.get()
-    img_vect = img_vect[0:image_size]
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
+
+    img_vect = pv.ccd_image.get(count=image_size)
     img_tmp = np.reshape(img_vect,[nRow, nCol])
 
     Im_max = np.max(np.max(img_tmp))
@@ -438,6 +449,7 @@ def align_pinhole():
     
     pv.ccd_acquire_mode.put(1, wait=True, timeout=500) # CCD mode switched to continuous
     pv.ccd_trigger.put(1) # Trigger the CCD
+    while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
     return
 

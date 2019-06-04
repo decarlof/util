@@ -6,11 +6,15 @@
 #"""
 
 ########################### input ###############################
-sleeptime = 2.5 # time to wait in order to register the intensity
-nSteps = 10
-range_scanned = 8
+#sleeptime = 0.5 # time to wait in order to register the intensity
+#nSteps = 10
+#range_scanned = 8
+nSteps = 8
+range_scanned = 12
 nPt_interp = 50
-wait = 100
+#detector = ion_chamber_DCM
+detector = ion_chamber_down
+
 #################################################################
 
 # get the current position of the DCM 2nd crystal piezo:
@@ -20,22 +24,30 @@ curr_pos = pv.pzt_sec_crystal.get()
 scan_val = np.linspace(curr_pos - range_scanned/2, curr_pos + range_scanned/2, nSteps)
 intensity = scan_val*0
 
-pv.ion_chamber_auto.put(0, wait=True, timeout=wait) # switch automatic to 1 shot mode
 dwelltime = pv.ion_chamber_autodwelltime.get() # get the dwell time of the auto mode
-pv.ion_chamber_dwelltime.put(dwelltime, wait=True, timeout=wait) # assigned the dwell time to the oneshot mode
-pv.ion_chamber_trigger.put(1) # trigger once fisrt to avoid a reading bug
+#pv.ion_chamber_dwelltime.put(dwelltime, wait=True, timeout=dwelltime+5) # assigned the dwell time to the oneshot mode
+print 'Switch ion chamber on OneShot mode'
+pv.ion_chamber_auto.put(0, wait=True, timeout=dwelltime+5) # switch automatic to 1 shot mode
+print 'Done!'
+
+print 'Trigger ion chamber once'
+pv.ion_chamber_trigger.put(1, wait=True, timeout=dwelltime+5)
+#sleep(dwelltime + 2)
+print 'Done!'
 
 # Loop acquiring the rocking curve:
 for i in range(0, np.size(scan_val)):
     print '*** Step %i/%i' % (i+1, np.size(scan_val))
     print '    Motor pos: ',scan_val[i]
-    pv.pzt_sec_crystal.put(scan_val[i], wait=True, timeout=wait)
-    sleep(sleeptime)
-    pv.ion_chamber_trigger.put(1)
-    intensity[i] = pv.ion_chamber_DCM.get()
+    pv.pzt_sec_crystal.put(scan_val[i], wait=True, timeout=dwelltime+5)
+    
+
+    pv.ion_chamber_trigger.put(1, wait=True, timeout=dwelltime+5) 
+    #sleep(dwelltime + 0.5)
+    intensity[i] = detector.get()
     print intensity[i]
 
-pv.ion_chamber_auto.put(1, wait=True, timeout=wait) # come back to automatic mode
+#pv.ion_chamber_auto.put(1, wait=True, timeout=dwelltime+5) # come back to automatic mode
 
 # Interpolate the rocking curve over 50 points
 f = interpolate.interp1d(scan_val, intensity, kind='cubic')
@@ -46,7 +58,7 @@ intensity_interp = f(scan_val_interp)
 index_max_intensity = np.where(intensity_interp==max(intensity_interp))
 
 # Move the 2nd crystal at the max intensity of the rocking curve:
-pv.pzt_sec_crystal.put(scan_val_interp[index_max_intensity], wait=True, timeout=wait)
+pv.pzt_sec_crystal.put(scan_val_interp[index_max_intensity], wait=True, timeout=dwelltime+5)
 
 plt.plot(scan_val, intensity, 'go', scan_val_interp, intensity_interp, 'r-'), plt.grid()
 plt.plot(scan_val_interp[index_max_intensity], max(intensity_interp), 'b*')

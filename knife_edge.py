@@ -73,76 +73,77 @@ def knife_edge(Motor, X_start, X_end, n_steps, acq_time, disp):
         pv.ccd_image_columns.put(2560, wait=True, timeout=wait)
 
     ################################  DATA PROCESSING
-    # Calculate the derivative of the intensity profile:
-    deriv_int = np.diff(intensity)
-
-    # Noise filtering of intensity profile & its derivative:
-    filter_struct = 3
-    intensity_filt = filters.median_filter(intensity, footprint=np.ones(filter_struct))
-    deriv_int_filt = filters.median_filter(deriv_int, footprint=np.ones(filter_struct))
-
-    # Gaussian fit + FWHM estimate:
-    deriv_int = np.diff(intensity)
-
-    # Gaussian function definition:
-    def gaus(x, a, x0, sigma):
-        return a*np.exp(-(x-x0)**2/(2*sigma**2))
-
-    # Gaussian fitting of the derivative:
-    x = vect_pos_x[1:] # resampled because derivative loose one value
-    x_HR = np.linspace(x[0], x[-1], nPt_gaus) # higher sampling for the gaussian fit display
-    mean_x = np.mean(x)
-    sigma = np.std(x)
-
-    # Fit a gaussian on the knife edge derivative
-    y = deriv_int
-    amp = np.max(y)
-    try:
-        popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
-        param = popt[0]
-        sigma1 = param[2]
-        deriv_int_fit = gaus(x_HR, param[0], param[1], param[2])
-    except (runtimeError, TypeError, NameError):
-        deriv_int_fit = deriv_int
-        sigma1 = 0
-    FWHM_1 = sigma1 * 2.3548
-    #--------------------------------------------
-
-    # Fit a gaussian on the filtered knife edge derivative
-    y = deriv_int_filt
-    amp = np.max(y)
-    try:
-        popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
-        param = popt[0]
-        sigma2 = param[2]
-        deriv_int_filt_fit = gaus(x_HR, param[0], param[1], param[2])
-    except (runtimeError, TypeError, NameError):
-        deriv_int_fit = deriv_int
-        sigma2 = 0
-    FWHM_2 = sigma2 * 2.3548
-    #--------------------------------------------
-
-    if disp:
-        plt.subplot(2,2,1) # knife edge
-        plt.plot(vect_pos_x, intensity, 'go-')
-        plt.title('Knife edge'), plt.ylabel('Intensity'), plt.grid()
-
-        plt.subplot(2,2,3) # knife edge derivative + gaussian fit
-        plt.plot(vect_pos_x[1:], deriv_int, 'go--', x_HR, deriv_int_fit, 'r-')
-        TheTitle = 'Knife edge derivative; FWHM: %0.2f' % FWHM_1
-        plt.title(TheTitle), plt.xlabel('motor position'), plt.ylabel('Intensity'), plt.grid()
-
-        plt.subplot(2,2,2) # filtered knife edge
-        plt.plot(vect_pos_x, intensity_filt, 'go-')
-        plt.title('Filtered knife edge'), plt.ylabel('Intensity'), plt.grid()
-
-        plt.subplot(2,2,4) # filtered knife edge derivative + gaussian fit
-        plt.plot(vect_pos_x[1:], deriv_int_filt, 'go--', x_HR, deriv_int_filt_fit, 'r-')
-        TheTitle = 'Filtered Knife edge derivative; FWHM: %0.2f' % FWHM_2
-        plt.title(TheTitle), plt.xlabel('motor position'), plt.ylabel('Intensity'), plt.grid()
-
-        plt.show()
-
+    if 0:
+        # Calculate the derivative of the intensity profile:
+        deriv_int = np.diff(intensity)
+    
+        # Noise filtering of intensity profile & its derivative:
+        filter_struct = 3
+        intensity_filt = filters.median_filter(intensity, footprint=np.ones(filter_struct))
+        deriv_int_filt = filters.median_filter(deriv_int, footprint=np.ones(filter_struct))
+    
+        # Gaussian fit + FWHM estimate:
+        deriv_int = np.diff(intensity)
+    
+        # Gaussian function definition:
+        def gaus(x, a, x0, sigma):
+            return a*np.exp(-(x-x0)**2/(2*sigma**2))
+    
+        # Gaussian fitting of the derivative:
+        x = vect_pos_x[1:] # resampled because derivative loose one value
+        x_HR = np.linspace(x[0], x[-1], nPt_gaus) # higher sampling for the gaussian fit display
+        mean_x = np.mean(x)
+        sigma = np.std(x)
+    
+        # Fit a gaussian on the knife edge derivative
+        y = deriv_int
+        amp = np.max(y)
+        try:
+            popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
+            param = popt[0]
+            sigma1 = param[2]
+            deriv_int_fit = gaus(x_HR, param[0], param[1], param[2])
+        except (runtimeError, TypeError, NameError):
+            deriv_int_fit = deriv_int
+            sigma1 = 0
+        FWHM_1 = sigma1 * 2.3548
+        #--------------------------------------------
+    
+        # Fit a gaussian on the filtered knife edge derivative
+        y = deriv_int_filt
+        amp = np.max(y)
+        try:
+            popt = curve_fit(gaus,x,y,p0=[amp,mean_x,sigma])
+            param = popt[0]
+            sigma2 = param[2]
+            deriv_int_filt_fit = gaus(x_HR, param[0], param[1], param[2])
+        except (runtimeError, TypeError, NameError):
+            deriv_int_fit = deriv_int
+            sigma2 = 0
+        FWHM_2 = sigma2 * 2.3548
+        #--------------------------------------------
+    
+        if disp:
+            plt.subplot(2,2,1) # knife edge
+            plt.plot(vect_pos_x, intensity, 'go-')
+            plt.title('Knife edge'), plt.ylabel('Intensity'), plt.grid()
+    
+            plt.subplot(2,2,3) # knife edge derivative + gaussian fit
+            plt.plot(vect_pos_x[1:], deriv_int, 'go--', x_HR, deriv_int_fit, 'r-')
+            TheTitle = 'Knife edge derivative; FWHM: %0.2f' % FWHM_1
+            plt.title(TheTitle), plt.xlabel('motor position'), plt.ylabel('Intensity'), plt.grid()
+    
+            plt.subplot(2,2,2) # filtered knife edge
+            plt.plot(vect_pos_x, intensity_filt, 'go-')
+            plt.title('Filtered knife edge'), plt.ylabel('Intensity'), plt.grid()
+    
+            plt.subplot(2,2,4) # filtered knife edge derivative + gaussian fit
+            plt.plot(vect_pos_x[1:], deriv_int_filt, 'go--', x_HR, deriv_int_filt_fit, 'r-')
+            TheTitle = 'Filtered Knife edge derivative; FWHM: %0.2f' % FWHM_2
+            plt.title(TheTitle), plt.xlabel('motor position'), plt.ylabel('Intensity'), plt.grid()
+    
+            plt.show()
+    
     return vect_pos_x, intensity, FWHM_2
 
 
