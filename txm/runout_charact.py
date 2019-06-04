@@ -58,10 +58,10 @@ for iScan in range(0, nScan):
 
         # Trigger the CCD
         pv.ccd_trigger.put(1, wait=True, timeout=wait)
+        while pv.ccd_detector_state.get() != 0: time.sleep(0.05)
 
         # Get the image loaded in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
+        img_vect = pv.ccd_image.get(count=image_size)
         img_tmp = np.reshape(img_vect,[nRow, nCol])
 
         FileName = output_path+radix+'_scan%i_%04i.tif' % (iScan, iAngle)
@@ -122,35 +122,6 @@ if 0:
     plt.subplot(2,2,3), plt.plot(scan_val, avg_centroY, 'b-'), plt.grid()
     plt.xlabel('angular position'), plt.ylabel('repeatable error in Y'), plt.grid()
     plt.show()
-
-
-
-# Matlab code to rename files
-#cd /local/dataraid/2014_11/TXM_commissioning/runout/180proj_0.3s/run2cp/
-#clear, clc
-#
-#FileName = 'runout_180proj_0.3s_scan0_0000.tif';
-#
-#FileNames = dir;
-#nRad = length(FileNames)-2;
-#nScans = 4;
-#
-#for iRad = 1:nRad
-#    the_file = FileNames(iRad+2).name;
-#    scan_index = str2num(the_file(end-7:end-4));
-#    renamed_file = [the_file(1:end-8),'xxx',num2str(scan_index),'.tif'];
-#    movefile(the_file, renamed_file) 
-#end
-#
-#for iRad = 1:nRad
-#    iRad
-#    the_file = FileNames(iRad+2).name;
-#    scan_index = str2num(the_file(end-4));
-#    rad_index = str2num(the_file(25:end-9));
-#    renamed_file = [the_file(1:20),'scan',num2str(scan_index),'_',sprintf('%04i',rad_index),'.tif'];
-#    movefile(the_file, renamed_file)
-#end
-
 
 
 

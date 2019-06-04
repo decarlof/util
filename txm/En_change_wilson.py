@@ -34,13 +34,21 @@ def moveE_8376():
     pv.zone_plate_z.put(0.255, wait=True)
     pv.DCM_mvt_status.put(0, wait=True) # status: 0=manual, 1=auto
     
+def moveE(En):
+    pv.DCM_mvt_status.put(1, wait=True) # status: 0=manual, 1=auto
+    offset = 0.132
+    pv.gap_en.put(En + offset, wait=True) # miove the gap
+    pv.DCM_en.put(En, wait=True) # move the DCM
+#    pv.zone_plate_z.put(0.255, wait=True)
+    pv.DCM_mvt_status.put(0, wait=True) # status: 0=manual, 1=auto
+    
     
 
 
 ################################ XANES change:
-if 1:
+if 0:
     ################# Input ###############
-    output_path = '/local/data/2014_11/2014_11_Chiu/Powder1/XANES/powder2_10s_preheat_'
+    output_path = '/local/data/2014_11/2014_11_Chiu/Powder2/XANES/powder2_10s_postred_'
     stage_ff = sample_y
     ff_pos = -0.2
     nff = 1
@@ -49,7 +57,7 @@ if 1:
     acq_time = 10000000 # unit = minutes
     Pause = 1 # time ellapsed to save data
     wait=1
-    ######################################
+    ######################################f
     
 
     # Get the CCD parameters:
@@ -63,52 +71,19 @@ if 1:
     # Set the CCD acquisition time:
     pv.ccd_dwell_time.put(exposure, wait=True, timeout=wait)
 
-    print '*** Close the shutter...'
-    pv.BPM_DCM_FBL.put(0, wait=True, timeout=wait) # turn feedback off
-    pv.close_shutter_B.put(1, wait=True, timeout=wait) # close the shutter 
-
-    print '*** Acquiring the dark-fields...'
-    dark_tmp = np.zeros((nRow, nCol))
-    for iDark in range(0,nDark):
-        pv.ccd_trigger.put(1, wait=True, timeout=wait)
-
-        # Get the image loaded in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
-        dark_tmp = dark_tmp + np.reshape(img_vect,[nRow, nCol])
-
-    dark = np.round(img_tmp/nDark)
-    sleep(0.5)
-
-    print '*** Open the shutter...'
-    pv.open_shutter_B.put(1, wait=True, timeout=wait) # close the shutter 
-    sleep(4)
-    pv.BPM_DCM_FBL.put(1, wait=True, timeout=wait) # turn feedback on
-
+    # Acquire the dark:
+    dark = dark_acq(exposure, nDark)
     
     # 1st XANES:
     print '##### 1st radiograph @ 8316 eV'
     moveE_8316()
-    # Acquire and average n flat flieds:
-    print '*** Move to flat-field position...'
-    stage_ff.put(ff_pos, wait=True, timeout=wait)
-    print '*** Acquiring the flat-fields...'
-    ff_tmp = np.zeros((nRow, nCol))
-    for iFF in range(0,nff):
-        print '   ff# %i' % (iFF+1)
-        pv.ccd_trigger.put(1, wait=True, timeout=wait)
 
-        # Get the image loaded in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
-        ff_tmp = ff_tmp + np.reshape(img_vect,[nRow, nCol])
+    # Acquire the flat-fields:
+    ff = ff_acq(stage_ff, ff_pos, exposure, nff)
 
-    ff = np.round(ff_tmp/nff)
-    stage_ff.put(0, wait=True, timeout=wait) # move sample back in
-    
     # Acquire the radiograph:
     print '*** Acquiring the sample radiograph...'
-    pv.ccd_trigger.put(1, wait=True, timeout=wait)
+    pv.ccd_trigger.put(1, wait=True, timeout=exposure+0.1)
     # Get the image loaded in memory
     img_vect = pv.ccd_image.get()
     img_vect = img_vect[0:image_size]
@@ -125,26 +100,13 @@ if 1:
     # 2nd XANES:
     print '##### 2nd radiograph @ 8348 eV'
     moveE_8348()
-    # Acquire and average n flat flieds:
-    print '*** Move to flat-field position...'
-    stage_ff.put(ff_pos, wait=True, timeout=wait)
-    print '*** Acquiring the flat-fields...'
-    ff_tmp = np.zeros((nRow, nCol))
-    for iFF in range(0,nff):
-        print '   ff# %i' % (iFF+1)
-        pv.ccd_trigger.put(1, wait=True, timeout=wait)
-
-        # Get the image loaded in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
-        ff_tmp = ff_tmp + np.reshape(img_vect,[nRow, nCol])
-
-    ff = np.round(ff_tmp/nff)
-    stage_ff.put(0, wait=True, timeout=wait) # move sample back in
     
+    # Acquire the flat-fields:
+    ff = ff_acq(stage_ff, ff_pos, exposure, nff)
+
     # Acquire the radiograph:
     print '*** Acquiring the sample radiograph...'
-    pv.ccd_trigger.put(1, wait=True, timeout=wait)
+    pv.ccd_trigger.put(1, wait=True, timeout=exposure+0.1)
     # Get the image loaded in memory
     img_vect = pv.ccd_image.get()
     img_vect = img_vect[0:image_size]
@@ -161,26 +123,13 @@ if 1:
     # 3rd XANES:
     print '##### 3rd radiograph @ 8358 eV'
     moveE_8358()
-    # Acquire and average n flat flieds:
-    print '*** Move to flat-field position...'
-    stage_ff.put(ff_pos, wait=True, timeout=wait)
-    print '*** Acquiring the flat-fields...'
-    ff_tmp = np.zeros((nRow, nCol))
-    for iFF in range(0,nff):
-        print '   ff# %i' % (iFF+1)
-        pv.ccd_trigger.put(1, wait=True, timeout=wait)
 
-        # Get the image loaded in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
-        ff_tmp = ff_tmp + np.reshape(img_vect,[nRow, nCol])
-
-    ff = np.round(ff_tmp/nff)
-    stage_ff.put(0, wait=True, timeout=wait) # move sample back in
+    # Acquire the flat-fields:
+    ff = ff_acq(stage_ff, ff_pos, exposure, nff)
     
     # Acquire the radiograph:
     print '*** Acquiring the sample radiograph...'
-    pv.ccd_trigger.put(1, wait=True, timeout=wait)
+    pv.ccd_trigger.put(1, wait=True, timeout=exposure+0.1)
     # Get the image loaded in memory
     img_vect = pv.ccd_image.get()
     img_vect = img_vect[0:image_size]
@@ -197,26 +146,13 @@ if 1:
     # 4th XANES:
     print '##### 4th radiograph @ 8376 eV'
     moveE_8376()
-    # Acquire and average n flat flieds:
-    print '*** Move to flat-field position...'
-    stage_ff.put(ff_pos, wait=True, timeout=wait)
-    print '*** Acquiring the flat-fields...'
-    ff_tmp = np.zeros((nRow, nCol))
-    for iFF in range(0,nff):
-        print '   ff# %i' % (iFF+1)
-        pv.ccd_trigger.put(1, wait=True, timeout=wait)
 
-        # Get the image loaded in memory
-        img_vect = pv.ccd_image.get()
-        img_vect = img_vect[0:image_size]
-        ff_tmp = ff_tmp + np.reshape(img_vect,[nRow, nCol])
-
-    ff = np.round(ff_tmp/nff)
-    stage_ff.put(0, wait=True, timeout=wait) # move sample back in
+    # Acquire the flat-fields:
+    ff = ff_acq(stage_ff, ff_pos, exposure, nff)
     
     # Acquire the radiograph:
     print '*** Acquiring the sample radiograph...'
-    pv.ccd_trigger.put(1, wait=True, timeout=wait)
+    pv.ccd_trigger.put(1, wait=True, timeout=exposure+0.1)
     # Get the image loaded in memory
     img_vect = pv.ccd_image.get()
     img_vect = img_vect[0:image_size]
@@ -228,7 +164,5 @@ if 1:
     img = misc.toimage(rad_corr)
     img.save(FileName)
     sleep(Pause)
-    
-
-
+  
 

@@ -47,3 +47,5 @@ np.save('gap_table_data_7keV.npy', intensity_scan)
 for i in range(0,gap_stp):
     FileName = 'gap_table_data_7keV_%i.txt' % i
     np.savetxt(FileName, np.squeeze(intensity_scan[:,:,i]), fmt='%4.4f', delimiter='   ', header='col1=gap_en, col2=gap pos, col3=DCM_en, col4=bragg position, col5=intensity')
+
+
