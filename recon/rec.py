@@ -234,7 +234,10 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
 
     rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
 
-    fname = os.path.dirname(h5fname) + os.sep + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
+    if os.path.dirname(h5fname) is not '':
+    	fname = os.path.dirname(h5fname) + os.sep + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
+    else:
+    	fname = './slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
     dxchange.write_tiff_stack(rec, fname=fname)
     print("Rec: ", fname)
     print("Slice: ", start)
