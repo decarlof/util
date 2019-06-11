@@ -11,6 +11,7 @@ import sys
 import json
 import argparse
 import collections
+import pathlib
 
 import h5py
 import tomopy
@@ -27,6 +28,7 @@ import numpy as np
 
 import sirtfilter
 
+LOG_DIR = '/home/beams/TOMO/logs/'
 
 def file_base_name(file_name):
     if '.' in file_name:
@@ -208,15 +210,23 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         # Reconstruct.
         rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
                 
-        # Write data as stack of TIFs.
-        fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        if os.path.dirname(h5fname) is not '':
+            fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+        else:
+            fname = '.' + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
+       # # Write data as stack of TIFs.
+       #  fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
         print("Reconstructions: ", fname)
         dxchange.write_tiff_stack(rec, fname=fname, start=strt)
         strt += sino[1] - sino[0]
 
     log = "python rec.py --axis " + str(rot_center) + " --type full " + h5fname + "\n"
     print (log)
-    with open("log.txt", "a") as myfile:
+
+    p = pathlib.Path(fname)
+    lfname = LOG_DIR + p.parts[-3] + '.log'
+    print(lfname)
+    with open(lfname, "a") as myfile:
         myfile.write(log)
     
 
