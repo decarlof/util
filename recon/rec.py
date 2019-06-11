@@ -17,6 +17,7 @@ import h5py
 import tomopy
 import tomopy.util.dtype as dtype
 import dxchange
+import dxchange.reader as dxreader
 
 import numpy as np
 
@@ -121,7 +122,7 @@ def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
     return rec
 
 
-def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
+def reconstruct(h5fname, sino, rot_center, binning, reverse, algorithm='gridrec'):
 
     sample_detector_distance = 8        # Propagation distance of the wavefront in cm
     detector_pixel_size_x = 2.247e-4    # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
@@ -133,6 +134,11 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     # Read APS 32-BM raw data.
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
+    if reverse:
+        step_size = (theta[1] - theta[0]) 
+        theta_size = dxreader.read_dx_dims(h5fname, 'data')[0]
+        theta = np.linspace(np.pi , (0+step_size), theta_size)    # zinger_removal
+
     # zinger_removal
     # proj = tomopy.misc.corr.remove_outlier(proj, zinger_level, size=15, axis=0)
     # flat = tomopy.misc.corr.remove_outlier(flat, zinger_level_w, size=15, axis=0)
@@ -181,7 +187,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     return rec
       
 
-def rec_full(h5fname, rot_center, algorithm, binning):
+def rec_full(h5fname, rot_center, algorithm, binning, reverse):
     
     data_shape = get_dx_dims(h5fname, 'data')
 
@@ -208,7 +214,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
 
         sino = (int(sino_chunk_start), int(sino_chunk_end))
         # Reconstruct.
-        rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
+        rec = reconstruct(h5fname, sino, rot_center, binning, reverse, algorithm)
                 
         if os.path.dirname(h5fname) is not '':
             fname = os.path.dirname(h5fname) + os.sep + os.path.splitext(os.path.basename(h5fname))[0]+ '_full_rec/' + 'recon'
@@ -230,7 +236,7 @@ def rec_full(h5fname, rot_center, algorithm, binning):
         myfile.write(log)
     
 
-def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
+def rec_slice(h5fname, nsino, rot_center, algorithm, binning, reverse):
     
     data_shape = get_dx_dims(h5fname, 'data')
     ssino = int(data_shape[1] * nsino)
@@ -242,7 +248,7 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
     end = start + 1
     sino = (start, end)
 
-    rec = reconstruct(h5fname, sino, rot_center, binning, algorithm)
+    rec = reconstruct(h5fname, sino, rot_center, binning, reverse, algorithm)
 
     if os.path.dirname(h5fname) is not '':
     	fname = os.path.dirname(h5fname) + os.sep + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(h5fname))[0]
@@ -253,7 +259,7 @@ def rec_slice(h5fname, nsino, rot_center, algorithm, binning):
     print("Slice: ", start)
     
 
-def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning):
+def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning, reverse):
     
     data_shape = get_dx_dims(h5fname, 'data')
     print(data_shape)
@@ -272,6 +278,11 @@ def rec_try(h5fname, nsino, rot_center, center_search_width, algorithm, binning)
 
     # Read APS 32-BM raw data.
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
+
+    if reverse:
+        step_size = (theta[1] - theta[0]) 
+        theta_size = dxreader.read_dx_dims(h5fname, 'data')[0]
+        theta = np.linspace(np.pi , (0+step_size), theta_size)    # zinger_removal
         
     # Flat-field correction of raw data.
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
@@ -322,6 +333,7 @@ def main(arg):
     parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try (default slice)")
     parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
     parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
+    parser.add_argument("--reverse",action="store_true", help="set when the data set was collected in reverse (180-0)")
 
     args = parser.parse_args()
 
@@ -336,6 +348,8 @@ def main(arg):
     rec_type = args.type
     center_search_width = args.srs
 
+    reverse = args.reverse
+
     if os.path.isfile(fname):    
 
         print("Reconstructing a single file")   
@@ -344,11 +358,11 @@ def main(arg):
             data_shape = get_dx_dims(fname, 'data')
             rot_center =  data_shape[2]/2
         if rec_type == "try":            
-            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
+            rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning, reverse=reverse)
         elif rec_type == "full":
-            rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
+            rec_full(fname, rot_center, algorithm=algorithm, binning=binning, reverse=reverse)
         else:
-            rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
+            rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning, reverse=reverse)
 
     elif os.path.isdir(fname):
         print("Reconstructing a folder containing multiple files")   
@@ -371,11 +385,11 @@ def main(arg):
                     data_shape = get_dx_dims(fname, 'data')
                     rot_center =  data_shape[2]/2
                 if rec_type == "try":            
-                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning)
+                    rec_try(fname, nsino, rot_center, center_search_width, algorithm=algorithm, binning=binning, reverse=reverse)
                 elif rec_type == "full":
-                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning)
+                    rec_full(fname, rot_center, algorithm=algorithm, binning=binning, reverse=reverse)
                 else:
-                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning)
+                    rec_slice(fname, nsino, rot_center, algorithm=algorithm, binning=binning, reverse=reverse)
     else:
         print("Directory or File Name does not exist: ", fname)
 
