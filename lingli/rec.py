@@ -157,7 +157,7 @@ def reconstruct(variableDict, sino):
     if (variableDict['phase'] is False):
         data = tomopy.normalize(proj, flat, dark)
     # remove stripes
-    #data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
     # data = tomopy.remove_stripe_ti(data, variableDict['alpha']=1.5)
     # data = tomopy.remove_stripe_sf(data, size=150)
@@ -353,7 +353,7 @@ def rec_try(variableDict):
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
 
     # remove stripes
-    # data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
 
 
     log_lib.info("  *** raw data: %s" % variableDict['fname'])
