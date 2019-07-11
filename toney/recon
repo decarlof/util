@@ -40,7 +40,7 @@ variableDict = {'fname': 'data.h5',
         'alpha': 1e-2,                         # Phase retrieval coeff.     
         'sample_detector_distance': 40,        # Propagation distance of the wavefront in cm
         'detector_pixel_size_x' : 0.69e-4,     # Detector pixel size in cm (5x: 1.17e-4, 2X: 2.93e-4)
-        'monochromator_energy' : 25,           # Energy of incident wave in keV                   
+        'monochromator_energy' : 50,           # Energy of incident wave in keV                   
         'zinger_level' : 800,                  # Zinger level for projections
         'zinger_level_w' : 1000,               # Zinger level for white
         'reverse' : False,                     # True for 180-0 data set
@@ -161,26 +161,30 @@ def reconstruct(variableDict, sino):
         theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
 
     # zinger_removal
-    # proj = tomopy.misc.corr.remove_outlier(proj, variableDict['zinger_level'], size=15, axis=0)
-    # flat = tomopy.misc.corr.remove_outlier(flat, variableDict['zinger_level']_w, size=15, axis=0)
+    proj = tomopy.misc.corr.remove_outlier(proj, variableDict['zinger_level'], size=15, axis=0)
+    flat = tomopy.misc.corr.remove_outlier(flat, variableDict['zinger_level'], size=15, axis=0)
 
-    if (variableDict['phase'] is False):
-        data = tomopy.normalize(proj, flat, dark)
+    data = tomopy.normalize(proj, flat, dark)
+    #if (variableDict['phase'] is False):
+    #    print('no phase retrieval')
+    #    data = tomopy.normalize(proj, flat, dark)
 
     # remove stripes
-    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+    data = tomopy.remove_stripe_fw(data, level=7, wname='sym16', sigma=1, pad=True)
 
-    # data = tomopy.remove_stripe_ti(data, variableDict['alpha']=1.5)
-    # data = tomopy.remove_stripe_sf(data, size=150)
+    #data = tomopy.remove_stripe_ti(data, alpha=1.5)
+    #data = tomopy.remove_stripe_sf(data, size=150)
 
     # phase retrieval
     if (variableDict['phase']):
-        data = tomopy.prep.phase.retrieve_phase(data,pixel_size=variableDict['detector_pixel_size_x'],dist=variableDict['sample_detector_distance'],energy=variableDict['monochromator_energy'], alpha=variableDict['alpha'],pad=True)
+        log_lib.info('retreiving phase')
+        data = tomopy.prep.phase.retrieve_phase(data, pixel_size=variableDict['detector_pixel_size_x'], dist=variableDict['sample_detector_distance'], energy=variableDict['monochromator_energy'], alpha=variableDict['alpha'], pad=True)
 
     log_lib.info("  *** raw data: %s" % variableDict['fname'])
 
-    if (variableDict['phase'] is False):
-        data = tomopy.minus_log(data)
+    data = tomopy.minus_log(data)
+    #if (variableDict['phase'] is False):
+    #    data = tomopy.minus_log(data)
 
     data = tomopy.remove_nan(data, val=0.0)
     data = tomopy.remove_neg(data, val=0.00)
@@ -206,6 +210,14 @@ def reconstruct(variableDict, sino):
         extra_options ={'MinConstraint':0}
         options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':200, 'extra_options':extra_options}
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)
+    elif variableDict['algorithm'] == "astra_fbp":
+        options = {'proj_type':'linear', 'method':'FBP'}
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)#, ncore=1)
+    elif variableDict['algorithm'] == "astra_fbp_cuda":
+        extra_options = {'filter':variableDict['filter_astra']}
+        print(extra_options)
+        options = {'proj_type':'cuda', 'method':'FBP_CUDA', 'filter':variableDict['filter_astra']}#'extra_options':extra_options}
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options, filter_name=variableDict['filter_astra'], ncore=1)
     else:        
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=variableDict['algorithm'], filter_name=variableDict['filter'])
 
@@ -480,7 +492,15 @@ def main(arg):
     parser.add_argument("--start", nargs='?', type=int, default=0, help="Projection number of the first blocked view")
     parser.add_argument("--end", nargs='?', type=int, default=1, help="Projection number of the first blocked view")
 
+    
+    parser.add_argument("--suffix", nargs='?', type=str, default='', help="suffix to add to the name/directory")
+    parser.add_argument("--distance", nargs='?', type=int, default=180, help="sample detector distance for phase retreival")
+    parser.add_argument("--energy", nargs='?', type=int, default=25, help="mono energy")
+    parser.add_argument("--alpha", nargs='?', type=float, default=-1, help="alpha for phase retrieval (default -1). if alpha > 0, phase retrieval is applied to the reconstruction")
+    parser.add_argument("--filter_astra", nargs='?', type=str, default='ram-lak', help='ram-lak (default), shepp-logan, cosine, hamming, hann, none, tukey, lanczos, triangular, gaussian, barlett-hann, blackman, nuttall, blackman-harris, blackman-nuttall, flat-top, kaiser, parzen, projection, sinogram, rprojection, rsinogram')
+
     args = parser.parse_args()
+
 
     # Set path to the micro-CT data to reconstruct.
     variableDict['fname'] = args.fname
@@ -497,6 +517,14 @@ def main(arg):
     variableDict['missing'] = args.missing
     variableDict['start'] = args.start
     variableDict['end'] = args.end
+
+    variableDict['suffix'] = args.suffix 
+    variableDict['filter_astra'] = args.filter_astra 
+    variableDict['sample_detector_distance'] = args.distance
+    variableDict['monochromator_energy'] = args.energy
+    variableDict['alpha'] = args.alpha
+    if variableDict['alpha'] > 0:
+        variableDict['phase'] = True
 
     variableDict['rec_dir'] = os.path.dirname(variableDict['fname']) + '_rec'
 
