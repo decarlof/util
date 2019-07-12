@@ -164,12 +164,18 @@ def reconstruct(variableDict, sino):
     proj = tomopy.misc.corr.remove_outlier(proj, variableDict['zinger_level'], size=15, axis=0)
     flat = tomopy.misc.corr.remove_outlier(flat, variableDict['zinger_level'], size=15, axis=0)
 
+    if variableDict['enhance']:
+    	proj = tomopy.misc.corr.enhance_projs_aps_1id(proj, median_ks=5)
+    	flat = tomopy.misc.corr.enhance_projs_aps_1id(flat, median_ks=5)
+
     data = tomopy.normalize(proj, flat, dark)
     #if (variableDict['phase'] is False):
     #    print('no phase retrieval')
     #    data = tomopy.normalize(proj, flat, dark)
 
+
     # remove stripes
+    data = tomopy.remove_all_stripe(data)
     data = tomopy.remove_stripe_fw(data, level=7, wname='sym16', sigma=1, pad=True)
 
     #data = tomopy.remove_stripe_ti(data, alpha=1.5)
@@ -197,7 +203,7 @@ def reconstruct(variableDict, sino):
 
     # padding 
     N = data.shape[2]
-    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
+    data_pad = np.zeros([data.shape[0], data.shape[1],3*N//2], dtype="float32")
     data_pad[:,:,N//4:5*N//4] = data
     data_pad[:,:,0:N//4] = np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1])
     data_pad[:,:,5*N//4:] = np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1])
@@ -208,23 +214,30 @@ def reconstruct(variableDict, sino):
     log_lib.info("  *** algorithm: %s" % variableDict['algorithm'])
     if variableDict['algorithm'] == 'astrasirt':
         extra_options ={'MinConstraint':0}
-        options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':200, 'extra_options':extra_options}
+        options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':100, 'extra_options':extra_options}
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)
     elif variableDict['algorithm'] == "astra_fbp":
         options = {'proj_type':'linear', 'method':'FBP'}
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)#, ncore=1)
     elif variableDict['algorithm'] == "astra_fbp_cuda":
         extra_options = {'filter':variableDict['filter_astra']}
-        print(extra_options)
-        options = {'proj_type':'cuda', 'method':'FBP_CUDA', 'filter':variableDict['filter_astra']}#'extra_options':extra_options}
+        options = {'proj_type':'cuda', 'method':'FBP_CUDA', 'filter':variableDict['filter_astra'],
+         'extra_options':extra_options}
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options, filter_name=variableDict['filter_astra'], ncore=1)
+    elif variableDict['algorithm'] == "astra_cgls":
+        options = {'proj_type':'cuda', 'method':'CGLS_CUDA', 'num_iter':10}#'extra_options':extra_options}
         rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options, filter_name=variableDict['filter_astra'], ncore=1)
     else:        
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm=variableDict['algorithm'], filter_name=variableDict['filter'])
+        try:
+        	rec = tomopy.recon(data, theta, center=rot_center, algorithm=variableDict['algorithm'], filter_name=variableDict['filter'])
+        except:
+        	rec = tomopy.recon(data, theta, center=rot_center, algorithm=variableDict['algorithm'])
 
     rec = rec[:,N//4:5*N//4,N//4:5*N//4]
 
     # Mask each reconstructed slice with a circle.
     rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+    #rec = tomopy.misc.corr.remove_ring(rec)
     return rec
       
 
@@ -498,6 +511,7 @@ def main(arg):
     parser.add_argument("--energy", nargs='?', type=int, default=25, help="mono energy")
     parser.add_argument("--alpha", nargs='?', type=float, default=-1, help="alpha for phase retrieval (default -1). if alpha > 0, phase retrieval is applied to the reconstruction")
     parser.add_argument("--filter_astra", nargs='?', type=str, default='ram-lak', help='ram-lak (default), shepp-logan, cosine, hamming, hann, none, tukey, lanczos, triangular, gaussian, barlett-hann, blackman, nuttall, blackman-harris, blackman-nuttall, flat-top, kaiser, parzen, projection, sinogram, rprojection, rsinogram')
+    parser.add_argument("--enhance",action="store_true", help="try to enhance using tomopy's function for APS 1ID")
 
     args = parser.parse_args()
 
@@ -525,6 +539,7 @@ def main(arg):
     variableDict['alpha'] = args.alpha
     if variableDict['alpha'] > 0:
         variableDict['phase'] = True
+    variableDict['enhance'] = args.enhance
 
     variableDict['rec_dir'] = os.path.dirname(variableDict['fname']) + '_rec'
 
