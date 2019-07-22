@@ -1,0 +1,611 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""
+TomoPy example script to reconstruct a single data set.
+"""
+from __future__ import print_function
+
+import os
+import sys
+import json
+import argparse
+import collections
+import pathlib
+
+import h5py
+import tomopy
+import tomopy.util.dtype as dtype
+import dxchange
+import dxchange.reader as dxreader
+
+import numpy as np
+from datetime import datetime
+
+import matplotlib.pylab as pl
+import matplotlib.widgets as wdg
+
+import log_lib
+
+
+variableDict = {'fname': 'data.h5',
+        'rec_dir' : '/local/data',
+        'nsino': 0.5,
+        'algorithm': 'gridrec',
+        'filter' : 'parzen',
+        'binning': 0,
+        'rot_center': 1024,
+        'rec_type': 'slice',
+        'center_search_width': 10,
+        'alpha': 1e-2,                         # Phase retrieval coeff.     
+        'sample_detector_distance': 40,        # Propagation distance of the wavefront in mm
+        'detector_pixel_size_x' : 1.17,        # Detector pixel size in microns (5x: 1.17, 2x: 2.93)
+        'monochromator_energy' : 25,           # Energy of incident wave in keV                   
+        'zinger_level' : 800,                  # Zinger level for projections
+        'zinger_level_w' : 1000,               # Zinger level for white
+        'reverse' : False,                     # True for 180-0 data set
+        'auto' : False,                        # True to use autocentering
+        'phase' :  False,                       # Use phase retrival    
+        'logs_home' : '.',
+        'plot' : False
+        }
+
+
+class slider():
+    def __init__(self, data, axis):
+        self.data = data
+        self.axis = axis
+
+        ax = pl.subplot(111)
+        pl.subplots_adjust(left=0.25, bottom=0.25)
+
+        self.frame = 0
+        self.l = pl.imshow(self.data[self.frame,:,:], cmap='gist_gray') 
+
+        axcolor = 'lightgoldenrodyellow'
+        axframe = pl.axes([0.25, 0.1, 0.65, 0.03])
+        self.sframe = wdg.Slider(axframe, 'Frame', 0, self.data.shape[0]-1, valfmt='%0.0f')
+        self.sframe.on_changed(self.update)
+
+        pl.show()
+
+    def update(self, val):
+        self.frame = int(np.around(self.sframe.val))
+        self.l.set_data(self.data[self.frame,:,:])
+        log_lib.info('%f' % self.axis[self.frame])
+
+
+def file_base_name(file_name):
+    if '.' in file_name:
+        separator_index = file_name.index('.')
+        base_name = file_name[:separator_index]
+        return base_name
+    else:
+        return file_name
+
+
+def path_base_name(path):
+    file_name = os.path.basename(path)
+    return file_base_name(file_name)
+
+
+def get_dx_dims(fname, dataset):
+    """
+    Read array size of a specific group of Data Exchange file.
+
+    Parameters
+    ----------
+    fname : str
+        String defining the path of file or file name.
+    dataset : str
+        Path to the dataset inside hdf5 file where data is located.
+
+    Returns
+    -------
+    ndarray
+        Data set size.
+    """
+
+    grp = '/'.join(['exchange', dataset])
+
+    with h5py.File(fname, "r") as f:
+        try:
+            data = f[grp]
+        except KeyError:
+            return None
+
+        shape = data.shape
+
+    return shape
+
+
+def restricted_float(x):
+
+    x = float(x)
+    if x < 0.0 or x >= 1.0:
+        raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
+    return x
+
+
+def read_rot_centers(fname):
+
+    try:
+        with open(fname) as json_file:
+            json_string = json_file.read()
+            dictionary = json.loads(json_string)
+
+        return collections.OrderedDict(sorted(dictionary.items()))
+
+    except Exception as error: 
+        log_lib.error("ERROR: the json file containing the rotation axis locations is missing")
+        log_lib.error("ERROR: run: python find_center.py to create one first")
+        exit()
+
+
+def reconstruct(variableDict, sino):
+
+    # Read APS 32-BM raw data.
+    proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+        
+    if variableDict['reverse']:
+        step_size = (theta[1] - theta[0]) 
+        theta_size = dxreader.read_dx_dims(variableDict['fname'], 'data')[0]
+        theta = np.linspace(np.pi , (0+step_size), theta_size)    # zinger_removal
+        log_lib.warning("  *** overwrite theta")
+
+    if variableDict['missing']:
+        miss_angles = [variableDict['start'], variableDict['end']]
+        
+        # Manage the missing angles:
+        proj = np.concatenate((proj[0:miss_angles[0],:,:], proj[miss_angles[1]+1:-1,:,:]), axis=0)
+        theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
+
+    # zinger_removal
+    # proj = tomopy.misc.corr.remove_outlier(proj, variableDict['zinger_level'], size=15, axis=0)
+    # flat = tomopy.misc.corr.remove_outlier(flat, variableDict['zinger_level']_w, size=15, axis=0)
+
+    # normalize
+    data = tomopy.normalize(proj, flat, dark)
+
+    # remove stripes
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+
+    # data = tomopy.remove_stripe_ti(data, variableDict['alpha']=1.5)
+    # data = tomopy.remove_stripe_sf(data, size=150)
+
+    # phase retrieval
+    if (variableDict['phase']):
+        data = tomopy.prep.phase.retrieve_phase(data,pixel_size=(variableDict['detector_pixel_size_x']*1e-4),dist=(variableDict['sample_detector_distance']/10.0),energy=variableDict['monochromator_energy'], alpha=variableDict['alpha'],pad=True)
+
+    log_lib.info("  *** raw data: %s" % variableDict['fname'])
+
+    data = tomopy.minus_log(data)
+
+    data = tomopy.remove_nan(data, val=0.0)
+    data = tomopy.remove_neg(data, val=0.00)
+    data[np.where(data == np.inf)] = 0.00
+
+    rot_center = variableDict['rot_center'] / np.power(2, float(variableDict['binning']))
+    log_lib.info("  *** rotation center: %f" % rot_center)
+    data = tomopy.downsample(data, level=variableDict['binning']) 
+    data = tomopy.downsample(data, level=variableDict['binning'], axis=1)
+
+    # padding 
+    N = data.shape[2]
+    data_pad = np.zeros([data.shape[0],data.shape[1],3*N//2],dtype = "float32")
+    data_pad[:,:,N//4:5*N//4] = data
+    data_pad[:,:,0:N//4] = np.reshape(data[:,:,0],[data.shape[0],data.shape[1],1])
+    data_pad[:,:,5*N//4:] = np.reshape(data[:,:,-1],[data.shape[0],data.shape[1],1])
+    data = data_pad
+    rot_center = rot_center + N//4
+
+    # Reconstruct object.
+    log_lib.info("  *** algorithm: %s" % variableDict['algorithm'])
+    if variableDict['algorithm'] == 'astrasirt':
+        extra_options ={'MinConstraint':0}
+        options = {'proj_type':'cuda', 'method':'SIRT_CUDA', 'num_iter':200, 'extra_options':extra_options}
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=tomopy.astra, options=options)
+    else:        
+        rec = tomopy.recon(data, theta, center=rot_center, algorithm=variableDict['algorithm'], filter_name=variableDict['filter'])
+
+    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
+
+    # Mask each reconstructed slice with a circle.
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+    return rec
+      
+
+def rec_full(variableDict):
+    
+    data_shape = get_dx_dims(variableDict['fname'], 'data')
+
+    nSino_per_chunk = 64  # always power of 2               # number of sinogram chunks to reconstruct
+                                                            # only one chunk at the time is reconstructed
+                                                            # allowing for limited RAM machines to complete a full reconstruction
+                                                            #
+                                                            # set this number based on how much memory your computer has
+                                                            # if it cannot complete a full size reconstruction lower it
+
+    chunks = int(np.ceil(data_shape[1]/nSino_per_chunk))    
+
+    # Select sinogram range to reconstruct.
+    sino_start = 0
+    sino_end = chunks*nSino_per_chunk
+    
+    log_lib.info("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((sino_end - sino_start), sino_start, sino_end, chunks, nSino_per_chunk))            
+
+    strt = 0
+    for iChunk in range(0,chunks):
+        log_lib.info('chunk # %i' % (iChunk))
+        sino_chunk_start = np.int(sino_start + nSino_per_chunk*iChunk)
+        sino_chunk_end = np.int(sino_start + nSino_per_chunk*(iChunk+1))
+        log_lib.info('  *** [%i, %i]' % (sino_chunk_start, sino_chunk_end))
+                
+        if sino_chunk_end > sino_end: 
+            break
+
+        sino = (int(sino_chunk_start), int(sino_chunk_end))
+        # Reconstruct.
+        rec = reconstruct(variableDict, sino)
+        if os.path.dirname(variableDict['fname']) is not '':
+            fname = variableDict['rec_dir'] + os.sep + os.path.splitext(os.path.basename(variableDict['fname']))[0]+ '_full_rec/' + 'recon'
+        else:
+            fname = '.' + os.sep + os.path.splitext(os.path.basename(variableDict['fname']))[0]+ '_full_rec/' + 'recon'
+
+        log_lib.info("  *** reconstructions: %s" % fname)
+
+        if(iChunk == chunks-1):
+            log_lib.info("  handling of the last chunk %d " % iChunk)
+            log_lib.info("  *** data_shape %d" % (data_shape[1]))
+            log_lib.info("  *** chunks %d" % (chunks))
+            log_lib.info("  *** nSino_per_chunk %d" % (nSino_per_chunk))
+            log_lib.info("  *** last rec size %d" % (data_shape[1]-(chunks-1)*nSino_per_chunk))
+            rec = rec[0:data_shape[1]-(chunks-1)*nSino_per_chunk,:,:]
+            
+        dxchange.write_tiff_stack(rec, fname=fname, start=strt)
+        strt += int((sino[1] - sino[0]) / np.power(2, float(variableDict['binning'])))
+
+    rec_log_msg = "\n" + "recon --axis " + str(variableDict['rot_center']) + " --type full " + variableDict['fname']
+    if (variableDict['binning'] > 0):
+        rec_log_msg = rec_log_msg + " --bin " + str(variableDict['binning'])
+
+    # log_lib.info('  *** command to repeat the reconstruction: %s' % rec_log_msg)
+
+    p = pathlib.Path(fname)
+    lfname = variableDict['logs_home'] + p.parts[-3] + '.log'
+    log_lib.info('  *** command added to %s ' % lfname)
+    with open(lfname, "a") as myfile:
+        myfile.write(rec_log_msg)
+    
+
+def phase_alpha_test_old(variableDict):
+    
+    data_shape = get_dx_dims(variableDict['fname'], 'data')
+    ssino = int(data_shape[1] * variableDict['nsino'])
+
+    # Select sinogram range to reconstruct       
+    sino_start = ssino - 32
+    sino_end = ssino + 32
+    chunks = 1          # number of sinogram chunks to reconstruct
+                        # only one chunk at the time is reconstructed
+                        # allowing for limited RAM machines to complete a full reconstruction
+
+    nSino_per_chunk = (sino_end - sino_start)/chunks
+    log_lib.info("Reconstructing [%d] slices from slice [%d] to [%d] in [%d] chunks of [%d] slices each" % ((sino_end - sino_start), sino_start, sino_end, chunks, nSino_per_chunk))            
+
+    strt = 0
+    for iChunk in range(0,chunks):
+        log_lib.info('chunk # %i' % (iChunk+1))
+        sino_chunk_start = np.int(sino_start + nSino_per_chunk*iChunk)
+        sino_chunk_end = np.int(sino_start + nSino_per_chunk*(iChunk+1))
+        log_lib.info('  *** [%i, %i]' % (sino_chunk_start, sino_chunk_end))
+                
+        if sino_chunk_end > sino_end: 
+            break
+
+        sino = (int(sino_chunk_start), int(sino_chunk_end))
+        # Reconstruct.
+        alphaa = [1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1, 1]
+        for k in range(len(alphaa)):
+            variableDict['alpha'] = alphaa[k]
+            log_lib.info('  *** alpha [%f]' % (variableDict['alpha']))
+            rec = reconstruct(variableDict, sino)
+                
+            if os.path.dirname(variableDict['fname']) is not '':
+                fname = variableDict['rec_dir'] + os.sep + os.path.splitext(os.path.basename(variableDict['fname']))[0]+ '_subset_rec/' + 'recon_' + str(alphaa[k])
+            else:
+                fname = '.' + os.sep + os.path.splitext(os.path.basename(variableDict['fname']))[0]+ '_subset_rec/' + 'recon_' + str(alphaa[k])
+
+            log_lib.info("  *** reconstructions: %s" % fname)
+            dxchange.write_tiff_stack(rec, fname=fname, start=strt)
+        strt += sino[1] - sino[0]
+
+    rec_log_msg = "\n" + "python rec.py --axis " + str(variableDict['rot_center']) + " --type subset " + variableDict['fname']
+    # log_lib.info('  *** command to repeat the reconstruction: %s' % rec_log_msg)
+
+    p = pathlib.Path(fname)
+    lfname = variableDict['logs_home'] + p.parts[-3] + '.log'
+    log_lib.info('  *** command added to %s ' % lfname)
+    with open(lfname, "a") as myfile:
+        myfile.write(rec_log_msg)
+
+
+def try_phase(variableDict):
+    
+    data_shape = get_dx_dims(variableDict['fname'], 'data')
+    ssino = int(data_shape[1] * variableDict['nsino'])
+
+    # Select sinogram range to reconstruct       
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    # Reconstruct.
+    alphaa = [1e-4, 5e-4, 1e-3, 5e-3, 1e-2, 5e-2, 1e-1, 5e-1, 1]
+    for k in range(len(alphaa)):
+        variableDict['alpha'] = alphaa[k]
+        log_lib.info('  *** alpha [%f]' % (variableDict['alpha']))
+        rec = reconstruct(variableDict, sino)
+            
+        if os.path.dirname(variableDict['fname']) is not '':
+            fname = variableDict['rec_dir'] + os.sep + 'try_phase/' + path_base_name(variableDict['fname']) + os.sep + 'recon_' + str(alphaa[k])
+        else:
+            fname = '.' + os.sep + 'try_phase/' + path_base_name(variableDict['fname']) + os.sep + 'recon_' + str(alphaa[k])
+        dxchange.write_tiff(rec, fname=fname, overwrite=True)
+        log_lib.info("  *** reconstructions: %s" % fname)
+
+
+def rec_slice(variableDict):
+    
+    data_shape = get_dx_dims(variableDict['fname'], 'data')
+    ssino = int(data_shape[1] * variableDict['nsino'])
+
+    # Select sinogram range to reconstruct       
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    rec = reconstruct(variableDict, sino)
+    if os.path.dirname(variableDict['fname']) is not '':
+        fname = variableDict['rec_dir'] + os.sep + 'slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(variableDict['fname']))[0]
+    else:
+        fname = './slice_rec/' + 'recon_' + os.path.splitext(os.path.basename(variableDict['fname']))[0]
+    dxchange.write_tiff_stack(rec, fname=fname)
+    log_lib.info("  *** rec: %s" % fname)
+    log_lib.info("  *** slice: %d" % start)
+    
+
+def try_center(variableDict):
+    
+    data_shape = get_dx_dims(variableDict['fname'], 'data')
+    log_lib.info(data_shape)
+    ssino = int(data_shape[1] * variableDict['nsino'])
+
+    # downsample
+    variableDict['rot_center'] = variableDict['rot_center']/np.power(2, float(variableDict['binning']))
+    variableDict['center_search_width'] = variableDict['center_search_width']/np.power(2, float(variableDict['binning']))
+
+    center_range = (variableDict['rot_center']-variableDict['center_search_width'], variableDict['rot_center']+variableDict['center_search_width'], 0.5)
+    log_lib.info('  *** reconstruct slice %d with rotation axis ranging from %.2f to %.2f in %.2f pixel steps' % (ssino, center_range[0], center_range[1], center_range[2]))
+
+    # Select sinogram range to reconstruct
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    # Read APS 32-BM raw data.
+    proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+
+    if variableDict['reverse']:
+        step_size = (theta[1] - theta[0]) 
+        theta_size = dxreader.read_dx_dims(variableDict['fname'], 'data')[0]
+        theta = np.linspace(np.pi , (0+step_size), theta_size)    # zinger_removal
+        log_lib.warning("  *** overwrite theta")
+
+    if variableDict['missing']:
+        miss_angles = [variableDict['start'], variableDict['end']]
+        
+        # Manage the missing angles:
+        proj = np.concatenate((proj[0:miss_angles[0],:,:], proj[miss_angles[1]+1:-1,:,:]), axis=0)
+        theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
+
+    # Flat-field correction of raw data.
+    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+
+    # remove stripes
+    data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
+
+    log_lib.info("  *** raw data: %s" % variableDict['fname'])
+    log_lib.info("  *** center: %f" % variableDict['rot_center'])
+
+    data = tomopy.minus_log(data)
+
+    data = tomopy.remove_nan(data, val=0.0)
+    data = tomopy.remove_neg(data, val=0.00)
+    data[np.where(data == np.inf)] = 0.00
+
+
+    # downsample
+    # variableDict['rot_center'] = variableDict['rot_center']/np.power(2, float(variableDict['binning']))
+    data = tomopy.downsample(data, level=variableDict['binning']) 
+
+    data_shape2 = data_shape[2]
+    data_shape2 = data_shape2 / np.power(2, float(variableDict['binning']))
+
+    stack = np.empty((len(np.arange(*center_range)), data_shape[0], int(data_shape2)))
+
+    index = 0
+    for axis in np.arange(*center_range):
+        stack[index] = data[:, 0, :]
+        index = index + 1
+
+    # padding 
+    N = stack.shape[2]
+    stack_pad = np.zeros([stack.shape[0],stack.shape[1],3*N//2],dtype = "float32")
+    stack_pad[:,:,N//4:5*N//4] = stack
+    stack_pad[:,:,0:N//4] = np.reshape(stack[:,:,0],[stack.shape[0],stack.shape[1],1])
+    stack_pad[:,:,5*N//4:] = np.reshape(stack[:,:,-1],[stack.shape[0],stack.shape[1],1])
+    stack = stack_pad
+
+
+    # Reconstruct the same slice with a range of centers. 
+    rec = tomopy.recon(stack, theta, center=np.arange(*center_range)+N//4, sinogram_order=True, algorithm=variableDict['algorithm'], filter_name=variableDict['filter'], nchunk=1)
+    rec = rec[:,N//4:5*N//4,N//4:5*N//4]
+ 
+    # Mask each reconstructed slice with a circle.
+    rec = tomopy.circ_mask(rec, axis=0, ratio=0.95)
+
+    index = 0
+    # Save images to a temporary folder.
+    fname = variableDict['rec_dir'] + os.sep + 'try_center/' + path_base_name(variableDict['fname']) + os.sep + 'recon_' ##+ os.path.splitext(os.path.basename(variableDict['fname']))[0]    
+    for axis in np.arange(*center_range):
+        rfname = fname + str('{0:.2f}'.format(axis*np.power(2, float(variableDict['binning']))) + '.tiff')
+        dxchange.write_tiff(rec[index], fname=rfname, overwrite=True)
+        index = index + 1
+
+    log_lib.info("  *** reconstructions: %s" % fname)
+
+    if variableDict['plot']:
+        slider(rec, np.arange(*center_range))
+     
+
+def find_rotation_axis(variableDict):
+    
+    log_lib.info("  *** calculating automatic center")
+    data_size = get_dx_dims(variableDict['fname'], 'data')
+    ssino = int(data_size[1] * variableDict['nsino'])
+
+    # Select sinogram range to reconstruct
+    start = ssino
+    end = start + 1
+    sino = (start, end)
+
+    # Read APS 32-BM raw data
+    proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+        
+    # Flat-field correction of raw data
+    data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
+
+    # remove stripes
+    data = tomopy.remove_stripe_fw(data,level=5,wname='sym16',sigma=1,pad=True)
+
+    # find rotation center
+    rot_center = tomopy.find_center_vo(data)   
+    log_lib.info("  *** automatic center: %f" % rot_center)
+    return rot_center
+
+
+def main(arg):
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("fname", help="Directory containing multiple datasets or file name of a single dataset: /data/ or /data/sample.h5")
+    parser.add_argument("--axis", nargs='?', type=str, default="0", help="Rotation axis location (pixel): 1024.0 (default 1/2 image horizontal size)")
+    parser.add_argument("--bin", nargs='?', type=int, default=0, help="Reconstruction binning factor as power(2, choice) (default 0, no binning)")
+    parser.add_argument("--method", nargs='?', type=str, default="gridrec", help="Reconstruction algorithm: astrasirt, gridrec, sirtfbp (default gridrec)")
+    parser.add_argument("--filter", nargs='?', type=str, default="parzen", help="Reconstruction filter: none, shepp, cosine, hann, hamming, ramlak, parzen, butterworth (default parzen)")
+    parser.add_argument("--type", nargs='?', type=str, default="slice", help="Reconstruction type: full, slice, try, phase (default slice). try/phase: multiple reconsctruction of the same slice with different (rotation axis)/(alpha coefficients)")
+    parser.add_argument("--srs", nargs='?', type=int, default=10, help="+/- center search width (pixel): 10 (default 10). Search is in 0.5 pixel increments")
+    parser.add_argument("--nsino", nargs='?', type=restricted_float, default=0.5, help="Location of the sinogram to reconstruct (0 top, 1 bottom): 0.5 (default 0.5)")
+    parser.add_argument("--reverse",action="store_true", help="set when the data set was collected in reverse (180-0)")
+    parser.add_argument("--auto",action="store_true", help="set to use autocenter, when set --axis value is ignored")
+    parser.add_argument("--plot",action="store_true", help="set to plot try result")
+    parser.add_argument("--missing",action="store_true", help="set to enable missing angle option. Must set start/end flags")
+    parser.add_argument("--start", nargs='?', type=int, default=0, help="Projection number of the first blocked view")
+    parser.add_argument("--end", nargs='?', type=int, default=1, help="Projection number of the first blocked view")
+    parser.add_argument("--phase",action="store_true", help="set to use phase retrieval; when selected also set the phase retrieval paramenters: sdd, dps, alpha and energy")
+    parser.add_argument("--alpha", nargs='?', type=restricted_float, default=1e-4, help="Phase retrieval paramenter: alpha: 1e-4 (default 1e-4)")
+    parser.add_argument("--sdd", nargs='?', type=restricted_float, default=10, help="Phase retrieval paramenter: Sample detector distance: 10 (default 10)")
+    parser.add_argument("--dps", nargs='?', type=restricted_float, default=0.5, help="Phase retrieval paramenter: Detector pixel size (microns): 1.17 (default 1.17) (5x: 1.17, 2x: 2.93)")
+    parser.add_argument("--energy", nargs='?', type=restricted_float, default=0.5, help="Phase retrieval paramenter: X-ray energy (keV): 20 (default 20)")
+
+    args = parser.parse_args()
+
+    # Set path to the micro-CT data to reconstruct.
+    variableDict['fname'] = args.fname
+    variableDict['algorithm'] = args.method
+    variableDict['filter'] = args.filter
+    variableDict['rot_center'] = float(args.axis)
+    variableDict['binning'] = int(args.bin)
+    variableDict['nsino'] = float(args.nsino)
+    variableDict['rec_type'] = args.type
+    variableDict['center_search_width'] = args.srs
+    variableDict['reverse'] = args.reverse
+    variableDict['auto'] = args.auto
+    variableDict['plot'] = args.plot
+    variableDict['missing'] = args.missing
+    variableDict['start'] = args.start
+    variableDict['end'] = args.end
+
+    variableDict['phase'] = args.phase
+    variableDict['sample_detector_distance'] = args.sdd
+    variableDict['detector_pixel_size_x'] = args.dps
+    variableDict['monochromator_energy'] = args.energy
+    variableDict['alpha'] = args.alpha
+
+    variableDict['rec_dir'] = os.path.dirname(variableDict['fname']) + '_rec'
+
+    # create logger
+    home = str(pathlib.Path.home())
+    logs_home = home + '/logs/'
+
+    # make sure logs directory exists
+    if not os.path.exists(logs_home):
+        os.makedirs(logs_home)
+
+    lfname = logs_home + 'rec_' + datetime.strftime(datetime.now(), "%Y-%m-%d_%H:%M:%S") + '.log'
+    log_lib.setup_logger(lfname)
+
+    variableDict['logs_home'] = logs_home
+    if os.path.isfile(variableDict['fname']):    
+
+        log_lib.info("Reconstructing a single file")   
+        # Set default rotation axis location
+        if variableDict['rot_center'] == 0:
+            if (variableDict['auto'] == True):
+                variableDict['rot_center'] = find_rotation_axis(variableDict)
+            else:    
+                data_shape = get_dx_dims(variableDict['fname'], 'data')
+                variableDict['rot_center'] =  data_shape[2]/2
+        if variableDict['rec_type'] == "try":            
+            try_center(variableDict)
+        elif variableDict['rec_type'] == "full":
+            rec_full(variableDict)
+        elif variableDict['rec_type'] == "phase":
+            variableDict['phase'] = True
+            try_phase(variableDict)
+        else:
+            rec_slice(variableDict)
+
+    elif os.path.isdir(variableDict['fname']):
+        log_lib.info("Reconstructing a folder containing multiple files")   
+        # Add a trailing slash if missing
+        top = os.path.join(variableDict['fname'], '')
+        
+        # Load the the rotation axis positions.
+        jfname = top + "rotation_axis.json"
+        
+        dictionary = read_rot_centers(jfname)
+            
+        for key in dictionary:
+            dict2 = dictionary[key]
+            for h5fname in dict2:
+                variableDict['rot_center'] = dict2[h5fname]
+                fname = top + h5fname
+                variableDict['fname'] = fname
+                log_lib.info("Reconstructing %s" % fname)
+                # Set default rotation axis location
+                if variableDict['rot_center'] == 0:
+                    data_shape = get_dx_dims(variableDict['fname'], 'data')
+                    variableDict['rot_center'] =  data_shape[2]/2
+                if variableDict['rec_type'] == "try":            
+                    try_center(variableDict)
+                elif variableDict['rec_type'] == "full":
+                    rec_full(variableDict)
+                else:
+                    rec_slice(variableDict)
+    else:
+        log_lib.info("Directory or File Name does not exist: %s" % variableDict['fname'])
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
+
