@@ -1,0 +1,17 @@
+recon --axis 1233.0 --type full /local/data/2019-07/pylypenko/004_pristine_Zn.h5
+recon --axis 1219.0 --type full /local/data/2019-07/pylypenko/006_cycled_Zn.h5
+recon --axis 1162.5 --type full /local/data/2019-07/pylypenko/008_pristine_Zn.h5
+recon --axis 1156.0 --type full /local/data/2019-07/pylypenko/015_operando_RT_a_1.h5
+recon --axis 1155.0 --type full /local/data/2019-07/pylypenko/016_operando_HT_a_1.h5
+recon --axis 1156.0 --type full /local/data/2019-07/pylypenko/020_operando_RT_b_1.h5
+recon --axis 1156.0 --type full /local/data/2019-07/pylypenko/021_operando_RT_b_1.h5
+recon --axis 1154.5 --type full /local/data/2019-07/pylypenko/022_operando_RT_c_1.h5
+recon --axis 1166.5 --type full /local/data/2019-07/pylypenko/026_operando_HT_c_2.h5
+recon --axis 1154.5 --type full /local/data/2019-07/pylypenko/030_operando_RT_d_1.h5
+recon --axis 1148.0 --type full /local/data/2019-07/pylypenko/031_operando_heating_d_1.h5
+recon --axis 1164.0 --type full /local/data/2019-07/pylypenko/033_operando_heating_d_1.h5
+recon --axis 1162.0 --type full /local/data/2019-07/pylypenko/034_operando_HT_d_1.h5
+recon --axis 1169.0 --type full /local/data/2019-07/pylypenko/041_operando_HT_d_1.h5
+recon --axis 1167.5 --type full /local/data/2019-07/pylypenko/040_operando_HT_d_1.h5
+recon --axis 1162.0 --type full /local/data/2019-07/pylypenko/026_operando_HT_c_2.h5
+recon --axis 1152.0 --type full /local/data/2019-07/pylypenko/022_operando_RT_c_1.h5
