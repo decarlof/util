@@ -112,7 +112,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level = 1000                 # Zinger level for projections
     zinger_level_w = 1000               # Zinger level for white
 
-    miss_angles = [141,226]
+    miss_angles = [700,800]
 
     # Read APS 32-BM raw data.
     proj, flat, dark, theta = dxchange.read_aps_32id(h5fname, sino=sino)
