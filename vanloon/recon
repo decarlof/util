@@ -141,6 +141,22 @@ def read_rot_centers(fname):
         log_lib.error("ERROR: run: python find_center.py to create one first")
         exit()
 
+def patch_projection(data, miss_angles):
+
+    datanew = data.copy()
+    w = int((miss_angles[1]-miss_angles[0]) * 0.1)
+    datanew[miss_angles[0]:miss_angles[0]+w+1,:,:] = data[miss_angles[0]-1,:,:]
+    datanew[miss_angles[0]:miss_angles[0]+w+1,:,:] *= np.reshape(np.cos(np.pi/2*np.linspace(0,1,w)),[w,1,1])
+
+    datanew[miss_angles[1]-w:miss_angles[1]+1,:,:] = data[miss_angles[1]+1,:,:]
+    datanew[miss_angles[1]-w:miss_angles[1]+1,:,:] *= np.reshape(np.sin(np.pi/2*np.linspace(0,1,w)),[w,1,1])
+
+    datanew[miss_angles[0]+w+1:miss_angles[1]-w-1] = 0
+
+    log_lib.warning("  *** patch_projection")
+    slider(datanew)
+
+    return datanew
 
 def reconstruct(variableDict, sino):
 
@@ -153,12 +169,13 @@ def reconstruct(variableDict, sino):
         theta = np.linspace(np.pi , (0+step_size), theta_size)    # zinger_removal
         log_lib.warning("  *** overwrite theta")
 
-    if variableDict['missing']:
-        miss_angles = [variableDict['start'], variableDict['end']]
+    # if variableDict['missing']:
+    #     miss_angles = [variableDict['start'], variableDict['end']]
         
-        # Manage the missing angles:
-        proj = np.concatenate((proj[0:miss_angles[0],:,:], proj[miss_angles[1]+1:-1,:,:]), axis=0)
-        theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
+    #     # Manage the missing angles:
+    #     # proj = np.concatenate((proj[0:miss_angles[0],:,:], proj[miss_angles[1]+1:-1,:,:]), axis=0)
+    #     # theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
+    #     # proj[miss_angles[0]:miss_angles[1],:,:] = 0
 
     # zinger_removal
     # proj = tomopy.misc.corr.remove_outlier(proj, variableDict['zinger_level'], size=15, axis=0)
@@ -166,6 +183,19 @@ def reconstruct(variableDict, sino):
 
     # normalize
     data = tomopy.normalize(proj, flat, dark)
+
+
+    if variableDict['missing']:
+
+        log_lib.warning("  *** missing")
+
+        miss_angles = [variableDict['start'], variableDict['end']]
+        data = patch_projection(data, miss_angles)
+        # Manage the missing angles:
+        # proj = np.concatenate((proj[0:miss_angles[0],:,:], proj[miss_angles[1]+1:-1,:,:]), axis=0)
+        # theta = np.concatenate((theta[0:miss_angles[0]], theta[miss_angles[1]+1:-1]))
+        # proj[miss_angles[0]:miss_angles[1],:,:] = 0
+
 
     # remove stripes
     data = tomopy.remove_stripe_fw(data,level=7,wname='sym16',sigma=1,pad=True)
