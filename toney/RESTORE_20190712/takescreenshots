@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import pyscreenshot as ImageGrab
+from time import gmtime, strftime, sleep
+if __name__ == '__main__':
+    # part of the screen
+    for k in range(2):
+       im = ImageGrab.grab(bbox=(10, 10, 510, 510))  # X1,Y1,X2,Y2
+       im.save(strftime("screenshots/%Y-%m-%d %H:%M:%S.png", gmtime()))
+       sleep(3)
+
+#    im.show()
