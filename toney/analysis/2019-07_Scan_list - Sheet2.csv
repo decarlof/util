@@ -1,0 +1,41 @@
+Scan,Center,Count_Time (s),Notes
+046_CFF_B36A_P15_A1_P1_Pink_p17s_180mm_Gl8mm,1236,0.17,Testing exposure time 0.17 s and 0.1 s
+047_CFF_B36A_P15_A1_P1_Pink_p1s_180mm_Gl8mm,1236,0.1,Going to go with 0.17 s for the rest of scans
+048_CFF_B36A_P15_A1_P2_Pink_p17s_180mm_Gl8mm,1238.5,0.17,"P2, y=P1 (36) - 5.5"
+049_CFF_B36A_P15_A1_P3_Pink_p17s_180mm_Gl8mm,1238.5,0.17,"P3, y=P2-5.5   # Signs of Lithium"
+050_CFF_B36A_P15_A1_P4_Pink_p17s_180mm_Gl8mm,1236.5,0.17,"P4, y=P3-7.4"
+051_CFF_B36A_P15_A2_P1_Pink_p17s_180mm_Gl8mm,1229.5,0.17,"A2, P1, y=35"
+052_CFF_B36A_P15_A2_P2_Pink_p17s_180mm_Gl8mm,1230.5,0.17,"P2, y=P1-6mm: Looks out of focus, but see Lithium"
+056_CFF_B36A_P15_A2_P1_Pink_p17s_180mm_Gl8mm,1227,0.17,focus issue fixed
+057_CFF_B36A_P15_A2_P2_Pink_p17s_180mm_Gl8mm,1236.5,0.17,"Li can be seen, with focus?"
+058_CFF_B36A_P15_A3_P1_Pink_p17s_180mm_Gl8mm,1226,0.17,Li possible. kind of large tho
+059_CFF_B36A_P15_A3_P2_Pink_p17s_180mm_Gl8mm,1237,0.17,
+060_CFF_B36A_P15_A3_P3_Pink_p17s_180mm_Gl8mm,1235,0.17,
+061_CFF_B36A_P15_A3_P4_Pink_p17s_180mm_Gl8mm,1235,0.17,
+062_CFF_B36A_P16_A1_P1_Pink_p17s_180mm_Gl8mm,1223.5,0.17,P16 A1
+063_CFF_B36A_P16_A1_P2_Pink_p17s_180mm_Gl8mm,1235.5,0.17,
+064_CFF_B36A_P16_A1_P3_Pink_p17s_180mm_Gl8mm,1229.5,0.17,
+065_CFF_B36A_P16_A1_P4_Pink_p17s_180mm_Gl8mm,1229,0.17,
+066_CFF_B36A_P16_A3_P1_Pink_p17s_180mm_Gl8mm,1225.5,0.17,P16 A3
+067_CFF_B36A_P16_A3_P2_Pink_p17s_180mm_Gl8mm,1222.5,0.17,
+068_CFF_B36A_P16_A3_P3_Pink_p17s_180mm_Gl8mm,1236,0.17,
+069_CFF_B36A_P16_A3_P4_Pink_p17s_180mm_Gl8mm,1225.5,0.17,
+070_WE_P1_Pink_p17s_180mm_Gl8mm,1227.5,0.17,
+071_WE_P2_Pink_p17s_180mm_Gl8mm,1225,0.17,
+072_WE_P3_Pink_p17s_180mm_Gl8mm,1237,0.17,
+073_WE_P4_Pink_p25s_180mm_Gl8mm,1233,0.25,
+074_WE_P5_Pink_p25s_180mm_Gl8mm,1229,0.25,
+075_WE_tab_Pink_p25s_180mm_Gl8mm,1226.5,0.25,
+076_WE_tab2_Pink_p25s_180mm_Gl8mm,1224.5,0.25,
+077_WE_tab3_Pink_p25s_180mm_Gl8mm,1236,0.25,
+078_P15_C1_P1_Pink_p25s_180mm_Gl8mm,1222,0.25,
+079_P15_C1_P2_Pink_p3s_180mm_Gl8mm,1237,0.3,
+080_P15_C1_P3_Pink_p3s_180mm_Gl8mm,1234,0.3,
+081_P15_C2_P1_Pink_p3s_180mm_Gl8mm,1222,0.3,Might be mislabelled as C1 in some places
+082_P15_C2_P2_Pink_p3s_180mm_Gl8mm,1227.5,0.3,Might be mislabelled as C1 in some places
+083_P15_C2_P3_Pink_p3s_180mm_Gl8mm,1219,0.3,Might be mislabelled as C1 in some places
+084_P16_C1_P1_Pink_p3s_180mm_Gl8mm,1214.5,0.3,
+085_P16_C1_P2_Pink_p3s_180mm_Gl8mm,1227,0.3,
+086_P16_C1_P3_Pink_p3s_180mm_Gl8mm,1221,0.3,
+087_P16_C2_P1_Pink_p3s_180mm_Gl8mm,1212.5,0.3,
+088_P16_C2_P2_Pink_p3s_180mm_Gl8mm,1225.5,0.3,
