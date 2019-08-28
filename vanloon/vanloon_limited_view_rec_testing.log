@@ -83,4 +83,3 @@ recon --axis 1160.0 --type slice /local/dataraid/2019-07/VanLoon/084_2013_46_143
 
 recon --axis 1152.0 --type slice /local/dataraid/2019-07/VanLoon/086_2012_20_1483.h5 --missing --start 1200 --end 1499 
 recon --axis 1160.5 --type slice /local/dataraid/2019-07/VanLoon/110_2012_20_1483.h5 --missing --start 1100 --end 1499
-
