@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def sequence(nproj_total, nproj_per_rot, prime, continuous_angle=True):
 
     # seq = np.array((nproj_total * nproj_per_rot))
