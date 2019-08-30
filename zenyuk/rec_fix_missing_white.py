@@ -19,10 +19,6 @@ import dxchange
 
 import numpy as np
 
-# sirtfilter:
-# conda install -c astra-toolbox astra-toolbox
-# conda install -c http://dmpelt.gitlab.io/sirtfilter/ sirtfilter
-import sirtfilter
    
 def get_dx_dims(fname, dataset):
     """
@@ -77,31 +73,6 @@ def read_rot_centers(fname):
         exit()
 
 
-def rec_sirtfbp(data, theta, rot_center, start=0, test_sirtfbp_iter = False):
-
-    # Use test_sirtfbp_iter = True to test which number of iterations is suitable for your dataset
-    # Filters are saved in .mat files in "./¨
-    if test_sirtfbp_iter:
-        nCol = data.shape[2]
-        output_name = './test_iter/'
-        num_iter = [50,100,150]
-        filter_dict = sirtfilter.getfilter(nCol, theta, num_iter, filter_dir='./')
-        for its in num_iter:
-            tomopy_filter = sirtfilter.convert_to_tomopy_filter(filter_dict[its], nCol)
-            rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='custom2d', filter_par=tomopy_filter)
-            output_name_2 = output_name + 'sirt_fbp_%iiter_slice_' % its
-            dxchange.write_tiff_stack(data, fname=output_name_2, start=start, dtype='float32')
-
-    # Reconstruct object using sirt-fbp algorithm:
-    num_iter = 100
-    nCol = data.shape[2]
-    sirtfbp_filter = sirtfilter.getfilter(nCol, theta, num_iter, filter_dir='./')
-    tomopy_filter = sirtfilter.convert_to_tomopy_filter(sirtfbp_filter, nCol)
-    rec = tomopy.recon(data, theta, center=rot_center, algorithm='gridrec', filter_name='custom2d', filter_par=tomopy_filter)
-    
-    return rec
-
-
 def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
 
     sample_detector_distance = 8        # Propagation distance of the wavefront in cm
@@ -112,7 +83,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     zinger_level_w = 1000               # Zinger level for white
 
     # Read APS 32-BM raw data.
-    proj1, flat, dark, theta1 = dxchange.read_aps_32id("/local/data/2019-02/Zenyuk/white_0025.h5", sino=sino)
+    proj1, flat, dark, theta1 = dxchange.read_aps_32id("/local/dataraid/2019-02/Zenyuk/white_0025.h5", sino=sino)
     proj, flat1, dark1, theta = dxchange.read_aps_32id(h5fname, sino=sino)
         
     # zinger_removal
@@ -146,10 +117,7 @@ def reconstruct(h5fname, sino, rot_center, binning, algorithm='gridrec'):
     data = tomopy.downsample(data, level=binning, axis=1)
 
     # Reconstruct object.
-    if algorithm == 'sirtfbp':
-        rec = rec_sirtfbp(data, theta, rot_center)
-    else:
-        rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
+    rec = tomopy.recon(data, theta, center=rot_center, algorithm=algorithm, filter_name='parzen')
         
     print("Algorithm: ", algorithm)
 
