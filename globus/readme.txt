@@ -1,3 +1,9 @@
+This repository is obsolete, please look at https://github.com/decarlof/globus for latest development.
+
+
+
+
+
 Tasks:
 
         - Authenticate with Globus
