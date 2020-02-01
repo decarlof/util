@@ -19,7 +19,7 @@ def main(args):
 
     dark_fname = head_tail[0] + os.sep + "proj_0203.hdf"
     white_fname = head_tail[0] + os.sep + "proj_0202.hdf"
-    converted_fmame = head_tail[0] + os.sep + os.path.splitext(head_tail[0])[1] + '.h5'
+    converted_fmame = head_tail[0] + os.sep + os.path.splitext(head_tail[1])[1] + '.h5'
 
     print(proj_fname)
     print(dark_fname)
