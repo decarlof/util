@@ -35,9 +35,9 @@ def main(args):
     # Open DataExchange file
     f = dx.File(fixedfmame, mode='w') 
 
-    f.add_entry(dx.Entry.data(data={'value': data, 'units':'counts'}))
-    f.add_entry(dx.Entry.data(data_white={'value': data_white, 'units':'counts'}))
-    f.add_entry(dx.Entry.data(data_dark={'value': data_dark, 'units':'counts'}))
+    f.add_entry(dx.Entry.data(data={'value': tomo, 'units':'counts'}))
+    f.add_entry(dx.Entry.data(data_white={'value': flat, 'units':'counts'}))
+    f.add_entry(dx.Entry.data(data_dark={'value': dark, 'units':'counts'}))
     f.add_entry(dx.Entry.data(theta={'value': theta, 'units':'degrees'}))
 
     f.close()
