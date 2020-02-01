@@ -172,6 +172,9 @@ def reconstruct(variableDict, sino):
     head_tail = os.path.split(variableDict['fname'])
     darkfname = head_tail[0] + "proj_0203.hdf"
     whitefname = head_tail[0] + "proj_0202.hdf"
+
+    print(darkfname)
+    print(whitefname)
     # Read APS 32-BM raw data.
     proj, flatpp, darkp, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
     projd, flatd, dark, thetad = dxchange.read_aps_32id(darkfname, sino=sino)
