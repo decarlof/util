@@ -4,7 +4,7 @@ import sys
 import argparse
 
 import dxfile.dxtomo as dx
-import dxchange 
+from dxchange import dxreader
 
 
 
