@@ -21,16 +21,8 @@ def main(args):
     white_fname = head_tail[0] + os.sep + "proj_0202.hdf"
     converted_fmame = head_tail[0] + os.sep + os.path.splitext(head_tail[1])[0] + '.h5'
 
-    print(head_tail)
-    print(head_tail[0])
-    print('xxx', head_tail[1])
-    print(os.path.splitext(head_tail[1])[0] + '.h5')
-    print(proj_fname)
-    print(dark_fname)
-    print(white_fname)
-    print(converted_fmame)
-
-    return
+    print('converting data file: %s in new format: %s' % (proj_fname, converted_fmame))
+    print('using %s as dark and %s as white field' %(dark_fname, white_fname))
     exchange_base = "exchange"
 
     tomo_grp = '/'.join([exchange_base, 'data'])
