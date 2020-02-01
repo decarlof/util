@@ -170,8 +170,8 @@ def patch_projection(data, miss_angles):
 def reconstruct(variableDict, sino):
 
     head_tail = os.path.split(variableDict['fname'])
-    darkfname = head_tail[0] + "proj_0203.hdf"
-    whitefname = head_tail[0] + "proj_0202.hdf"
+    darkfname = head_tail[0] + os.sep + "proj_0203.hdf"
+    whitefname = head_tail[0] + os.sep + "proj_0202.hdf"
 
     print(darkfname)
     print(whitefname)
@@ -452,8 +452,8 @@ def try_center(variableDict):
     # Read APS 32-BM raw data.
 
     head_tail = os.path.split(variableDict['fname'])
-    darkfname = head_tail[0] + "proj_0203.hdf"
-    whitefname = head_tail[0] + "proj_0202.hdf"
+    darkfname = head_tail[0] + os.sep + "proj_0203.hdf"
+    whitefname = head_tail[0] + os.sep + "proj_0202.hdf"
 
     print(darkfname)
     print(whitefname)
@@ -550,8 +550,8 @@ def find_rotation_axis(variableDict):
 
 
     head_tail = os.path.split(variableDict['fname'])
-    darkfname = head_tail[0] + "proj_0203.hdf"
-    whitefname = head_tail[0] + "proj_0202.hdf"
+    darkfname = head_tail[0] + os.sep + "proj_0203.hdf"
+    whitefname = head_tail[0] + os.sep + "proj_0202.hdf"
 
     print(darkfname)
     print(whitefname)
