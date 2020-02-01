@@ -13,27 +13,33 @@ def main(args):
     parser.add_argument("fname", help="file name of a tomographic dataset: /data/ or /data/sample.hdf")
     args = parser.parse_args()
 
-    projfname = args.fname
+    proj_fname = args.fname
 
-    head_tail = os.path.split(projfname)
+    head_tail = os.path.split(proj_fname)
 
-    darkfname = head_tail[0] + os.sep + "proj_0203.hdf"
-    whitefname = head_tail[0] + os.sep + "proj_0202.hdf"
-    fixedfmame = head_tail[0] + os.sep + 'proj_201.h5'
+    dark_fname = head_tail[0] + os.sep + "proj_0203.hdf"
+    white_fname = head_tail[0] + os.sep + "proj_0202.hdf"
+    converted_fmame = head_tail[0] + os.sep + os.path.splitext(head_tail[0])[1] + '.h5'
 
+    print(proj_fname)
+    print(dark_fname)
+    print(white_fname)
+    print(converted_fmame)
+
+    return
     exchange_base = "exchange"
 
     tomo_grp = '/'.join([exchange_base, 'data'])
     flat_grp = '/'.join([exchange_base, 'data_white'])
     dark_grp = '/'.join([exchange_base, 'data_dark'])
     theta_grp = '/'.join([exchange_base, 'theta'])
-    tomo = read_hdf5(projfname, tomo_grp)
-    flat = read_hdf5(whitefname, flat_grp)
-    dark = read_hdf5(darkfname, dark_grp)
-    theta = read_hdf5(projfname, theta_grp)
+    tomo = read_hdf5(proj_fname, tomo_grp)
+    flat = read_hdf5(white_fname, flat_grp)
+    dark = read_hdf5(dark_fname, dark_grp)
+    theta = read_hdf5(proj_fname, theta_grp)
 
     # Open DataExchange file
-    f = dx.File(fixedfmame, mode='w') 
+    f = dx.File(converted_fmame, mode='w') 
 
     f.add_entry(dx.Entry.data(data={'value': tomo, 'units':'counts'}))
     f.add_entry(dx.Entry.data(data_white={'value': flat, 'units':'counts'}))
