@@ -24,7 +24,7 @@ def main(args):
     print(head_tail)
     print(head_tail[0])
     print(head_tail[1])
-    print(os.path.splitext(head_tail[1]))
+    print(os.path.splitext(head_tail[1])[0])
     print(proj_fname)
     print(dark_fname)
     print(white_fname)
