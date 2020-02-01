@@ -4,11 +4,12 @@ import dxfile.dxtomo as dx
 import dxchange 
 
 projfname = '/loca/data/proj_201.hdf'
-fixedfmame = '/loca/data/proj_201.h5'
 
 head_tail = os.path.split(projfname)
+
 darkfname = head_tail[0] + os.sep + "proj_0203.hdf"
 whitefname = head_tail[0] + os.sep + "proj_0202.hdf"
+fixedfmame = head_tail[0] + os.sep + 'proj_201.h5'
 
 exchange_base = "exchange"
 
