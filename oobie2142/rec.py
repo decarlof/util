@@ -6,19 +6,19 @@ import matplotlib.pyplot as plt
 import tomopy
 import numpy as np
 
-proj = dxchange.read_tiff_stack('/local/dataraid/Converted_To_Tiff/Scan-8_9_2019 10_45_13 AM000000.tif', range(0, 900))
+proj = dxchange.read_tiff_stack('/Users/decarlo/Downloads/Converted_To_Tiff/Scan-8_9_2019 10_45_13 AM000000.tif', range(0, 900))
 proj.shape, proj.min(), proj.max()
 
 
 # Adjusted pixel sizes to match flat and dark panel size
-# hshift = 30
-# vshift = 150
+hshift = 30
+vshift = 150
 
-# flat = dxchange.read_tiff('/local/dataraid/Converted_To_Tiff/lite_1024avg.tif', slc=((vshift, vshift+422, 1),(hshift,hshift+876,1)),)
-# dark = dxchange.read_tiff('/local/dataraid/Converted_To_Tiff/dark_1024avg.tif', slc=((vshift, vshift+422, 1),(hshift,hshift+876,1)),)
+flat = dxchange.read_tiff('/Users/decarlo/Downloads/Converted_To_Tiff/lite_1024avg.tif', slc=((vshift, vshift+422, 1),(hshift,hshift+876,1)),)
+dark = dxchange.read_tiff('/Users/decarlo/Downloads/Converted_To_Tiff/dark_1024avg.tif', slc=((vshift, vshift+422, 1),(hshift,hshift+876,1)),)
 
-falt = np.ones(flat.shape) * 65536
-dark = np.zeros(dark.shape)
+# force dark to same value
+dark = np.zeros(dark.shape) + 100
 
 data = tomopy.normalize(proj, flat, dark)
 print(hshift, vshift, data.min(), data.max())
@@ -30,15 +30,13 @@ data = tomopy.remove_neg(data, val=0.00)
 data[np.where(data == np.inf)] = 0.00
 
 
-plt.imshow(data[:, 400, :])
+plt.imshow(data[:, 200, :])
 plt.colorbar()
 plt.show()
 
-print(data.shape)
 theta = tomopy.angles(data.shape[0], 0, 360)
 
 rot_center = 424.5
-
 
 # padding 
 N = data.shape[2]
@@ -58,6 +56,6 @@ recon = recon[:,N//4:5*N//4,N//4:5*N//4]
 recon = tomopy.circ_mask(recon, axis=0, ratio=0.80)
 
 plt.figure(dpi=150)
-plt.imshow(recon[400, :,:])
+plt.imshow(recon[200, :,:])
 plt.colorbar()
 plt.show()

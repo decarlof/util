@@ -169,8 +169,13 @@ def patch_projection(data, miss_angles):
 
 def reconstruct(variableDict, sino):
 
+    head_tail = os.path.split(variableDict['fname'])
+    darkfname = head_tail[0] + "proj_0203.hdf"
+    whitefname = head_tail[0] + "proj_0203.hdf"
     # Read APS 32-BM raw data.
-    proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+    proj, flatpp, darkp, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+    projd, flatd, dark, thetad = dxchange.read_aps_32id(darkfname, sino=sino)
+    projw, flat, darkw, thetaw = dxchange.read_aps_32id(whitefname, sino=sino)
         
     if variableDict['reverse']:
         step_size = (theta[1] - theta[0]) 
@@ -442,7 +447,16 @@ def try_center(variableDict):
     sino = (start, end)
 
     # Read APS 32-BM raw data.
-    proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+
+    head_tail = os.path.split(variableDict['fname'])
+    darkfname = head_tail[0] + "proj_0203.hdf"
+    whitefname = head_tail[0] + "proj_0203.hdf"
+    # Read APS 32-BM raw data.
+    proj, flatpp, darkp, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+    projd, flatd, dark, thetad = dxchange.read_aps_32id(darkfname, sino=sino)
+    projw, flat, darkw, thetaw = dxchange.read_aps_32id(whitefname, sino=sino)
+
+    # proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
 
     if variableDict['reverse']:
         step_size = (theta[1] - theta[0]) 
@@ -528,8 +542,17 @@ def find_rotation_axis(variableDict):
     end = start + 1
     sino = (start, end)
 
+
+    head_tail = os.path.split(variableDict['fname'])
+    darkfname = head_tail[0] + "proj_0203.hdf"
+    whitefname = head_tail[0] + "proj_0203.hdf"
+    # Read APS 32-BM raw data.
+    proj, flatpp, darkp, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+    projd, flatd, dark, thetad = dxchange.read_aps_32id(darkfname, sino=sino)
+    projw, flat, darkw, thetaw = dxchange.read_aps_32id(whitefname, sino=sino)
+
     # Read APS 32-BM raw data
-    proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
+    # proj, flat, dark, theta = dxchange.read_aps_32id(variableDict['fname'], sino=sino)
         
     # Flat-field correction of raw data
     data = tomopy.normalize(proj, flat, dark, cutoff=1.4)
