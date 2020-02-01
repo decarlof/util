@@ -4,8 +4,7 @@ import sys
 import argparse
 
 import dxfile.dxtomo as dx
-from dxchange import dxreader
-
+from dxchange.reader import read_hdf5
 
 
 def main(args):
@@ -28,10 +27,10 @@ def main(args):
     flat_grp = '/'.join([exchange_base, 'data_white'])
     dark_grp = '/'.join([exchange_base, 'data_dark'])
     theta_grp = '/'.join([exchange_base, 'theta'])
-    tomo = dxreader.read_hdf5(projfname, tomo_grp)
-    flat = dxreader.read_hdf5(whitefname, flat_grp)
-    dark = dxreader.read_hdf5(darkfname, dark_grp)
-    theta = dxreader.read_hdf5(projfname, theta_grp)
+    tomo = read_hdf5(projfname, tomo_grp)
+    flat = read_hdf5(whitefname, flat_grp)
+    dark = read_hdf5(darkfname, dark_grp)
+    theta = read_hdf5(projfname, theta_grp)
 
     # Open DataExchange file
     f = dx.File(fixedfmame, mode='w') 
